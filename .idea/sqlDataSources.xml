@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SqlDataSourceStorage">
+    <option name="dataSources">
+      <list>
+        <State>
+          <option name="id" value="6e5f413f-16f6-48cd-8183-9062ffeefa1a" />
+          <option name="name" value="postgres@localhost (DDL)" />
+          <option name="urls">
+            <array>
+              <option value="file://$USER_HOME$/Desktop/test.sql" />
+            </array>
+          </option>
+          <option name="scriptOptions">
+            <map>
+              <entry key="QualifyWithSchema" value="ALWAYS" />
+            </map>
+          </option>
+        </State>
+      </list>
+    </option>
+  </component>
+</project>
