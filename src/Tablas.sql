@@ -224,3 +224,74 @@ create table Luchan
     foreign key (id_deck1) references Deck (id),
     foreign key (id_deck2) references Deck(id)
 );--Falta poner el foreign key de batalla y arena
+/* AZUL */
+
+drop table if exists Deck cascade;
+create table Deck
+(
+    id              serial,
+    nombre          varchar(50),
+    fecha_creacion  date,
+    descripcion     text,
+    id_jugador      varchar(50),
+    primary key (id),
+    foreign key (id_jugador) references Jugador (id)
+);
+
+drop table if exists Carta cascade;
+create table Carta
+(
+    id                  serial,
+    Nombre              varchar(50),
+    Dano                integer,
+    velocidad_ataque    integer,
+    rareza              varchar(50),
+    arena               integer,
+    primary key (id)
+);--Falta poner el foreign key de arena
+
+drop table if exists Ve cascade;
+create table Ve
+(
+    id_deck     integer,
+    id_jugador  varchar(50),
+    primary key (id_deck, id_jugador),
+    foreign key (id_deck) references Deck(id),
+    foreign key (id_jugador) references Jugador(id)
+);
+
+drop table if exists Deck_carta cascade;
+create table Deck_carta
+(
+    id_carta    integer,
+    id_deck     integer,
+    primary key (id_carta, id_deck),
+    foreign key (id_carta) references Carta(id),
+    foreign key (id_deck) references Deck(id)
+);
+
+drop table if exists Encuentra cascade;
+create table Encuentra
+(
+    id_jugador          varchar(50),
+    id_carta            integer,
+    fecha_desbloqueada  date,
+    fecha_mejora        date,
+    nivel_actual        integer,
+    primary key (id_carta, id_jugador),
+    foreign key (id_jugador) references Jugador(id),
+    foreign key (id_carta) references Carta(id)
+);
+
+drop table if exists Luchan cascade;
+create table Luchan
+(
+    id_deck1        integer,
+    id_deck2        integer,
+    titulo_arena    varchar(50),
+    id_batalla      integer,
+    id_ganador      integer,
+    primary key (id_deck1, id_deck2, titulo_arena, id_batalla),
+    foreign key (id_deck1) references Deck (id),
+    foreign key (id_deck2) references Deck(id)
+);--Falta poner el foreign key de batalla y arena
