@@ -15,6 +15,8 @@ Drop table if exists BatallaClan cascade;
 Create table BatallaClan
 (
     id serial,
+    data_inici  date,
+    data_final  date,
     primary key (id)
 );
 
@@ -46,6 +48,7 @@ Create table Adquiere
 (
     idClan     Varchar(50),
     idInsignia int,
+    Data       date,
     primary key (idClan, idInsignia),
     foreign key (idClan) references Clan (id),
     foreign key (idInsignia) references Insignia (id)
@@ -87,6 +90,7 @@ Create table Consigue
 (
     idJugador  Varchar(50),
     idInsignia int,
+    Data       date,
     primary key (idJugador, idInsignia),
     foreign key (idJugador) references Jugador (id),
     foreign key (idInsignia) references Insignia (id)
@@ -95,8 +99,10 @@ Create table Consigue
 Drop table if exists Formado cascade;
 Create table Formado
 (
-    idClan    Varchar(50),
-    idJugador Varchar(50),
+    idClan      Varchar(50),
+    idJugador   Varchar(50),
+    data_inici  date,
+    data_final  date,
     primary key (idClan, idJugador),
     foreign key (idClan) references Clan (id),
     foreign key (idJugador) references Jugador (id)
@@ -108,7 +114,8 @@ Create table Dona
     idClan        Varchar(50),
     idJugador     Varchar(50),
     idModificador int,
-    cantidad      int,
+    oro           int,
+    data          date,
     primary key (idClan, idJugador, idModificador),
     foreign key (idClan) references Clan (id),
     foreign key (idJugador) references Jugador (id),
