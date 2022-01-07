@@ -79,8 +79,8 @@ Drop table if exists Cofre cascade;
 Create table Cofre
 (
     id_cofre              int,
-    oro_contenido              int,    /*TODO: validar tipo*/
-    gemas_contenido            int,    /*TODO: validar tipo*/
+    oro_contenido         int,    /*TODO: validar tipo*/
+    gemas_contenido       int,    /*TODO: validar tipo*/
     id_mision              int,
     primary key (id_cofre),
     foreign key (id_cofre) references Articulo (id) -- TODO:
