@@ -160,6 +160,126 @@ Create table Mensaje
     foreign key (idClan) references Clan (id)
 );
 
+
+/****GROC****/
+
+DROP TABLE IF EXISTS Arena CASCADE; --arenas
+CREATE TABLE Arena
+(
+    titulo      VARCHAR(50),
+    min_trofeos INTEGER,
+    max_trofeos INTEGER,
+    PRIMARY KEY (titulo)
+);
+
+DROP TABLE IF EXISTS Temporada CASCADE; --Season
+CREATE TABLE Temporada
+(
+    ID           SERIAL,
+    nombre       VARCHAR(255),
+    fecha_inicio DATE,
+    fecha_final  DATE,
+    PRIMARY KEY (ID)
+);
+
+DROP TABLE IF EXISTS Participa CASCADE;
+CREATE TABLE Participa
+(
+    id_temporada INTEGER,
+    puntos       INTEGER,
+    id_jugador   VARCHAR(50),
+    n_victorias INTEGER,
+    n_derrotas INTEGER,
+    PRIMARY KEY (id_temporada, id_jugador),
+    FOREIGN KEY (id_temporada) REFERENCES Temporada (ID),
+    FOREIGN KEY (id_jugador) REFERENCES Jugador (ID)
+);
+
+DROP TABLE IF EXISTS Desbloquea CASCADE;
+CREATE TABLE Desbloquea
+(
+    titulo_arena   VARCHAR(50),
+    id_jugador VARCHAR(50),
+    PRIMARY KEY (titulo_arena, id_jugador),
+    FOREIGN KEY (titulo_arena) REFERENCES Arena (titulo),
+    FOREIGN KEY (id_jugador) REFERENCES Jugador (ID)
+);
+
+DROP TABLE IF EXISTS Logro CASCADE;
+CREATE TABLE Logro
+(
+    ID         INTEGER,
+    titulo     VARCHAR(255),
+    recompensa INTEGER,
+    PRIMARY KEY (ID)
+);
+
+DROP TABLE IF EXISTS Obtiene CASCADE;
+CREATE TABLE Obtiene
+(
+    id_jugador      VARCHAR(50),
+    obtiene         DATE,
+    titulo_arena    VARCHAR(50),
+    id_logro        INTEGER,
+    PRIMARY KEY (id_jugador, titulo_arena, id_logro),
+    FOREIGN KEY (id_jugador) REFERENCES Jugador (ID),
+    FOREIGN KEY (titulo_arena) REFERENCES Arena (titulo),
+    FOREIGN KEY (id_logro) REFERENCES Logro (ID)
+);
+
+DROP TABLE IF EXISTS Batalla_Jugadores CASCADE;
+CREATE TABLE Batalla_Jugadores
+(
+    ID              SERIAL,
+    fecha           DATE,
+    durada          TIME,
+    puntuacion      INTEGER,
+    id_batalla_clan INTEGER,
+    PRIMARY KEY (ID),
+    FOREIGN KEY (id_batalla_clan) REFERENCES BatallaClan (id)
+);
+
+DROP TABLE IF EXISTS Ocurre CASCADE;
+CREATE TABLE Ocurre
+(
+    id_temporada INTEGER,
+    id_batalla   INTEGER,
+    PRIMARY KEY (id_temporada, id_batalla),
+    FOREIGN KEY (id_temporada) REFERENCES Temporada (ID),
+    FOREIGN KEY (id_batalla) REFERENCES Batalla_Jugadores (ID)
+);
+
+
+DROP TABLE IF EXISTS Mision CASCADE;
+CREATE TABLE Mision (
+                        ID              SERIAL,
+                        nombre          VARCHAR(255),
+                        description     VARCHAR(255),
+                        recompensa_oro  INTEGER,
+                        PRIMARY KEY (ID)
+);
+
+DROP TABLE IF EXISTS Realiza CASCADE;
+CREATE TABLE Realiza
+(
+    fecha      DATE,
+    id_mision  INTEGER,
+    id_jugador varchar(50),
+    PRIMARY KEY (id_mision, id_jugador),
+    FOREIGN KEY (id_jugador) REFERENCES Jugador (ID),
+    FOREIGN KEY (id_mision) REFERENCES Mision (ID)
+);
+
+DROP TABLE IF EXISTS Depende;
+CREATE TABLE Depende
+(
+    id_mision_dependiente   INTEGER,
+    id_mision_necesaria     INTEGER,
+    PRIMARY KEY (id_mision_dependiente, id_mision_necesaria),
+    FOREIGN KEY (id_mision_necesaria) REFERENCES Mision (ID),
+    FOREIGN KEY (id_mision_dependiente) REFERENCES Mision (ID)
+);
+
 /* AZUL */
 
 drop table if exists Deck cascade;
@@ -182,9 +302,10 @@ create table Carta
     Dano                integer,
     velocidad_ataque    integer,
     rareza              varchar(50),
-    arena               integer,
-    primary key (id)
-);--Falta poner el foreign key de arena
+    arena               varchar(50),
+    primary key (id),
+    foreign key (arena) references Arena(titulo)
+);
 
 drop table if exists Ve cascade;
 create table Ve
@@ -222,83 +343,15 @@ create table Encuentra
 drop table if exists Luchan cascade;
 create table Luchan
 (
-    id_deck1        integer,
-    id_deck2        integer,
-    titulo_arena    varchar(50),
+    id_deck_win     integer,
+    id_deck_lose    integer,
+    id_temporada    integer,
     id_batalla      integer,
-    id_ganador      integer,
-    primary key (id_deck1, id_deck2, titulo_arena, id_batalla),
-    foreign key (id_deck1) references Deck (id),
-    foreign key (id_deck2) references Deck(id)
-);--Falta poner el foreign key de batalla y arena
-/* AZUL */
-
-drop table if exists Deck cascade;
-create table Deck
-(
-    id              serial,
-    nombre          varchar(50),
-    fecha_creacion  date,
-    descripcion     text,
-    id_jugador      varchar(50),
-    primary key (id),
-    foreign key (id_jugador) references Jugador (id)
+    punts_win       integer,
+    punts_lose      integer,
+    primary key (id_deck_win, id_deck_lose, id_temporada, id_batalla),
+    foreign key (id_deck_win) references Deck (id),
+    foreign key (id_deck_lose) references Deck(id),
+    foreign key (id_temporada) references Temporada(ID),
+    foreign key (id_batalla) references Batalla_Jugadores(ID)
 );
-
-drop table if exists Carta cascade;
-create table Carta
-(
-    id                  serial,
-    Nombre              varchar(50),
-    Dano                integer,
-    velocidad_ataque    integer,
-    rareza              varchar(50),
-    arena               integer,
-    primary key (id)
-);--Falta poner el foreign key de arena
-
-drop table if exists Ve cascade;
-create table Ve
-(
-    id_deck     integer,
-    id_jugador  varchar(50),
-    primary key (id_deck, id_jugador),
-    foreign key (id_deck) references Deck(id),
-    foreign key (id_jugador) references Jugador(id)
-);
-
-drop table if exists Deck_carta cascade;
-create table Deck_carta
-(
-    id_carta    integer,
-    id_deck     integer,
-    primary key (id_carta, id_deck),
-    foreign key (id_carta) references Carta(id),
-    foreign key (id_deck) references Deck(id)
-);
-
-drop table if exists Encuentra cascade;
-create table Encuentra
-(
-    id_jugador          varchar(50),
-    id_carta            integer,
-    fecha_desbloqueada  date,
-    fecha_mejora        date,
-    nivel_actual        integer,
-    primary key (id_carta, id_jugador),
-    foreign key (id_jugador) references Jugador(id),
-    foreign key (id_carta) references Carta(id)
-);
-
-drop table if exists Luchan cascade;
-create table Luchan
-(
-    id_deck1        integer,
-    id_deck2        integer,
-    titulo_arena    varchar(50),
-    id_batalla      integer,
-    id_ganador      integer,
-    primary key (id_deck1, id_deck2, titulo_arena, id_batalla),
-    foreign key (id_deck1) references Deck (id),
-    foreign key (id_deck2) references Deck(id)
-);--Falta poner el foreign key de batalla y arena
