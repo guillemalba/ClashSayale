@@ -155,7 +155,7 @@ create table Carta
     foreign key (arena) references Arena(titulo)
 );
 
---Azul
+
 
 Drop table if exists Mejoran cascade;
 create table Mejoran(
@@ -306,7 +306,7 @@ CREATE TABLE Depende
     FOREIGN KEY (id_mision_dependiente) REFERENCES Mision (ID)
 );
 
-/* AZUL */
+/* -----------------------------------AZUL */
 
 drop table if exists Deck cascade;
 create table Deck

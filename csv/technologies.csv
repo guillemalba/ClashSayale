@@ -1,0 +1,69 @@
+technology,cost,max_level,prerequisite,prereq_level,mod_damage,mod_hit_speed,mod_radius,mod_spawn_damage,mod_lifetime,description
+Advanced Ballistics,1410,4,Replaceable Parts,6,3,,2,,,Advanced Ballistics modifies the cards with the following modifiers: Damage +3  Radius +2  
+Advanced Flight,1410,4,Radio,4,3,,2,,,Advanced Flight modifies the cards with the following modifiers: Damage +3  Radius +2  
+Animal Husbandry,25,5,,,,1,1,1,1,Animal Husbandry modifies the cards with the following modifiers:   Hit speed +1 Radius +1 Spawn damage +1 Lifetime +1
+Apprenticeship,300,7,Horseback Riding,1,2,,,,,Apprenticeship modifies the cards with the following modifiers: Damage +2    
+Archery,50,2,Animal Husbandry,4,1,2,2,,2,Archery modifies the cards with the following modifiers: Damage +1 Hit speed +2 Radius +2  Lifetime +2
+Astrology,50,2,,,1,2,2,,2,Astrology modifies the cards with the following modifiers: Damage +1 Hit speed +2 Radius +2  Lifetime +2
+Astronomy,660,3,Education,5,2,,,,,Astronomy modifies the cards with the following modifiers: Damage +2    
+Ballistics,845,6,Metal Casting,2,1,5,1,1,2,Ballistics modifies the cards with the following modifiers: Damage +1 Hit speed +5 Radius +1 Spawn damage +1 Lifetime +2
+Banking,540,2,Stirrups,5,1,,,,,Banking modifies the cards with the following modifiers: Damage +1    
+Bronze Working,80,4,Mining,4,3,2,,,2,Bronze Working modifies the cards with the following modifiers: Damage +3 Hit speed +2   Lifetime +2
+Cartography,540,2,Shipbuilding,4,1,,,,,Cartography modifies the cards with the following modifiers: Damage +1    
+Castles,390,6,Construction,4,1,,2,,,Castles modifies the cards with the following modifiers: Damage +1  Radius +2  
+Celestial Navigation,120,2,Sailing,1,1,,,,,Celestial Navigation modifies the cards with the following modifiers: Damage +1    
+Chemistry,1250,5,Sanitation,4,,2,2,,2,Chemistry modifies the cards with the following modifiers:   Hit speed +2 Radius +2  Lifetime +2
+Combined Arms,1410,4,Combustion,4,3,,2,,,Combined Arms modifies the cards with the following modifiers: Damage +3  Radius +2  
+Combustion,1250,5,Steel,6,,2,2,,2,Combustion modifies the cards with the following modifiers:   Hit speed +2 Radius +2  Lifetime +2
+Composites,1850,3,Synthetic Materials,5,2,2,2,,2,Composites modifies the cards with the following modifiers: Damage +2 Hit speed +2 Radius +2  Lifetime +2
+Computers,1580,6,Electricity,4,1,2,,,2,Computers modifies the cards with the following modifiers: Damage +1 Hit speed +2   Lifetime +2
+Construction,200,5,Masonry,3,,2,,,2,Construction modifies the cards with the following modifiers:   Hit speed +2   Lifetime +2
+Currency,120,2,Writing,1,1,,,,,Currency modifies the cards with the following modifiers: Damage +1    
+Economics,970,5,Scientific Theory,5,,4,2,,1,Economics modifies the cards with the following modifiers:   Hit speed +4 Radius +2  Lifetime +1
+Education,390,6,Mathematics,4,1,,2,,,Education modifies the cards with the following modifiers: Damage +1  Radius +2  
+Electricity,1250,5,Steam Power,4,,2,2,,2,Electricity modifies the cards with the following modifiers:   Hit speed +2 Radius +2  Lifetime +2
+Engineering,200,5,Wheel,3,,2,,,2,Engineering modifies the cards with the following modifiers:   Hit speed +2   Lifetime +2
+Flight,1140,7,Scientific Theory,5,2,,,,,Flight modifies the cards with the following modifiers: Damage +2    
+Future Tech,2500,2,Satellites,2,1,4,,,1,Future Tech modifies the cards with the following modifiers: Damage +1 Hit speed +4   Lifetime +1
+Guidance Systems,1850,3,Rocketry,3,2,2,2,,2,Guidance Systems modifies the cards with the following modifiers: Damage +2 Hit speed +2 Radius +2  Lifetime +2
+Gunpowder,540,2,Stirrups,5,1,,,,,Gunpowder modifies the cards with the following modifiers: Damage +1    
+Horseback Riding,120,2,Archery,1,1,,,,,Horseback Riding modifies the cards with the following modifiers: Damage +1    
+Industrialization,845,6,Square Rigging,2,1,5,1,1,2,Industrialization modifies the cards with the following modifiers: Damage +1 Hit speed +5 Radius +1 Spawn damage +1 Lifetime +2
+Iron Working,120,2,Bronze Working,3,1,,,,,Iron Working modifies the cards with the following modifiers: Damage +1    
+Irrigation,50,2,Pottery,4,1,2,2,,2,Irrigation modifies the cards with the following modifiers: Damage +1 Hit speed +2 Radius +2  Lifetime +2
+Lasers,1850,3,Nuclear Fission,5,2,2,2,,2,Lasers modifies the cards with the following modifiers: Damage +2 Hit speed +2 Radius +2  Lifetime +2
+Machinery,300,7,Iron Working,1,2,,,,,Machinery modifies the cards with the following modifiers: Damage +2    
+Masonry,80,4,Mining,4,3,2,,,2,Masonry modifies the cards with the following modifiers: Damage +3 Hit speed +2   Lifetime +2
+Mass Production,540,2,Shipbuilding,4,1,,,,,Mass Production modifies the cards with the following modifiers: Damage +1    
+Mathematics,200,5,Currency,1,,2,,,2,Mathematics modifies the cards with the following modifiers:   Hit speed +2   Lifetime +2
+Metal Casting,660,3,Gunpowder,1,2,,,,,Metal Casting modifies the cards with the following modifiers: Damage +2    
+Military Engineering,390,6,Construction,4,1,,2,,,Military Engineering modifies the cards with the following modifiers: Damage +1  Radius +2  
+Military Science,845,6,Siege Tactics,2,1,5,1,1,2,Military Science modifies the cards with the following modifiers: Damage +1 Hit speed +5 Radius +1 Spawn damage +1 Lifetime +2
+Military Tactics,300,7,Mathematics,4,2,,,,,Military Tactics modifies the cards with the following modifiers: Damage +2    
+Mining,25,5,,,,1,1,1,1,Mining modifies the cards with the following modifiers:   Hit speed +1 Radius +1 Spawn damage +1 Lifetime +1
+Nanotechnology,2155,7,Composites,2,2,1,3,1,1,Nanotechnology modifies the cards with the following modifiers: Damage +2 Hit speed +1 Radius +3 Spawn damage +1 Lifetime +1
+Nuclear Fission,1580,6,Combined Arms,3,1,2,,,2,Nuclear Fission modifies the cards with the following modifiers: Damage +1 Hit speed +2   Lifetime +2
+Nuclear Fusion,2155,7,Lasers,2,2,1,3,1,1,Nuclear Fusion modifies the cards with the following modifiers: Damage +2 Hit speed +1 Radius +3 Spawn damage +1 Lifetime +1
+Plastics,1410,4,Combustion,4,3,,2,,,Plastics modifies the cards with the following modifiers: Damage +3  Radius +2  
+Pottery,25,5,,,,1,1,1,1,Pottery modifies the cards with the following modifiers:   Hit speed +1 Radius +1 Spawn damage +1 Lifetime +1
+Printing,540,2,Machinery,6,1,,,,,Printing modifies the cards with the following modifiers: Damage +1    
+Radio,1250,5,Steam Power,4,,2,2,,2,Radio modifies the cards with the following modifiers:   Hit speed +2 Radius +2  Lifetime +2
+Replaceable Parts,1140,7,Economics,4,2,,,,,Replaceable Parts modifies the cards with the following modifiers: Damage +2    
+Rifling,970,5,Military Science,5,,4,2,,1,Rifling modifies the cards with the following modifiers:   Hit speed +4 Radius +2  Lifetime +1
+Robotics,2155,7,Computers,5,2,1,3,1,1,Robotics modifies the cards with the following modifiers: Damage +2 Hit speed +1 Radius +3 Spawn damage +1 Lifetime +1
+Rocketry,1410,4,Radio,4,3,,2,,,Rocketry modifies the cards with the following modifiers: Damage +3  Radius +2  
+Sailing,50,2,,,1,2,2,,2,Sailing modifies the cards with the following modifiers: Damage +1 Hit speed +2 Radius +2  Lifetime +2
+Sanitation,970,5,Scientific Theory,5,,4,2,,1,Sanitation modifies the cards with the following modifiers:   Hit speed +4 Radius +2  Lifetime +1
+Satellites,1850,3,Rocketry,3,2,2,2,,2,Satellites modifies the cards with the following modifiers: Damage +2 Hit speed +2 Radius +2  Lifetime +2
+Scientific Theory,845,6,Banking,1,1,5,1,1,2,Scientific Theory modifies the cards with the following modifiers: Damage +1 Hit speed +5 Radius +1 Spawn damage +1 Lifetime +2
+Shipbuilding,200,5,Sailing,1,,2,,,2,Shipbuilding modifies the cards with the following modifiers:   Hit speed +2   Lifetime +2
+Siege Tactics,660,3,Castles,5,2,,,,,Siege Tactics modifies the cards with the following modifiers: Damage +2    
+Square Rigging,660,3,Cartography,1,2,,,,,Square Rigging modifies the cards with the following modifiers: Damage +2    
+Stealth Technology,1850,3,Synthetic Materials,5,2,2,2,,2,Stealth Technology modifies the cards with the following modifiers: Damage +2 Hit speed +2 Radius +2  Lifetime +2
+Steam Power,970,5,Industrialization,5,,4,2,,1,Steam Power modifies the cards with the following modifiers:   Hit speed +4 Radius +2  Lifetime +1
+Steel,1140,7,Rifling,4,2,,,,,Steel modifies the cards with the following modifiers: Damage +2    
+Stirrups,390,6,Horseback Riding,1,1,,2,,,Stirrups modifies the cards with the following modifiers: Damage +1  Radius +2  
+Synthetic Materials,1580,6,Plastics,3,1,2,,,2,Synthetic Materials modifies the cards with the following modifiers: Damage +1 Hit speed +2   Lifetime +2
+Telecommunications,1850,3,Computers,5,2,2,2,,2,Telecommunications modifies the cards with the following modifiers: Damage +2 Hit speed +2 Radius +2  Lifetime +2
+Wheel,80,4,Mining,4,3,2,,,2,Wheel modifies the cards with the following modifiers: Damage +3 Hit speed +2   Lifetime +2
+Writing,50,2,Pottery,4,1,2,2,,2,Writing modifies the cards with the following modifiers: Damage +1 Hit speed +2 Radius +2  Lifetime +2
