@@ -1,0 +1,60 @@
+id,name,minTrophies,maxTrophies
+54000000,"TrainingCamp - Training Camp",0,32767
+54000001,"Arena1 - Goblin Stadium",0,299
+54000021,"ArenaPvE - Training Camp",0,32767
+54000022,"ArenaTvE - Training Camp",0,32767
+54000023,"Arena_TouchdownTest - Touchdown Arena",0,32767
+54000025,"Arena_KingOfTheHillTest - King of the Hill Arena Info",0,32767
+54000026,"Arena_KingOfTheHillTest2 - King of the Hill Arena Info",0,32767
+54000032,"Arena_Obstacles - Touchdown Arena",0,32767
+54000002,"Arena2 - Bone Pit",300,599
+54000003,"Arena3 - Barbarian Bowl",600,999
+54000004,"Arena4 - P.E.K.K.A's Playhouse",1000,1299
+54000005,"Arena5 - Spell Valley",1300,1599
+54000006,"Arena6 - Builder's Workshop",1600,1999
+54000008,"Arena7 - Royal Arena",2000,2299
+54000009,"Arena8 - Frozen Peak",2300,2599
+54000010,"Arena9 - Jungle Arena",2600,2999
+54000007,"Arena_L - Hog Mountain",3000,4999
+54000027,"ArenaClanWars1 - Clan War Arena",3000,32767
+54000028,"ArenaClanWars2 - Clan War Arena",3000,32767
+54000029,"ArenaClanWars3 - Clan War Arena",3000,32767
+54000030,"ArenaClanWars4 - Clan War Arena",3000,32767
+54000024,"Arena_Electric - Electro Valley",3400,32767
+54000011,"Arena_T - Spooky Town",3800,32767
+54000055,"Arena13 - Rascal's Hideout",4200,4599
+54000056,"Arena14 - Serenity Peak",4600,4999
+54000012,"Arena_L1 - Legendary Arena",5000,5299
+54000013,"Arena_L2 - Challenger II",5300,5599
+54000014,"Arena_L3 - Challenger III",5600,5999
+54000015,"Arena_L4 - Master I",6000,6299
+54000016,"Arena_L5 - Master II",6300,6599
+54000017,"Arena_L6 - Master III",6600,6999
+54000018,"Arena_L7 - Champion",7000,7299
+54000019,"Arena_L8 - Grand Champion",7300,7599
+54000020,"Arena_L9 - Royal Champion",7600,7999
+54000031,"Arena_L10 - Ultimate Champion",8000,32767
+54000033,"Arena_Boat - Fisherman's Float",8000,32767
+54000034,"Arena_Flood - Fisherman's Float",8000,32767
+54000035,"Arena_Shipwreck - Shipwreck Island",8000,32767
+54000036,"Arena_Legendary - Legendary Arena",8000,32767
+54000037,"Arena_Halloween - Legendary Arena",8000,32767
+54000038,"Arena_Goblin_Party - Legendary Arena",8000,32767
+54000039,"Arena_Holiday - Legendary Arena",8000,32767
+54000040,"Arena_Lunar - Legendary Arena",8000,32767
+54000041,"Arena_Cake - Legendary Arena",8000,32767
+54000042,"Arena_Heist - Legendary Arena",8000,32767
+54000043,"Arena_Dragon - Legendary Arena",8000,32767
+54000044,"Arena_Dream - Legendary Arena",8000,32767
+54000045,"Arena_Shipwreck_2 - Shipwreck Island",8000,32767
+54000046,"Arena_Clanboat - Legendary Arena",8000,32767
+54000047,"Arena_Giant - Legendary Arena",8000,32767
+54000048,"Arena_Electric2 - Legendary Arena",8000,32767
+54000049,"Arena_Tomb - Legendary Arena",8000,32767
+54000050,"Arena_Holiday_2 - Legendary Arena",8000,32767
+54000051,"Arena8_Season - Frozen Peak",8000,32767
+54000052,"Arena_Forbidden - Legendary Arena",8000,32767
+54000053,"Arena4_Season - P.E.K.K.A's Playhouse",8000,32767
+54000054,"Arena9_Season - Jungle Arena",8000,32767
+54000057,"Arena_Executioner - Legendary Arena",8000,32767
+54000058,"Arena7_Season - Royal Arena",8000,32767

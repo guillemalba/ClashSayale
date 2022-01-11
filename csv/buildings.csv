@@ -1,0 +1,81 @@
+building,cost,trophies,prerequisite,mod_damage,mod_hit_speed,mod_radius,mod_spawn_damage,mod_lifetime,description
+Airport,600,1250,Hangar,1,,,,,Airport modifies the cards with the following modifiers: Damage +1    
+Alhambra,710,1150,,3,2,2,,2,Alhambra modifies the cards with the following modifiers: Damage +3 Hit speed +2 Radius +2  Lifetime +2
+Amphitheater,150,1150,,3,,2,,,Amphitheater modifies the cards with the following modifiers: Damage +3  Radius +2  
+Ancient Walls,80,1150,,3,2,,,2,Ancient Walls modifies the cards with the following modifiers: Damage +3 Hit speed +2   Lifetime +2
+Archaeological Museum,290,1150,Amphitheater,3,2,2,,2,Archaeological Museum modifies the cards with the following modifiers: Damage +3 Hit speed +2 Radius +2  Lifetime +2
+Arena,150,1150,,3,,2,,,Arena modifies the cards with the following modifiers: Damage +3  Radius +2  
+Armory,195,1300,Stable,2,3,3,1,,Armory modifies the cards with the following modifiers: Damage +2 Hit speed +3 Radius +3 Spawn damage +1 
+Art Museum,290,1150,Amphitheater,3,2,2,,2,Art Museum modifies the cards with the following modifiers: Damage +3 Hit speed +2 Radius +2  Lifetime +2
+Bank,290,1150,Market,3,2,2,,2,Bank modifies the cards with the following modifiers: Damage +3 Hit speed +2 Radius +2  Lifetime +2
+Barracks,90,1300,,2,,2,,,Barracks modifies the cards with the following modifiers: Damage +2  Radius +2  
+Big Ben,1450,1050,Bank,1,4,2,,1,Big Ben modifies the cards with the following modifiers: Damage +1 Hit speed +4 Radius +2  Lifetime +1
+Bolshoi Theatre,1240,1050,,1,4,,,1,Bolshoi Theatre modifies the cards with the following modifiers: Damage +1 Hit speed +4   Lifetime +1
+Broadcast Center,580,1300,Archaeological Museum,2,4,,,1,Broadcast Center modifies the cards with the following modifiers: Damage +2 Hit speed +4   Lifetime +1
+Broadway,1620,1150,,3,,,,,Broadway modifies the cards with the following modifiers: Damage +3    
+Cathedral,190,1050,Temple,1,4,2,,1,Cathedral modifies the cards with the following modifiers: Damage +1 Hit speed +4 Radius +2  Lifetime +1
+Chichen Itza,710,1150,,3,2,2,,2,Chichen Itza modifies the cards with the following modifiers: Damage +3 Hit speed +2 Radius +2  Lifetime +2
+Colossus,400,1050,,1,4,,,1,Colossus modifies the cards with the following modifiers: Damage +1 Hit speed +4   Lifetime +1
+Cristo Redentor,1620,1150,,3,,,,,Cristo Redentor modifies the cards with the following modifiers: Damage +3    
+Dar-e Mehr,190,1050,Temple,1,4,2,,1,Dar-e Mehr modifies the cards with the following modifiers: Damage +1 Hit speed +4 Radius +2  Lifetime +1
+Eiffel Tower,1620,1150,,3,,,,,Eiffel Tower modifies the cards with the following modifiers: Damage +3    
+Electronics Factory,390,1250,Workshop,1,,2,,,Electronics Factory modifies the cards with the following modifiers: Damage +1  Radius +2  
+Estádio do Maracanã,1740,1200,Stadium,,,,,,Estádio do Maracanã modifies the cards with the following modifiers:      
+Factory,390,1250,Workshop,1,,2,,,Factory modifies the cards with the following modifiers: Damage +1  Radius +2  
+Film Studio,580,1300,Archaeological Museum,2,4,,,1,Film Studio modifies the cards with the following modifiers: Damage +2 Hit speed +4   Lifetime +1
+Forbidden City,920,1150,,3,2,,,2,Forbidden City modifies the cards with the following modifiers: Damage +3 Hit speed +2   Lifetime +2
+Fortress,305,1200,Medieval Walls,,5,1,1,2,Fortress modifies the cards with the following modifiers:   Hit speed +5 Radius +1 Spawn damage +1 Lifetime +2
+Granary,65,1100,,2,5,1,1,2,Granary modifies the cards with the following modifiers: Damage +2 Hit speed +5 Radius +1 Spawn damage +1 Lifetime +2
+Great Library,400,1050,Library,1,4,,,1,Great Library modifies the cards with the following modifiers: Damage +1 Hit speed +4   Lifetime +1
+Great Lighthouse,290,1150,Lighthouse,3,2,2,,2,Great Lighthouse modifies the cards with the following modifiers: Damage +3 Hit speed +2 Radius +2  Lifetime +2
+Great Zimbabwe,920,1150,Market,3,2,,,2,Great Zimbabwe modifies the cards with the following modifiers: Damage +3 Hit speed +2   Lifetime +2
+Gurdwara,190,1050,Temple,1,4,2,,1,Gurdwara modifies the cards with the following modifiers: Damage +1 Hit speed +4 Radius +2  Lifetime +1
+Hagia Sophia,710,1150,,3,2,2,,2,Hagia Sophia modifies the cards with the following modifiers: Damage +3 Hit speed +2 Radius +2  Lifetime +2
+Hangar,465,1150,,3,3,1,1,,Hangar modifies the cards with the following modifiers: Damage +3 Hit speed +3 Radius +1 Spawn damage +1 
+Hanging Gardens,180,1250,,1,,,,,Hanging Gardens modifies the cards with the following modifiers: Damage +1    
+Hermitage,1450,1050,,1,4,2,,1,Hermitage modifies the cards with the following modifiers: Damage +1 Hit speed +4 Radius +2  Lifetime +1
+Large Rocket,1,1050,,1,1,1,1,1,Large Rocket modifies the cards with the following modifiers: Damage +1 Hit speed +1 Radius +1 Spawn damage +1 Lifetime +1
+Library,90,1300,,2,,2,,,Library modifies the cards with the following modifiers: Damage +2  Radius +2  
+Lighthouse,120,1050,,1,,,,,Lighthouse modifies the cards with the following modifiers: Damage +1    
+Madrasa,250,1250,Library,1,4,2,,1,Madrasa modifies the cards with the following modifiers: Damage +1 Hit speed +4 Radius +2  Lifetime +1
+Mahabodhi Temple,400,1050,Temple,1,4,,,1,Mahabodhi Temple modifies the cards with the following modifiers: Damage +1 Hit speed +4   Lifetime +1
+Market,120,1050,,1,,,,,Market modifies the cards with the following modifiers: Damage +1    
+Medieval Walls,225,1050,Ancient Walls,1,3,1,1,,Medieval Walls modifies the cards with the following modifiers: Damage +1 Hit speed +3 Radius +1 Spawn damage +1 
+Medium Rocket,1,1050,,1,1,1,1,1,Medium Rocket modifies the cards with the following modifiers: Damage +1 Hit speed +1 Radius +1 Spawn damage +1 Lifetime +1
+Meeting House,190,1050,Temple,1,4,2,,1,Meeting House modifies the cards with the following modifiers: Damage +1 Hit speed +4 Radius +2  Lifetime +1
+Military Academy,390,1250,Armory,1,,2,,,Military Academy modifies the cards with the following modifiers: Damage +1  Radius +2  
+Mont St. Michel,710,1150,,3,2,2,,2,Mont St. Michel modifies the cards with the following modifiers: Damage +3 Hit speed +2 Radius +2  Lifetime +2
+Monument,60,1200,,,,,,,Monument modifies the cards with the following modifiers:      
+Mosque,190,1050,Temple,1,4,2,,1,Mosque modifies the cards with the following modifiers: Damage +1 Hit speed +4 Radius +2  Lifetime +1
+Oracle,290,1150,,3,2,2,,2,Oracle modifies the cards with the following modifiers: Damage +3 Hit speed +2 Radius +2  Lifetime +2
+Oxford University,1240,1050,University,1,4,,,1,Oxford University modifies the cards with the following modifiers: Damage +1 Hit speed +4   Lifetime +1
+Pagoda,190,1050,Temple,1,4,2,,1,Pagoda modifies the cards with the following modifiers: Damage +1 Hit speed +4 Radius +2  Lifetime +1
+Palace,1,1050,,1,1,1,1,1,Palace modifies the cards with the following modifiers: Damage +1 Hit speed +1 Radius +1 Spawn damage +1 Lifetime +1
+Petra,400,1050,,1,4,,,1,Petra modifies the cards with the following modifiers: Damage +1 Hit speed +4   Lifetime +1
+Potala Palace,1060,1150,,3,4,,,1,Potala Palace modifies the cards with the following modifiers: Damage +3 Hit speed +4   Lifetime +1
+Power Plant,580,1300,Factory,2,4,,,1,Power Plant modifies the cards with the following modifiers: Damage +2 Hit speed +4   Lifetime +1
+Pyramids,220,1150,,3,4,,,1,Pyramids modifies the cards with the following modifiers: Damage +3 Hit speed +4   Lifetime +1
+Renaissance Walls,305,1200,Medieval Walls,,5,1,1,2,Renaissance Walls modifies the cards with the following modifiers:   Hit speed +5 Radius +1 Spawn damage +1 Lifetime +2
+Research Lab,580,1300,University,2,4,,,1,Research Lab modifies the cards with the following modifiers: Damage +2 Hit speed +4   Lifetime +1
+Ruhr Valley,1240,1050,Factory,1,4,,,1,Ruhr Valley modifies the cards with the following modifiers: Damage +1 Hit speed +4   Lifetime +1
+Seaport,580,1300,Shipyard,2,4,,,1,Seaport modifies the cards with the following modifiers: Damage +2 Hit speed +4   Lifetime +1
+Sewer,200,1200,,,2,,,2,Sewer modifies the cards with the following modifiers:   Hit speed +2   Lifetime +2
+Shipyard,290,1150,Lighthouse,3,2,2,,2,Shipyard modifies the cards with the following modifiers: Damage +3 Hit speed +2 Radius +2  Lifetime +2
+Shrine,70,1000,,,4,2,,1,Shrine modifies the cards with the following modifiers:   Hit speed +4 Radius +2  Lifetime +1
+Small Rocket,1,1050,,1,1,1,1,1,Small Rocket modifies the cards with the following modifiers: Damage +1 Hit speed +1 Radius +1 Spawn damage +1 Lifetime +1
+Stable,120,1050,,1,,,,,Stable modifies the cards with the following modifiers: Damage +1    
+Stadium,660,1100,Zoo,2,,,,,Stadium modifies the cards with the following modifiers: Damage +2    
+Stave Church,120,1050,Shrine,1,,,,,Stave Church modifies the cards with the following modifiers: Damage +1    
+Stock Exchange,390,1250,Bank,1,,2,,,Stock Exchange modifies the cards with the following modifiers: Damage +1  Radius +2  
+Stonehenge,180,1250,,1,,,,,Stonehenge modifies the cards with the following modifiers: Damage +1    
+Stupa,190,1050,Temple,1,4,2,,1,Stupa modifies the cards with the following modifiers: Damage +1 Hit speed +4 Radius +2  Lifetime +1
+Sydney Opera House,1850,1100,,2,2,2,,2,Sydney Opera House modifies the cards with the following modifiers: Damage +2 Hit speed +2 Radius +2  Lifetime +2
+Synagogue,190,1050,Temple,1,4,2,,1,Synagogue modifies the cards with the following modifiers: Damage +1 Hit speed +4 Radius +2  Lifetime +1
+Temple,120,1050,Shrine,1,,,,,Temple modifies the cards with the following modifiers: Damage +1    
+Terracotta Army,400,1050,Stable,1,4,,,1,Terracotta Army modifies the cards with the following modifiers: Damage +1 Hit speed +4   Lifetime +1
+University,250,1250,Library,1,4,2,,1,University modifies the cards with the following modifiers: Damage +1 Hit speed +4 Radius +2  Lifetime +1
+Venetian Arsenal,920,1150,,3,2,,,2,Venetian Arsenal modifies the cards with the following modifiers: Damage +3 Hit speed +2   Lifetime +2
+Wat,190,1050,Temple,1,4,2,,1,Wat modifies the cards with the following modifiers: Damage +1 Hit speed +4 Radius +2  Lifetime +1
+Water Mill,80,1150,,3,2,,,2,Water Mill modifies the cards with the following modifiers: Damage +3 Hit speed +2   Lifetime +2
+Workshop,195,1300,,2,3,3,1,,Workshop modifies the cards with the following modifiers: Damage +2 Hit speed +3 Radius +3 Spawn damage +1 
+Zoo,445,1200,Arena,,1,1,1,1,Zoo modifies the cards with the following modifiers:   Hit speed +1 Radius +1 Spawn damage +1 Lifetime +1
