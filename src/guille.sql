@@ -1,5 +1,5 @@
 /*COLOR MORADO actualizado con los errores de la fase 1*/ -- TODO: falta definir algunos tipos
-Drop table if exists Mensaje cascade;
+/*Drop table if exists Mensaje cascade;
 Create table Mensaje
 (
     id                  serial,
@@ -105,4 +105,71 @@ Create table Paquete_Oferta
     gemas_contenido            int,    /*TODO: validar tipo*/
     primary key (id_p_oferta),
     foreign key (id_p_oferta) references Articulo (id)
+);*/
+
+/* CSV */
+Drop table if exists players_quests cascade;
+Create table players_quests
+(
+    player_tag        varchar(255),
+    quest_id          int,
+    quest_title       varchar(255),
+    quest_description varchar(255),
+    quest_requirement int,
+    quest_depends     varchar(255),
+    unlock            Date
+
+);
+
+Drop table if exists players cascade;
+Create table players
+(
+    tag        varchar(255),
+    name       varchar(255),
+    experience int,
+    trophies   int,
+    cardnumber int,
+    cardexpiry Date
+
+);
+
+Drop table if exists players_achievements cascade;
+Create table players_achievements
+(
+    player      varchar(255),
+    name        varchar(255),
+    description varchar(255),
+    arena       int,
+    date        Date,
+    gems        int
+);
+
+Drop table if exists players_badge cascade;
+Create table players_badge
+(
+    player varchar(255),
+    name   varchar(255),
+    arena  int,
+    date   Date,
+    img    varchar(255)
+);
+
+Drop table if exists players_cards cascade;
+Create table players_cards
+(
+    player varchar(255),
+    id     int,
+    name   varchar(255),
+    level  int,
+    amount int,
+    date   Date
+);
+
+Drop table if exists players_clans cascade;
+Create table players_clans
+(
+    player varchar(255),
+    clan   varchar(255),
+    role   varchar(255),
+    date   Date
 );
