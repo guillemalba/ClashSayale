@@ -372,7 +372,32 @@ create table Luchan
 );
 
 --Falta la parte de las 3 tipos de cartas--
+drop table if exists Edificio cascade;
+create table Edificio
+(
+    id_edificio integer,
+    vida        integer,
+    primary key (id_edificio),
+    foreign key (id_edificio) references Carta(id)
+);
 
+drop table if exists Tropas cascade;
+create table Tropas
+(
+    id_tropas           integer,
+    damage_aparicion    integer,
+    primary key (id_tropas),
+    foreign key (id_tropas) references Carta(id)
+);
+
+drop table if exists Encantamiento cascade;
+create table Encantamiento
+(
+    id_encantamiento integer,
+    radio_efecto     integer,
+    primary key (id_encantamiento),
+    foreign key (id_encantamiento) references Carta (id)
+);
 --MORADO
 Drop table if exists Mensaje cascade;
 Create table Mensaje
