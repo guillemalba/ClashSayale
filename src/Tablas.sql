@@ -538,3 +538,5 @@ create table Contiene(
     foreign key (idCofre) references Cofre(id_cofre),
     foreign key (idCarta) references Carta(id)
 );
+
+--Mario monguer
