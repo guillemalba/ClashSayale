@@ -11,7 +11,14 @@ Create Table Clan
     Primary Key (id)
 );
 
-Drop table if exists BatallaClan cascade;
+--Insert Into  Clan(id,nombre,description,trofeosTotales,minimoTrofeos,puntuacion,nMiembros)
+--Select Distinct tag,name,description,trophies,requiredtrophies,score,count(tag)-- como meto el numero de id que hay?
+--From clans;
+
+
+
+
+Drop table if exists BatallaClan cascade; --> por rellenar
 Create table BatallaClan
 (
     id serial,
@@ -19,8 +26,12 @@ Create table BatallaClan
     data_final  date,
     primary key (id)
 );
+Insert Into  BatallaClan(data_inici,data_final)
+Select Distinct start_date,end_date
+From clan_battles;
 
-Drop table if exists Lucha cascade;
+
+Drop table if exists Lucha cascade; --> por rellenar
 Create table Lucha
 (
     idBatalla int,
@@ -34,7 +45,7 @@ Create table Lucha
     foreign key (idGanador) references Clan (id)
 );
 
-Drop table if exists insignia cascade;
+Drop table if exists insignia cascade; --> rellenar
 Create table insignia
 (
     id        serial,
@@ -43,7 +54,7 @@ Create table insignia
     primary key (id)
 );
 
-Drop table if exists Adquiere cascade;
+Drop table if exists Adquiere cascade; -->Rellenar i preguntar como
 Create table Adquiere
 (
     idClan     Varchar(50),
@@ -62,6 +73,7 @@ Create table Rol
     description text,
     primary key (id)
 );
+
 
 Drop table if exists Modificadors cascade;
 Create table Modificadors
@@ -133,7 +145,7 @@ Create table Dona
 
 
 --Azul
-DROP TABLE IF EXISTS Arena CASCADE; --arenas
+DROP TABLE IF EXISTS Arena CASCADE;
 CREATE TABLE Arena
 (
     titulo      VARCHAR(50),
@@ -166,7 +178,7 @@ create table Mejoran(
     foreign key (idCarta) references Carta(id)
 );
 
-/*----------------------------------------------Herencia no se com es fa*/
+
 Drop table if exists Tecnologia cascade;
 Create table Tecnologia
 (
@@ -371,7 +383,7 @@ create table Luchan
     foreign key (id_batalla) references Batalla_Jugadores(ID)
 );
 
---Falta la parte de las 3 tipos de cartas--
+
 drop table if exists Edificio cascade;
 create table Edificio
 (
@@ -398,6 +410,7 @@ create table Encantamiento
     primary key (id_encantamiento),
     foreign key (id_encantamiento) references Carta (id)
 );
+
 --MORADO
 Drop table if exists Mensaje cascade;
 Create table Mensaje
