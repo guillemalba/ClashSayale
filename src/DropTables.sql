@@ -93,3 +93,53 @@ Drop table if exists Paquete_Oferta cascade;
 Drop table if exists Emoticono cascade;
 
 Drop table if exists Contiene cascade;
+
+
+--Tablas de csv
+drop table if exists arena_pack cascade;
+
+drop table if exists arenas cascade ;
+
+drop table if exists battles cascade;
+
+drop table if exists buildings cascade;
+
+drop table if exists cards cascade;
+
+drop table if exists clan_battles cascade;
+
+drop table if exists clan_tech_structures cascade;
+
+drop table if exists clans cascade;
+
+drop table if exists friends cascade;
+
+drop table if exists messages_between_players cascade;
+
+drop table if exists messages_to_clans cascade;
+
+drop table if exists player_purchases cascade;
+
+Drop table if exists players_quests cascade;
+
+Drop table if exists players cascade;
+
+Drop table if exists playersachievements cascade;
+
+Drop table if exists playersbadge cascade;
+
+Drop table if exists playerscards cascade;
+
+Drop table if exists playersClans cascade;
+
+DROP TABLE IF EXISTS playersClansdonations CASCADE;
+
+DROP TABLE IF EXISTS playersdeck CASCADE;
+
+DROP TABLE IF EXISTS quests_arenas CASCADE;
+
+DROP TABLE IF EXISTS seasons CASCADE;
+
+DROP TABLE IF EXISTS shared_decks CASCADE;
+
+DROP TABLE IF EXISTS technologies CASCADE;
