@@ -1,175 +1,162 @@
-/*COLOR MORADO actualizado con los errores de la fase 1*/ -- TODO: falta definir algunos tipos
-/*Drop table if exists Mensaje cascade;
-Create table Mensaje
+/*------------ GUILLEM (VERDE)------------*/
+Drop table if exists Jugador cascade;
+Create table Jugador
 (
-    id                  serial,
-    titulo              Varchar(50),
-    cuerpo              text,
-    fecha               Date,
-    idMensajeRespondido int,
-    idClan              Varchar(50),
-    primary key (id),
-    foreign key (idMensajeRespondido) references Mensaje (id),
-    foreign key (idClan) references Clan (id)
-);
-
-Drop table if exists Escribe cascade;
-Create table Escribe
-(
-    id_emisor           int,
-    id_receptor         int,
-    id_mensaje          int,
-    primary key (id_emisor, id_receptor, id_mensaje),
-    foreign key (id_emisor) references Mensaje (id),
-    foreign key (id_receptor) references Mensaje (id),
-    foreign key (id_mensaje) references Mensaje (id)
-);
-
-Drop table if exists Amigo cascade;
-Create table Amigo
-(
-    id_jugador_1            int,
-    id_jugador_2            int,
-    primary key (id_jugador_1, id_jugador_2),
-    foreign key (id_jugador_1) references Jugador (id),
-    foreign key (id_jugador_2) references Jugador (id)
-);
-
-Drop table if exists Tarjeta cascade;
-Create table Tarjeta
-(
-    id                      int,
-    foreign key (id) references Jugador (id)
-);
-
-Drop table if exists Posee cascade;
-Create table Posee
-(
-    id_jugador              int,
-    id_tarjeta              int,
-    primary key (id_jugador, id_tarjeta),
-    foreign key (id_jugador) references Jugador (id),
-    foreign key (id_tarjeta) references Tarjeta (id)
-);
-
-Drop table if exists Compra cascade;
-Create table Compra
-(
-    id_jugador              int,
-    id_tarjeta              int,
-    id_articulo             int,
-    descuento               int,    /*TODO: tipo*/
-    fecha               Date,    /*TODO: tipo*/
-    primary key (id_jugador, id_tarjeta, id_articulo),
-    foreign key (id_jugador) references Jugador (id),
-    foreign key (id_tarjeta) references Tarjeta (id),
-    foreign key (id_articulo) references Articulo (id)
-);
-
-Drop table if exists Articulo cascade;
-Create table Articulo
-(
-    id                      int,
-    coste_real              int,    /*TODO: validar tipo*/
-    veces_compra            int,    /*TODO: validar tipo*/
+    id          Varchar(50),
+    nombre      Varchar(50),
+    experiencia int,
+    trofeos     int,
+    oro         int,
+    gemas       int,
     primary key (id)
 );
 
-Drop table if exists Cofre cascade;
-Create table Cofre
+Drop Table If Exists Clan Cascade;
+Create Table Clan
 (
-    id_cofre              int,
-    oro_contenido         int,    /*TODO: validar tipo*/
-    gemas_contenido       int,    /*TODO: validar tipo*/
-    id_mision              int,
-    primary key (id_cofre),
-    foreign key (id_cofre) references Articulo (id) -- TODO:
-    foreign key (id_mision) references Mision (id) -- TODO:
+    id             Varchar(25),
+    nombre         Varchar(50),
+    descripcion    Text,
+    trofeos_totales int,
+    minimo_trofeos  int,
+    puntuacion     int,
+    Primary Key (id)
 );
 
-Drop table if exists Paquete_Arena cascade;
-Create table Paquete_Arena
+Drop table if exists Formado cascade;
+Create table Formado
 (
-    id_p_arena              int,
-    oro_contenido              int,    /*TODO: validar tipo*/
-    titulo_arena            varchar(255),    /*TODO: validar tipo*/
-    primary key (id_p_arena),
-    foreign key (titulo_arena) references Articulo (id) -- TODO:
+    id_clan     Varchar(50),
+    id_jugador  Varchar(50),
+    fecha date,
+    role Varchar(50),
+    primary key (id_clan, id_jugador),
+    foreign key (id_clan) references Clan (id),
+    foreign key (id_jugador) references Jugador (id)
 );
 
-Drop table if exists Paquete_Oferta cascade;
-Create table Paquete_Oferta
+Drop table if exists Dona cascade;
+Create table Dona
 (
-    id_p_oferta              int,
-    oro_contenido              int,          /*TODO: validar tipo*/
-    gemas_contenido            int,    /*TODO: validar tipo*/
-    primary key (id_p_oferta),
-    foreign key (id_p_oferta) references Articulo (id)
-);*/
+    id_clan        Varchar(50),
+    id_jugador     Varchar(50),
+    oro           int,
+    fecha          date,
+    primary key (id_clan, id_jugador),
+    foreign key (id_clan) references Clan (id),
+    foreign key (id_jugador) references Jugador (id)
+);
 
-/* CSV */
-Drop table if exists players_quests cascade;
-Create table players_quests
+Drop table if exists Insignia cascade;
+Create table Insignia
 (
-    player_tag        varchar(255),
-    quest_id          int,
-    quest_title       varchar(255),
-    quest_description varchar(255),
-    quest_requirement int,
-    quest_depends     varchar(255),
-    unlock            Date
+    nombre        serial,           /*TODO: tipo?*/
+    imagenUrl     text,
+    primary key (nombre)
+);
+
+Drop table if exists Adquiere cascade;
+Create table Adquiere
+(
+    id_clan     Varchar(50),
+    id_insignia int,
+    fecha       date,
+    primary key (id_clan, id_insignia),
+    foreign key (id_clan) references Clan (id),
+    foreign key (id_insignia) references Insignia (id)
+);
+
+Drop table if exists Batalla_Clan cascade;
+Create table Batalla_Clan
+(
+    id         serial,
+    primary key (id)
+);
+
+DROP TABLE IF EXISTS Participa CASCADE;
+CREATE TABLE Participa
+(
+    batalla_clan INTEGER,
+    clan         VARCHAR(50),       /*TODO: tipo?*/
+    fecha_inicio  Date,
+    fech_fin   Date,
+    PRIMARY KEY (batalla_clan, clan)
+);
+
+Drop table if exists Consigue cascade;
+Create table Consigue
+(
+    id_insignia int,
+    id_arena    int,
+    id_jugador  Varchar(50),
+    fecha       date,
+    primary key (id_insignia, id_arena, id_jugador),
+    foreign key (id_jugador) references Jugador (id),
+    foreign key (id_insignia) references Insignia (id),
+    foreign key (id_arena) references Arena (id)
+);
+
+Drop table if exists Mensaje_clan cascade;
+Create table Mensaje_clan
+(
+    id                      serial,
+    cuerpo                  text,
+    fecha                   Date,
+    emisor                  int,         /*TODO: tipo?*/
+    receptor                int,         /*TODO: tipo?*/
+    id_mensaje_respondido   int,
+    primary key (id),
+    foreign key (id_mensaje_respondido) references Mensaje_clan (id)
+);
+
+Drop table if exists Tecnologia cascade;
+Create table Tecnologia
+(
+    nombre          Varchar(50),
+    coste_oro       int,
+    descripcion     text,
+    nivel_max       int,
+    dep_level       int,
+    damage          int,        /*TODO: tipo?*/
+    deploy_damage   int,        /*TODO: tipo?*/
+    radio           int,        /*TODO: tipo?*/
+    vel_ataque      int,        /*TODO: tipo?*/
+    vida            int,        /*TODO: tipo?*/
+    tec_dep         int,        /*TODO: tipo?*/
+    primary key (nombre),
+    foreign key (tec_dep) references Modificadors (id) /*TODO: tipo?*/
+);
+
+Drop table if exists Estructura cascade;
+Create table Estructura
+(
+    nombre          Varchar(50),
+    coste_oro       int,
+    descripcion     text,
+    trofeos         int,
+    damage          int,        /*TODO: tipo?*/
+    deploy_damage   int,        /*TODO: tipo?*/
+    radio           int,        /*TODO: tipo?*/
+    vel_ataque      int,        /*TODO: tipo?*/
+    vida            int,        /*TODO: tipo?*/
+    tec_dep         int,        /*TODO: tipo?*/
+    primary key (nombre),
+    foreign key (tec_dep) references Modificadors (id) /*TODO: tipo?*/
+);
+
+Drop table if exists Modificador cascade;
+Create table Modificador
+(
+    id_clan         serial,
+    estructura      Varchar(50),
+    tecnologia      text,
+    costeOro        int,
+    nivel           int,
+    fecha           date,
+    primary key (id_clan, estructura, tecnologia),
+    foreign key (id_clan) references Clan (id), /*TODO: tipo?*/
+    foreign key (estructura) references Estructura (nombre), /*TODO: tipo?*/
+    foreign key (tecnologia) references Tecnologia (nombre) /*TODO: tipo?*/
 
 );
 
-Drop table if exists players cascade;
-Create table players
-(
-    tag        varchar(255),
-    name       varchar(255),
-    experience int,
-    trophies   int,
-    cardnumber int,
-    cardexpiry Date
-
-);
-
-Drop table if exists players_achievements cascade;
-Create table players_achievements
-(
-    player      varchar(255),
-    name        varchar(255),
-    description varchar(255),
-    arena       int,
-    date        Date,
-    gems        int
-);
-
-Drop table if exists players_badge cascade;
-Create table players_badge
-(
-    player varchar(255),
-    name   varchar(255),
-    arena  int,
-    date   Date,
-    img    varchar(255)
-);
-
-Drop table if exists players_cards cascade;
-Create table players_cards
-(
-    player varchar(255),
-    id     int,
-    name   varchar(255),
-    level  int,
-    amount int,
-    date   Date
-);
-
-Drop table if exists players_clans cascade;
-Create table players_clans
-(
-    player varchar(255),
-    clan   varchar(255),
-    role   varchar(255),
-    date   Date
-);
