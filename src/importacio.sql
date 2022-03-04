@@ -298,8 +298,8 @@ COPY technologies FROM '/Users/Shared/Bases/Base/technologies.csv' CSV HEADER DE
 DROP TABLE IF EXISTS oro_gemas CASCADE;
 CREATE TABLE oro_gemas
 (
-    player            VARCHAR(255),
     oro               INTEGER,
-    gemas             INTEGER
+    gemas             INTEGER,
+    player            VARCHAR(255)
 );
-COPY oro_gemas FROM '/Users/Shared/Bases/Base/oro_gemas.csv' CSV HEADER DELIMITER ',';
+COPY oro_gemas FROM '/Users/guillemalba/Downloads/DB2021-2022-datasets/oro_gemas.csv' CSV HEADER DELIMITER ',';
