@@ -111,8 +111,8 @@ create table Batalla_Clan
     primary key (id)
 );
 
-drop table if exists pelea cascade;
-create table pelea
+drop table if exists Participa cascade;
+create table Participa
 (
     batalla_clan integer,
     clan         varchar(255),
