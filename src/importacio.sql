@@ -301,4 +301,4 @@ CREATE TABLE oro_gemas
     oro               INTEGER,
     gemas             INTEGER
 );
-COPY technologies FROM '/Users/Shared/Bases/Base/technologies.csv' CSV HEADER DELIMITER ',';
+COPY oro_gemas FROM '/Users/Shared/Bases/Base/oro_gemas.csv' CSV HEADER DELIMITER ',';
