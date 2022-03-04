@@ -28,7 +28,7 @@ insert into Jugador (id, nombre, experiencia, trofeos, oro, gemas, tarjeta)
 select distinct tag, name, experience, trophies, oro, gemas, cardnumber
 from players join oro_gemas on player = tag;
 
-select * from jugador;
+
 
 drop table if exists Clan cascade ;
 create table Clan
@@ -51,23 +51,36 @@ create table Formado
     clan    Varchar(255),
     jugador Varchar(255),
     fecha   date,
-    role    Varchar(255),
+    role    text,
     primary key (clan, jugador),
     foreign key (clan) references Clan (id),
     foreign key (jugador) references Jugador (id)
 );
 
+insert into Formado(clan, jugador,fecha,role)
+select distinct clan,player,date,role
+from playersclans;
+
+
+
 drop table if exists Dona cascade;
 create table Dona
 (
+    id      serial, --TODO: Mirar si pueden haver 1 PK y dos PK/FK
     clan    varchar(255),
     jugador varchar(255),
     oro     int,
     fecha   date,
-    primary key (clan, jugador),
+    primary key (clan, jugador,id),
     foreign key (clan) references Clan (id),
     foreign key (jugador) references Jugador (id)
 );
+
+insert into Dona(clan,jugador,oro,fecha)
+select distinct clan,player,gold,date
+from playersclansdonations;
+
+
 
 drop table if exists Insignia cascade;
 create table Insignia
@@ -80,7 +93,7 @@ create table Insignia
 insert into Insignia (nombre, imagenUrl)
 select distinct name, img from playersbadge;
 
-drop table if exists Adquiere cascade;
+/*drop table if exists Adquiere cascade;
 create table Adquiere
 (
     clan     varchar(255),
@@ -90,7 +103,7 @@ create table Adquiere
     foreign key (clan) references Clan (id),
     foreign key (insignia) references Insignia (nombre)
 );
-
+*/
 drop table if exists Batalla_Clan cascade;
 create table Batalla_Clan
 (
@@ -118,7 +131,8 @@ create table Arena
     primary key (id)
 );
 
-insert into Arena (id, nombre, max_trofeos, min_trofeos) select distinct id, name, minTrophies, maxTrophies from arenas;
+insert into Arena (id, nombre, max_trofeos, min_trofeos)
+select distinct id, name, minTrophies, maxTrophies from arenas;
 
 drop table if exists Consigue cascade;
 create table Consigue
@@ -133,6 +147,10 @@ create table Consigue
     foreign key (arena) references Arena (id)
 );
 
+insert into Consigue(insignia, arena, jugador, fecha)
+select distinct name,arena,player,date
+from playersbadge;
+
 drop table if exists Mensaje_clan cascade;
 create table Mensaje_clan
 (
@@ -144,9 +162,13 @@ create table Mensaje_clan
     mensaje_respondido integer,
     primary key (id),
     foreign key (mensaje_respondido) references Mensaje_clan (id),
-    foreign key (emisor) references Clan (id),
+    foreign key (emisor) references Jugador (id),
     foreign key (receptor) references Clan (id)
 );
+
+insert into Mensaje_clan(id, cuerpo, fecha, emisor, receptor, mensaje_respondido)
+select distinct id,text,date,sender,receiver,answer
+from messages_to_clans;
 
 drop table if exists Modificador cascade;
 create table Modificador
@@ -164,6 +186,15 @@ create table Modificador
     foreign key (dependencia) references Modificador (nombre)
 );
 
+insert into Modificador(nombre, coste_oro, descripcion, daño, vel_ataque, daño_aparicion, radio, vida, dependencia)
+select distinct building,cost,description,mod_damage,mod_hit_speed,mod_spawn_damage,mod_radius,mod_lifetime,prerequisite
+from buildings
+UNION
+select distinct technology,cost,description,mod_damage,mod_hit_speed,mod_spawn_damage,mod_radius,mod_lifetime,prerequisite
+from technologies;
+
+
+
 drop table if exists Tecnologias cascade;
 create table Tecnologias
 (
@@ -174,6 +205,10 @@ create table Tecnologias
     foreign key (nombre) references Modificador (nombre)
 );
 
+insert into Tecnologias(nombre, nivel_max, dep_level)
+select distinct technology,max_level,prereq_level
+from technologies;
+
 drop table if exists Estructura cascade;
 create table Estructura
 (
@@ -182,6 +217,9 @@ create table Estructura
     primary key (nombre),
     foreign key (nombre) references Modificador (nombre)
 );
+insert into Estructura(nombre, trofeos)
+select distinct building, trophies
+from buildings;
 
 drop table if exists Clan_modificador cascade;
 Create table Clan_modificador
@@ -194,7 +232,9 @@ Create table Clan_modificador
     foreign key (clan) references Clan (id),
     foreign key (modificador) references Modificador (nombre)
 );
-
+insert into Clan_modificador(clan, modificador, nivel, fecha)
+select clan,concat_ws('',tech,structure),level,date
+from clan_tech_structures;
 
 /*------------ MARIO (AZUL)------------*/
 drop table if exists Deck cascade;
@@ -228,7 +268,6 @@ select distinct deck,player
 from shared_decks;
 
 
-
 drop table if exists Carta cascade;
 create table Carta
 (
@@ -246,6 +285,8 @@ insert into Carta (id, nombre, daño, velocidad_ataque, rereza, arena)
 select distinct AVG(p.id), c.name, c.damage, c.hit_speed, c.rarity, c.arena
 from cards as c join playerscards as p on c.name = p.name
 group by c.name, c.damage, c.hit_speed, c.rarity, c.arena;
+
+select count(id) from carta; --TODO: Faltan dos cartas deberia haber 99 y hay 97 faltan los dos que tienen el 0
 
 drop table if exists Edificio cascade;  --TODO Como se hace para que no detecte los 0 como nulls
 create table Edificio
@@ -302,6 +343,10 @@ create table compuesto
     foreign key (jugador) references Jugador (id)
 );
 
+/*insert into compuesto(carta, deck, jugador, nivel)
+select card,deck,player,level --TODO: en teoria esta bien pero hay una carta que no esta en el csv de carta pero si en los de deck mas las cartas que no hemos podido añadir en el carta
+from playersdeck;*/
+
 drop table if exists Encuentra cascade;
 create table Encuentra
 (
@@ -315,6 +360,8 @@ create table Encuentra
     foreign key (carta) references Carta (id)
 );
 
+
+
 /*------------ DANIEL (VERDE)------------*/
 drop table if exists Temporada cascade;
 create table Temporada
@@ -324,6 +371,9 @@ create table Temporada
     fecha_final  date,
     primary key (nombre)
 );
+insert into Temporada(nombre, fecha_inicio, fecha_final)
+select distinct name,startdate,enddate
+from seasons;
 
 drop table if exists Pelea cascade;
 create table Pelea
@@ -331,29 +381,41 @@ create table Pelea
     temporada varchar(255),
     jugador   varchar(255),
     primary key (temporada, jugador),
-    foreign key (temporada) references Temporada (nombre)
+    foreign key (temporada) references Temporada (nombre) --TODO: no hay ninguna tabla que nos relacione esto.
 );
 
 drop table if exists Logro cascade;
 create table Logro
 (
+    id               serial,
     nombre           varchar(255),
     descripcion      text,
     recompensa_gemas integer,
-    primary key (nombre)
+    primary key (id)
 );
+
+insert into Logro(nombre, descripcion, recompensa_gemas)
+select distinct name,description,gems
+from playersachievements
+group by name,description,gems;
 
 drop table if exists Desbloquea cascade;
 create table Desbloquea
 (
-    jugador varchar(255),
-    arena   integer,
-    logro   varchar(255),
-    fecha   date,
-    primary key (jugador, arena, logro),
+    jugador     varchar(255),
+    arena       integer,
+    id_logro    integer,
+    fecha       date,
+    primary key (jugador, arena, id_logro),
     foreign key (jugador) references Jugador (id),
     foreign key (arena) references Arena (id)
 );
+insert into Desbloquea(jugador, arena,id_logro, fecha)
+select distinct pa.player, pa.arena, l.id, pa.date
+from playersachievements as pa Join Logro as l on pa.name = l.nombre and pa.description = l.descripcion and pa.gems = l.recompensa_gemas;
+
+
+
 
 drop table if exists Mision cascade;
 create table Mision
@@ -374,10 +436,11 @@ from players_quests;
 drop table if exists Realiza cascade;   --TODO se puede añadir un pk mas con la fecha o se tiene que añadir ID?
 create table Realiza
 (
+    id      serial,
     mision  integer,
     jugador varchar(255),
     fecha   date,
-    primary key (mision, jugador),
+    primary key (id,mision, jugador),
     foreign key (mision) references Mision (id),
     foreign key (jugador) references Jugador (id)
 );
@@ -430,6 +493,11 @@ create table Mensaje
     foreign key (idMensajeRespondido) references Mensaje (id)
 );
 
+insert into Mensaje(id, cuerpo, fecha, idMensajeRespondido)
+select distinct id,text,date,answer
+from messages_between_players;
+
+
 drop table if exists Escribe cascade ;
 create table Escribe
 (
@@ -442,6 +510,10 @@ create table Escribe
     foreign key (id_mensaje) references Mensaje (id)
 );
 
+insert into Escribe(id_emisor, id_receptor, id_mensaje)
+select distinct sender,receiver,id
+from messages_between_players;
+
 drop table if exists Amigo cascade;
 create table Amigo
 (
@@ -451,6 +523,9 @@ create table Amigo
     foreign key (id_jugador_emisor) references Jugador (id),
     foreign key (id_jugador_receptor) references Jugador (id)
 );
+insert into Amigo(id_jugador_emisor, id_jugador_receptor)
+select distinct requester,requeted
+from friends;
 
 drop table if exists Articulo cascade ;
 create table Articulo
