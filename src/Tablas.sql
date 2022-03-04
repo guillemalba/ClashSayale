@@ -7,7 +7,8 @@ create table Tarjeta
     primary key (numero_tarjeta)
 );
 
-insert into Tarjeta (numero_tarjeta, fecha_caducidad) select distinct cardnumber, cardexpiry from players;
+insert into Tarjeta (numero_tarjeta, fecha_caducidad)
+select distinct cardnumber, cardexpiry from players;
 
 drop table if exists Jugador cascade;
 create table Jugador
@@ -26,6 +27,8 @@ create table Jugador
 insert into Jugador (id, nombre, experiencia, trofeos, oro, gemas, tarjeta)
 select distinct tag, name, experience, trophies, oro, gemas, cardnumber
 from players join oro_gemas on player = tag;
+
+select * from jugador;
 
 drop table if exists Clan cascade ;
 create Table Clan
@@ -89,8 +92,8 @@ create table Batalla_Clan
     primary key (id)
 );
 
-drop table if exists Participa cascade;
-create table Participa
+drop table if exists pelea cascade;
+create table pelea
 (
     batalla_clan integer,
     clan         varchar(255),
@@ -198,6 +201,12 @@ create table Deck
     primary key (id)
 );
 
+insert into Deck(id,titulo,descripcion,fecha)
+select distinct deck,title,description,date
+from playersdeck;
+
+
+
 drop table if exists Ve cascade;
 create table Ve
 (
@@ -207,6 +216,12 @@ create table Ve
     foreign key (deck) references Deck (id),
     foreign key (jugador) references Jugador (id)
 );
+
+insert into Ve(deck,jugador)
+select distinct deck,player
+from shared_decks;
+
+
 
 drop table if exists Carta cascade;
 create table Carta
@@ -250,8 +265,8 @@ create table Encantamiento
     foreign key (carta) references Carta (id)
 );
 
-drop table if exists Formado cascade;
-create table Formado
+drop table if exists compuesto cascade;
+create table compuesto
 (
     carta   integer,
     deck    integer,
@@ -357,7 +372,7 @@ create table batalla
     deck_win     integer,
     deck_lose    integer,
     fecha        date,
-    durada       int, --TODO Que tipo de variable es 3:23:00? date?
+    durada       time,
     puntos_win   integer,
     puntos_lose  integer,
     batalla_clan integer,
