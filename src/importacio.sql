@@ -160,7 +160,7 @@ Create table players_quests
     quest_title       varchar(255),
     quest_description varchar(255),
     quest_requirement varchar(255),
-    quest_depends     varchar(255),
+    quest_depends     int,
     unlock            Date
 
 );
@@ -302,4 +302,4 @@ CREATE TABLE oro_gemas
     gemas             INTEGER,
     player            VARCHAR(255)
 );
-COPY oro_gemas FROM '/Users/guillemalba/Downloads/DB2021-2022-datasets/oro_gemas.csv' CSV HEADER DELIMITER ',';
+COPY oro_gemas FROM '/Users/Shared/Bases/Base/oro_gemas.csv' CSV HEADER DELIMITER ',';

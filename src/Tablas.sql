@@ -247,13 +247,19 @@ select distinct AVG(p.id), c.name, c.damage, c.hit_speed, c.rarity, c.arena
 from cards as c join playerscards as p on c.name = p.name
 group by c.name, c.damage, c.hit_speed, c.rarity, c.arena;
 
-drop table if exists Edificio cascade;
+drop table if exists Edificio cascade;  --TODO Como se hace para que no detecte los 0 como nulls
 create table Edificio
 (
     carta integer,
     vida  integer,
     foreign key (carta) references Carta (id)
 );
+
+insert into Edificio (carta, vida)
+select distinct AVG(p.id), c.lifetime
+from cards as c join playerscards as p on c.name = p.name
+where lifetime is not null
+group by c.name, c.damage, c.hit_speed, c.rarity, c.arena, c.lifetime;
 
 drop table if exists Tropas cascade;
 create table Tropas
@@ -263,6 +269,12 @@ create table Tropas
     foreign key (carta) references Carta (id)
 );
 
+insert into Tropas (carta, daño_aparicion)
+select distinct AVG(p.id), c.spawn_damage
+from cards as c join playerscards as p on c.name = p.name
+where spawn_damage IS NOT NULL
+group by c.name, c.damage, c.hit_speed, c.rarity, c.arena, c.spawn_damage;
+
 drop table if exists Encantamiento cascade;
 create table Encantamiento
 (
@@ -270,6 +282,12 @@ create table Encantamiento
     radio_efecto integer,
     foreign key (carta) references Carta (id)
 );
+
+insert into Encantamiento (carta, radio_efecto)
+select distinct AVG(p.id), c.radious
+from cards as c join playerscards as p on c.name = p.name
+where radious IS NOT NULL
+group by c.name, c.damage, c.hit_speed, c.rarity, c.arena, c.radious;
 
 drop table if exists compuesto cascade;
 create table compuesto
@@ -307,8 +325,8 @@ create table Temporada
     primary key (nombre)
 );
 
-drop table if exists Participa cascade;
-create table Participa
+drop table if exists Pelea cascade;
+create table Pelea
 (
     temporada varchar(255),
     jugador   varchar(255),
@@ -342,14 +360,18 @@ create table Mision
 (
     id            integer,
     nombre        varchar(255),
-    dscripcion    text,
+    descripcion   text,
     requerimiento text,
     mision_dep    integer,
     primary key (id),
     foreign key (mision_dep) references Mision (id)
 );
 
-drop table if exists Realiza cascade;
+insert into Mision (id, nombre, descripcion, requerimiento, mision_dep)
+select distinct quest_id, quest_title, quest_description, quest_requirement, quest_depends
+from players_quests;
+
+drop table if exists Realiza cascade;   --TODO se puede añadir un pk mas con la fecha o se tiene que añadir ID?
 create table Realiza
 (
     mision  integer,
@@ -359,6 +381,10 @@ create table Realiza
     foreign key (mision) references Mision (id),
     foreign key (jugador) references Jugador (id)
 );
+
+insert into Realiza (mision, jugador, fecha)
+select distinct quest_id, player_tag, unlock
+from players_quests;
 
 drop table if exists Mision_arena cascade;
 create table Mision_arena
@@ -371,6 +397,10 @@ create table Mision_arena
     foreign key (mision) references Mision (id),
     foreign key (arena) references Arena (id)
 );
+
+insert into Mision_arena (mision, arena, experiencia, recompensa_oro)
+select distinct quest_id, arena_id, experience, gold
+from quests_arenas;
 
 drop table if exists Batalla cascade;
 create table batalla
