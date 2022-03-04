@@ -28,7 +28,7 @@ select distinct tag, name, experience, trophies, oro, gemas, cardnumber
 from players join oro_gemas on player = tag;
 
 drop table if exists Clan cascade ;
-create Table Clan
+create table Clan
 (
     id              varchar(255),
     nombre          varchar(255),
@@ -38,6 +38,9 @@ create Table Clan
     puntuacion      int,
     Primary Key (id)
 );
+
+insert into Clan (id, nombre, descripcion, minimo_trofeos, puntuacion, trofeos_totales)
+select distinct tag, name, description, requiredtrophies, score, trophies from clans;
 
 drop table if exists Formado cascade;
 create table Formado
@@ -70,6 +73,9 @@ create table Insignia
     imagenUrl text,
     primary key (nombre)
 );
+
+insert into Insignia (nombre, imagenUrl)
+select distinct name, img from playersbadge;
 
 drop table if exists Adquiere cascade;
 create table Adquiere
