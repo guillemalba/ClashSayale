@@ -372,7 +372,7 @@ create table Temporada
     primary key (nombre)
 );
 insert into Temporada(nombre, fecha_inicio, fecha_final)
-select distinct name,startdate,enddate
+select distinct name,startDate,enddate
 from seasons;
 
 drop table if exists Pelea cascade;
