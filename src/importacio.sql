@@ -298,6 +298,7 @@ COPY technologies FROM '/Users/Shared/Bases/Base/technologies.csv' CSV HEADER DE
 DROP TABLE IF EXISTS oro_gemas CASCADE;
 CREATE TABLE oro_gemas
 (
+    player            VARCHAR(255),
     oro               INTEGER,
     gemas             INTEGER
 );
