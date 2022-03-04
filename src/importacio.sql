@@ -1,70 +1,70 @@
 drop table if exists arena_pack cascade;
 create table arena_pack(
-    id      int,
-    arena   int,
-    gold    int
+                           id      int,
+                           arena   int,
+                           gold    int
 );
 
 copy arena_pack from '/Users/Shared/Bases/Base/arena_pack.csv' csv header delimiter ',';
 
 drop table if exists arenas cascade ;
 create table arenas(
-    id      int,
-    name    varchar(255),
-    minTrophies     int,
-    maxTrophies     int
+                       id      int,
+                       name    varchar(255),
+                       minTrophies     int,
+                       maxTrophies     int
 );
 
 copy arenas from '/Users/Shared/Bases/Base/arenas.csv' csv header delimiter ',';
 
 drop table if exists battles cascade;
 create table battles(
-    winner             int,
-    loser              int,
-    winner_score       int,
-    loser_score        int,
-    date               date,
-    duration           time,
-    clan_battle        int
+                        winner             int,
+                        loser              int,
+                        winner_score       int,
+                        loser_score        int,
+                        date               date,
+                        duration           time,
+                        clan_battle        int
 );
 
 copy battles from '/Users/Shared/Bases/Base/battles.csv' csv header delimiter ',';
 
 drop table if exists buildings cascade;
 create table buildings(
-    building           varchar(255),
-    cost                int,
-    trophies            int,
-    prerequisite        Varchar(255),
-    mod_damage          int,
-    mod_hit_speed       int,
-    mod_radius          int,
-    mod_spawn_damage    int,
-    mod_lifetime        int,
-    description         text
+                          building           varchar(255),
+                          cost                int,
+                          trophies            int,
+                          prerequisite        Varchar(255),
+                          mod_damage          int,
+                          mod_hit_speed       int,
+                          mod_radius          int,
+                          mod_spawn_damage    int,
+                          mod_lifetime        int,
+                          description         text
 );
 
 copy buildings from '/Users/Shared/Bases/Base/buildings.csv' csv header delimiter ',';
 
 drop table if exists cards cascade;
 create table cards(
-    name            varchar(255),
-    rarity          varchar(100),
-    arena           int,
-    damage          int,
-    hit_speed       int,
-    spawn_damage    int,
-    lifetime        int,
-    radious         int
+                      name            varchar(255),
+                      rarity          varchar(100),
+                      arena           int,
+                      damage          int,
+                      hit_speed       int,
+                      spawn_damage    int,
+                      lifetime        int,
+                      radious         int
 );
 copy cards from '/Users/Shared/Bases/Base/cards.csv' csv header delimiter ',';
 
 drop table if exists clan_battles cascade;
 create table clan_battles(
-    battle       int,
-    clan         Varchar(255),
-    start_date   date,
-    end_date     date
+                             battle       int,
+                             clan         Varchar(255),
+                             start_date   date,
+                             end_date     date
 );
 
 copy clan_battles from '/Users/Shared/Bases/Base/clan_battles.csv' csv header delimiter ',';
@@ -292,5 +292,13 @@ CREATE TABLE technologies
     mod_spawn_damage INTEGER,
     mod_lifetime     INTEGER,
     description      text
+);
+COPY technologies FROM '/Users/Shared/Bases/Base/technologies.csv' CSV HEADER DELIMITER ',';
+
+DROP TABLE IF EXISTS oro_gemas CASCADE;
+CREATE TABLE oro_gemas
+(
+    oro               INTEGER,
+    gemas             INTEGER
 );
 COPY technologies FROM '/Users/Shared/Bases/Base/technologies.csv' CSV HEADER DELIMITER ',';
