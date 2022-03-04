@@ -1,6 +1,16 @@
 /*------------ GUILLEM (VERDE)------------*/
-Drop table if exists Jugador cascade;
-Create table Jugador
+
+drop table if exists Tarjeta cascade;
+create table Tarjeta
+(
+    numero_tarjeta  bigint,
+    fecha_caducidad date,
+    jugador_id      varchar(255),
+    primary key (numero_tarjeta)
+);
+
+drop table if exists Jugador cascade;
+create table Jugador
 (
     id          Varchar(255),
     nombre      Varchar(255),
@@ -8,11 +18,15 @@ Create table Jugador
     trofeos     int,
     oro         int,
     gemas       int,
-    primary key (id)
+    tarjeta     bigint,
+    primary key (id),
+    foreign key (tarjeta) references Tarjeta(numero_tarjeta)
 );
 
-Drop Table If Exists Clan Cascade;
-Create Table Clan
+
+
+drop Table If Exists Clan Cascade;
+create Table Clan
 (
     id              varchar(255),
     nombre          varchar(255),
@@ -23,8 +37,8 @@ Create Table Clan
     Primary Key (id)
 );
 
-Drop table if exists Formado cascade;
-Create table Formado
+drop table if exists Formado cascade;
+create table Formado
 (
     clan    Varchar(255),
     jugador Varchar(255),
@@ -35,8 +49,8 @@ Create table Formado
     foreign key (jugador) references Jugador (id)
 );
 
-Drop table if exists Dona cascade;
-Create table Dona
+drop table if exists Dona cascade;
+create table Dona
 (
     clan    varchar(255),
     jugador varchar(255),
@@ -47,16 +61,16 @@ Create table Dona
     foreign key (jugador) references Jugador (id)
 );
 
-Drop table if exists Insignia cascade;
-Create table Insignia
+drop table if exists Insignia cascade;
+create table Insignia
 (
     nombre    varchar(255),
     imagenUrl text,
     primary key (nombre)
 );
 
-Drop table if exists Adquiere cascade;
-Create table Adquiere
+drop table if exists Adquiere cascade;
+create table Adquiere
 (
     clan     varchar(255),
     insignia varchar(255),
@@ -66,18 +80,18 @@ Create table Adquiere
     foreign key (insignia) references Insignia (nombre)
 );
 
-Drop table if exists Batalla_Clan cascade;
-Create table Batalla_Clan
+drop table if exists Batalla_Clan cascade;
+create table Batalla_Clan
 (
     id serial,
     primary key (id)
 );
 
-Drop table if exists Participa cascade;
+drop table if exists Participa cascade;
 create table Participa
 (
     batalla_clan integer,
-    clan         varchar(255), /*TODO: tipo?*/
+    clan         varchar(255),
     fecha_inicio date,
     fech_fin     date,
     primary key (batalla_clan, clan)
@@ -93,8 +107,8 @@ create table Arena
     primary key (id)
 );
 
-Drop table if exists Consigue cascade;
-Create table Consigue
+drop table if exists Consigue cascade;
+create table Consigue
 (
     insignia varchar(255),
     arena    integer,
@@ -112,8 +126,8 @@ create table Mensaje_clan
     id                 serial,
     cuerpo             text,
     fecha              date,
-    emisor             varchar(255), /*TODO: tipo?*/
-    receptor           varchar(255), /*TODO: tipo?*/
+    emisor             varchar(255),
+    receptor           varchar(255),
     mensaje_respondido integer,
     primary key (id),
     foreign key (mensaje_respondido) references Mensaje_clan (id),
@@ -345,8 +359,8 @@ create table batalla
 );
 
 /*------------ DIDAC (MORADO)------------*/
-Drop table if exists Mensaje cascade;
-Create table Mensaje
+drop table if exists Mensaje cascade;
+create table Mensaje
 (
     id                  serial,
     cuerpo              text,
@@ -356,91 +370,69 @@ Create table Mensaje
     foreign key (idMensajeRespondido) references Mensaje (id)
 );
 
-DROP TABLE IF EXISTS Escribe CASCADE;
-CREATE TABLE Escribe
+drop table if exists Escribe cascade ;
+create table Escribe
 (
-    id_emisor   INT,
-    id_receptor INT,
-    id_mensaje  INT,
-    PRIMARY KEY (id_emisor, id_receptor, id_mensaje),
-    FOREIGN KEY (id_emisor) REFERENCES Jugador (id),
-    FOREIGN KEY (id_receptor) REFERENCES Jugador (id),
-    FOREIGN KEY (id_mensaje) REFERENCES Mensaje (id)
+    id_emisor   varchar(255),
+    id_receptor varchar(255),
+    id_mensaje  integer,
+    primary key (id_emisor, id_receptor, id_mensaje),
+    foreign key (id_emisor) references Jugador (id),
+    foreign key (id_receptor) references Jugador (id),
+    foreign key (id_mensaje) references Mensaje (id)
 );
 
-DROP TABLE IF EXISTS Amigo CASCADE;
-CREATE TABLE Amigo
+drop table if exists Amigo cascade;
+create table Amigo
 (
-    id_jugador_emisor   INT,
-    id_jugador_receptor INT,
-    PRIMARY KEY (id_jugador_emisor, id_jugador_receptor),
-    FOREIGN KEY (id_jugador_emisor) REFERENCES Jugador (id),
-    FOREIGN KEY (id_jugador_receptor) REFERENCES Jugador (id)
+    id_jugador_emisor   varchar(255),
+    id_jugador_receptor varchar(255),
+    primary key (id_jugador_emisor, id_jugador_receptor),
+    foreign key (id_jugador_emisor) references Jugador (id),
+    foreign key (id_jugador_receptor) references Jugador (id)
 );
 
-DROP TABLE IF EXISTS Compra CASCADE;
-CREATE TABLE Compra
+drop table if exists Articulo cascade ;
+create table Articulo
 (
-    id_jugador  INT,
-    id_tarjeta  INT,
-    id_articulo INT,
-    PRIMARY KEY (id_jugador, id_tarjeta, id_articulo),
-    FOREIGN KEY (id_jugador) REFERENCES Jugador (id),
-    FOREIGN KEY (id_tarjeta) REFERENCES Tarjeta (card_number),
-    FOREIGN KEY (id_articulo) REFERENCES Articulo (id)
+    id           serial,
+    coste_real   integer,
+    veces_compra integer,
+    nombre       varchar(50),
+    primary key (id)
 );
 
-DROP TABLE IF EXISTS Tarjeta CASCADE;
-CREATE TABLE Tarjeta
+drop table if exists Emoticono cascade;
+create table Emoticono
 (
-    card_number     INT,
-    fecha_caducidad INT,
-    jugador_id      INT,
-    PRIMARY KEY (card_number),
-    FOREIGN KEY (jugador_id) REFERENCES Jugador (id)
+    id_emoticono    integer,
+    nombre          varchar(50),
+    path            varchar(255),
+    primary key (id_emoticono),
+    foreign key (id_emoticono) references Articulo (id)
 );
 
-DROP TABLE IF EXISTS Articulo CASCADE;
-CREATE TABLE Articulo
+drop table if exists Cofre cascade;
+create table Cofre
 (
-    id           INT,
-    coste_real   FLOAT,
-    veces_compra INT,
-    nombre       VARCHAR(50),
-    PRIMARY KEY (id)
-);
-
-DROP TABLE IF EXISTS Emoticono CASCADE;
-CREATE TABLE Emoticono
-(
-    id     int,
-    nombre VARCHAR(50),
-    path   varchar(255),
-    PRIMARY KEY (id),
-    FOREIGN KEY (id) REFERENCES Articulo (id)
-);
-
-DROP TABLE IF EXISTS Cofre CASCADE;
-CREATE TABLE Cofre
-(
-    id                int,
-    nombre            varchar(255),
-    rareza            varchar(255),
-    tiempo_desbloqueo int,
-    num_cartas        int,
-    primary key (id),
-    foreign key (id) references Articulo (id)
+    id_cofre            int,
+    nombre              varchar(255),
+    rareza              varchar(255),
+    tiempo_desbloqueo   int,
+    num_cartas          int,
+    primary key (id_cofre),
+    foreign key (id_cofre) references Articulo (id)
 );
 
 drop table if exists Paquete_Arena cascade;
 create table Paquete_Arena
 (
-    id_p_arena int,
-    oro        int,
-    arena_id   int,
+    id_p_arena  int,
+    oro         int,
+    arena       int,
     primary key (id_p_arena),
     foreign key (id_p_arena) references Articulo (id),
-    foreign key (arena_id) references Arena (id)
+    foreign key (arena) references Arena (id)
 );
 
 drop table if exists Paquete_Oferta cascade;
@@ -452,3 +444,16 @@ create table Paquete_Oferta
     primary key (id_p_oferta),
     foreign key (id_p_oferta) references Articulo (id)
 );
+
+drop table if exists Compra cascade ;
+create table Compra
+(
+    id_jugador  varchar(255),
+    id_tarjeta  bigint,
+    id_articulo integer,
+    primary key (id_jugador, id_tarjeta, id_articulo),
+    foreign key (id_jugador) references Jugador (id),
+    foreign key (id_tarjeta) references Tarjeta (numero_tarjeta),
+    foreign key (id_articulo) references Articulo (id)
+);
+
