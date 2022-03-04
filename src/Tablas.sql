@@ -1,19 +1,19 @@
 /*------------ GUILLEM (VERDE)------------*/
-
 drop table if exists Tarjeta cascade;
 create table Tarjeta
 (
     numero_tarjeta  bigint,
     fecha_caducidad date,
-    jugador_id      varchar(255),
     primary key (numero_tarjeta)
 );
+
+insert into Tarjeta (numero_tarjeta, fecha_caducidad) select distinct cardnumber, cardexpiry from players;
 
 drop table if exists Jugador cascade;
 create table Jugador
 (
-    id          Varchar(255),
-    nombre      Varchar(255),
+    id          varchar(255),
+    nombre      varchar(255),
     experiencia int,
     trofeos     int,
     oro         int,
@@ -23,9 +23,11 @@ create table Jugador
     foreign key (tarjeta) references Tarjeta(numero_tarjeta)
 );
 
+insert into Jugador (id, nombre, experiencia, trofeos, oro, gemas, tarjeta)
+select distinct tag, name, experience, trophies, oro, gemas, cardnumber
+from players join oro_gemas on player = tag;
 
-
-drop Table If Exists Clan Cascade;
+drop table if exists Clan cascade ;
 create Table Clan
 (
     id              varchar(255),
@@ -83,7 +85,7 @@ create table Adquiere
 drop table if exists Batalla_Clan cascade;
 create table Batalla_Clan
 (
-    id serial,
+    id integer,
     primary key (id)
 );
 
@@ -100,12 +102,14 @@ create table Participa
 drop table if exists Arena cascade;
 create table Arena
 (
-    id          serial, --TODO mirar si se pueden forzar datos en un serial. Si no se puede ponerlo integer.
+    id          integer,
     nombre      varchar(255),
     max_trofeos integer,
     min_trofeos integer,
     primary key (id)
 );
+
+insert into Arena (id, nombre, max_trofeos, min_trofeos) select distinct id, name, minTrophies, maxTrophies from arenas;
 
 drop table if exists Consigue cascade;
 create table Consigue
@@ -123,7 +127,7 @@ create table Consigue
 drop table if exists Mensaje_clan cascade;
 create table Mensaje_clan
 (
-    id                 serial,
+    id                 integer,
     cuerpo             text,
     fecha              date,
     emisor             varchar(255),
@@ -187,7 +191,7 @@ Create table Clan_modificador
 drop table if exists Deck cascade;
 create table Deck
 (
-    id          serial,
+    id          integer,
     titulo      varchar(255),
     descripcion text,
     fecha       date,
@@ -207,7 +211,7 @@ create table Ve
 drop table if exists Carta cascade;
 create table Carta
 (
-    id               serial,
+    id               integer,
     nombre           varchar(255),
     daño             integer,
     velocidad_ataque integer,
@@ -216,6 +220,11 @@ create table Carta
     primary key (id),
     foreign key (arena) references Arena (id)
 );
+
+insert into Carta (id, nombre, daño, velocidad_ataque, rereza, arena)
+select distinct AVG(p.id), c.name, c.damage, c.hit_speed, c.rarity, c.arena
+from cards as c join playerscards as p on c.name = p.name
+group by c.name, c.damage, c.hit_speed, c.rarity, c.arena;
 
 drop table if exists Edificio cascade;
 create table Edificio
@@ -362,7 +371,7 @@ create table batalla
 drop table if exists Mensaje cascade;
 create table Mensaje
 (
-    id                  serial,
+    id                  integer,
     cuerpo              text,
     fecha               Date,
     idMensajeRespondido int,
@@ -395,7 +404,7 @@ create table Amigo
 drop table if exists Articulo cascade ;
 create table Articulo
 (
-    id           serial,
+    id           integer,
     coste_real   integer,
     veces_compra integer,
     nombre       varchar(50),
