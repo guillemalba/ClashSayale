@@ -111,15 +111,22 @@ create table Batalla_Clan
     primary key (id)
 );
 
-drop table if exists Participa cascade;
-create table Participa
+insert into Batalla_Clan(id) select distinct battle from clan_battles;
+
+
+drop table if exists Pelea cascade;
+create table Pelea
 (
     batalla_clan integer,
     clan         varchar(255),
     fecha_inicio date,
-    fech_fin     date,
+    fecha_fin     date,
     primary key (batalla_clan, clan)
 );
+
+insert into Pelea(batalla_clan, clan, fecha_inicio, fecha_fin)
+select battle, clan, start_date, end_date
+from clan_battles;
 
 drop table if exists Arena cascade;
 create table Arena
@@ -282,11 +289,11 @@ create table Carta
 );
 
 insert into Carta (id, nombre, daño, velocidad_ataque, rereza, arena)
-select distinct AVG(p.id), c.name, c.damage, c.hit_speed, c.rarity, c.arena
-from cards as c join playerscards as p on c.name = p.name
-group by c.name, c.damage, c.hit_speed, c.rarity, c.arena;
+select distinct AVG(p.id), p.name, c.damage, c.hit_speed, c.rarity, c.arena
+from cards as c right join playerscards as p on c.name = p.name
+group by p.name, c.damage, c.hit_speed, c.rarity, c.arena;
 
-select count(id) from carta; --TODO: Faltan dos cartas deberia haber 99 y hay 97 faltan los dos que tienen el 0
+
 
 drop table if exists Edificio cascade;  --TODO Como se hace para que no detecte los 0 como nulls
 create table Edificio
@@ -343,9 +350,9 @@ create table compuesto
     foreign key (jugador) references Jugador (id)
 );
 
-/*insert into compuesto(carta, deck, jugador, nivel)
-select card,deck,player,level --TODO: en teoria esta bien pero hay una carta que no esta en el csv de carta pero si en los de deck mas las cartas que no hemos podido añadir en el carta
-from playersdeck;*/
+insert into compuesto(carta, deck, jugador, nivel)
+select card,deck,player,level
+from playersdeck;
 
 drop table if exists Encuentra cascade;
 create table Encuentra
@@ -362,7 +369,7 @@ create table Encuentra
 
 
 
-/*------------ DANIEL (VERDE)------------*/
+/*------------ DANIEL (AMARILLO)------------*/
 drop table if exists Temporada cascade;
 create table Temporada
 (
@@ -375,8 +382,8 @@ insert into Temporada(nombre, fecha_inicio, fecha_final)
 select distinct name,startDate,enddate
 from seasons;
 
-drop table if exists Pelea cascade;
-create table Pelea
+drop table if exists Participa cascade;
+create table Participa
 (
     temporada varchar(255),
     jugador   varchar(255),
@@ -415,8 +422,6 @@ select distinct pa.player, pa.arena, l.id, pa.date
 from playersachievements as pa Join Logro as l on pa.name = l.nombre and pa.description = l.descripcion and pa.gems = l.recompensa_gemas;
 
 
-
-
 drop table if exists Mision cascade;
 create table Mision
 (
@@ -440,7 +445,7 @@ create table Realiza
     mision  integer,
     jugador varchar(255),
     fecha   date,
-    primary key (id,mision, jugador),
+    primary key (id),
     foreign key (mision) references Mision (id),
     foreign key (jugador) references Jugador (id)
 );
@@ -468,18 +473,24 @@ from quests_arenas;
 drop table if exists Batalla cascade;
 create table batalla
 (
-    deck_win     integer,
-    deck_lose    integer,
-    fecha        date,
-    durada       time,
-    puntos_win   integer,
-    puntos_lose  integer,
-    batalla_clan integer,
-    primary key (deck_lose, deck_win),
+    id              serial,
+    deck_win        integer,
+    deck_lose       integer,
+    fecha           date,
+    durada          time,
+    puntos_win      integer,
+    puntos_lose     integer,
+    batalla_clan    integer,
+    primary key (id),
     foreign key (deck_win) references Deck (id),
     foreign key (deck_lose) references Deck (id),
     foreign key (batalla_clan) references Batalla_Clan (id)
 );
+
+insert into Batalla(deck_win, deck_lose, fecha, durada, puntos_win, puntos_lose, batalla_clan)
+select winner, loser, date, duration, winner_score, loser_score, clan_battle
+from battles;
+
 
 /*------------ DIDAC (MORADO)------------*/
 drop table if exists Mensaje cascade;
