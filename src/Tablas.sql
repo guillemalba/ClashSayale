@@ -548,6 +548,10 @@ create table Articulo
     primary key (id)
 );
 
+insert into Articulo(id, coste_real, veces_compra, nombre)
+select distinct buy_id, buy_cost, buy_stock, buy_name
+from player_purchases;
+
 drop table if exists Emoticono cascade;
 create table Emoticono
 (
@@ -557,6 +561,12 @@ create table Emoticono
     primary key (id_emoticono),
     foreign key (id_emoticono) references Articulo (id)
 );
+
+insert into Emoticono(id_emoticono, nombre, path)
+select distinct buy_id, emote_name, emote_path
+from player_purchases
+where emote_name is not null;
+
 
 drop table if exists Cofre cascade;
 create table Cofre
@@ -570,6 +580,12 @@ create table Cofre
     foreign key (id_cofre) references Articulo (id)
 );
 
+insert into Cofre(id_cofre, nombre, rareza, tiempo_desbloqueo, num_cartas)
+select distinct buy_id, chest_name, chest_rarity, chest_unlock_time, chest_num_cards
+from player_purchases
+where chest_name is not null;
+
+
 drop table if exists Paquete_Arena cascade;
 create table Paquete_Arena
 (
@@ -580,6 +596,7 @@ create table Paquete_Arena
     foreign key (id_p_arena) references Articulo (id),
     foreign key (arena) references Arena (id)
 );
+
 
 drop table if exists Paquete_Oferta cascade;
 create table Paquete_Oferta
@@ -594,12 +611,17 @@ create table Paquete_Oferta
 drop table if exists Compra cascade ;
 create table Compra
 (
-    id_jugador  varchar(255),
-    id_tarjeta  bigint,
-    id_articulo integer,
-    primary key (id_jugador, id_tarjeta, id_articulo),
-    foreign key (id_jugador) references Jugador (id),
-    foreign key (id_tarjeta) references Tarjeta (numero_tarjeta),
-    foreign key (id_articulo) references Articulo (id)
+    id          serial,
+    jugador     varchar(255),
+    tarjeta     bigint,
+    articulo    integer,
+    primary key (id),
+    foreign key (jugador) references Jugador (id),
+    foreign key (tarjeta) references Tarjeta (numero_tarjeta),
+    foreign key (articulo) references Articulo (id)
 );
+
+insert into Compra(jugador, tarjeta, articulo)
+select player, credit_card, buy_id
+from player_purchases;
 
