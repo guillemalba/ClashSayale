@@ -637,3 +637,8 @@ create table Compra
 insert into Compra(jugador, tarjeta, articulo, fecha, descuento)
 select player, credit_card, buy_id, date, discount
 from player_purchases;
+
+
+/************* QUERIES DE PRUEBA *************/
+
+--Muestra el articulo mas comprado de la tienda
