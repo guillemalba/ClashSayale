@@ -28,7 +28,6 @@ select distinct tag, name, experience, trophies, oro, gemas, cardnumber
 from players join oro_gemas on player = tag;
 
 
-
 drop table if exists Clan cascade ;
 create table Clan
 (
@@ -87,8 +86,8 @@ create table Insignia
 insert into Insignia (nombre, imagenUrl)
 select distinct name, img from playersbadge;
 
-
-/*drop table if exists Adquiere cascade;
+/*
+drop table if exists Adquiere cascade;
 create table Adquiere
 (
     clan     varchar(255),
@@ -248,10 +247,12 @@ create table Deck
     titulo      varchar(255),
     descripcion text,
     fecha       date,
-    primary key (id)
+    jugador     varchar(255),
+    primary key (id),
+    foreign key (jugador) references Jugador(id)
 );
-insert into Deck(id,titulo,descripcion,fecha)
-select distinct deck,title,description,date
+insert into Deck(id,titulo,descripcion,fecha,jugador)
+select distinct deck,title,description,date,player
 from playersdeck;
 
 
@@ -282,9 +283,8 @@ create table Carta
     foreign key (arena) references Arena (id)
 );
 insert into Carta (id, nombre, daño, velocidad_ataque, rereza, arena)
-select distinct AVG(p.id), p.name, c.damage, c.hit_speed, c.rarity, c.arena
-from cards as c right join playerscards as p on c.name = p.name
-group by p.name, c.damage, c.hit_speed, c.rarity, c.arena;
+select distinct p.id, p.name, c.damage, c.hit_speed, c.rarity, c.arena
+from cards as c right join playerscards as p on c.name = p.name;
 
 
 drop table if exists Edificio cascade;  --TODO Como se hace para que no detecte los 0 como nulls
@@ -295,10 +295,9 @@ create table Edificio
     foreign key (carta) references Carta (id)
 );
 insert into Edificio (carta, vida)
-select distinct AVG(p.id), c.lifetime
-from cards as c join playerscards as p on c.name = p.name
-where lifetime is not null
-group by c.name, c.damage, c.hit_speed, c.rarity, c.arena, c.lifetime;
+select distinct p.id, c.lifetime
+from cards as c right join playerscards as p on c.name = p.name
+where c.lifetime is not null;
 
 
 drop table if exists Tropas cascade;
@@ -309,10 +308,9 @@ create table Tropas
     foreign key (carta) references Carta (id)
 );
 insert into Tropas (carta, daño_aparicion)
-select distinct AVG(p.id), c.spawn_damage
-from cards as c join playerscards as p on c.name = p.name
-where spawn_damage IS NOT NULL
-group by c.name, c.damage, c.hit_speed, c.rarity, c.arena, c.spawn_damage;
+select distinct p.id, c.spawn_damage
+from cards as c right join playerscards as p on c.name = p.name
+where c.spawn_damage is not null;
 
 
 drop table if exists Encantamiento cascade;
@@ -323,10 +321,9 @@ create table Encantamiento
     foreign key (carta) references Carta (id)
 );
 insert into Encantamiento (carta, radio_efecto)
-select distinct AVG(p.id), c.radious
-from cards as c join playerscards as p on c.name = p.name
-where radious IS NOT NULL
-group by c.name, c.damage, c.hit_speed, c.rarity, c.arena, c.radious;
+select distinct p.id, c.radious
+from cards as c right join playerscards as p on c.name = p.name
+where radious is not null;
 
 
 drop table if exists compuesto cascade;
@@ -334,15 +331,13 @@ create table compuesto
 (
     carta   integer,
     deck    integer,
-    jugador varchar(255),
     nivel   integer,
-    primary key (carta, deck, jugador),
+    primary key (carta, deck),
     foreign key (carta) references Carta (id),
-    foreign key (deck) references Deck (id),
-    foreign key (jugador) references Jugador (id)
+    foreign key (deck) references Deck (id)
 );
-insert into compuesto(carta, deck, jugador, nivel)
-select card,deck,player,level
+insert into compuesto(carta, deck, nivel)
+select card,deck,level
 from playersdeck;
 
 
@@ -351,14 +346,15 @@ create table Encuentra
 (
     jugador            varchar(255),
     carta              integer,
-    fecha_desbloqueada date,
     fecha_mejora       date,
     nivel_actual       integer,
     primary key (jugador, carta),
     foreign key (jugador) references Jugador (id),
     foreign key (carta) references Carta (id)
 );
-
+insert into Encuentra(jugador, carta, fecha_mejora, nivel_actual)
+select player, id, date, level
+from playerscards;
 
 
 /*------------ DANIEL (AMARILLO)------------*/
@@ -373,16 +369,6 @@ create table Temporada
 insert into Temporada(nombre, fecha_inicio, fecha_final)
 select distinct name,startDate,enddate
 from seasons;
-
-
-/*drop table if exists Participa cascade;
-create table Participa
-(
-    temporada varchar(255),
-    jugador   varchar(255),
-    primary key (temporada, jugador),
-    foreign key (temporada) references Temporada (nombre) --TODO: no hay ninguna tabla que nos relacione esto.
-);*/
 
 
 drop table if exists Logro cascade;
@@ -639,6 +625,30 @@ select player, credit_card, buy_id, date, discount
 from player_purchases;
 
 
+/*
+drop table if exists Participa cascade;
+create table Participa
+(
+    temporada varchar(255),
+    jugador   varchar(255),
+    primary key (temporada, jugador),
+    foreign key (temporada) references Temporada (nombre) --TODO: no hay ninguna tabla que nos relacione esto.
+);
+insert into Participa (temporada, jugador)*/
+
+/*select distinct *
+from batalla as b join deck as d on b.deck_win = d.id
+join compuesto as c on d.id = c.deck
+join jugador as j on c.jugador = j.id
+where deck_win = 101;
+*/
+
 /************* QUERIES DE PRUEBA *************/
 
 --Muestra el articulo mas comprado de la tienda
+select a2.nombre, a2.coste_real, count(c2.id) as num_compras
+from Articulo as a2 join compra as c2 on a2.id = c2.articulo
+group by a2.id having count(c2.id) = (select count(c.id) from articulo as a join compra as c on a.id = c.articulo group by a.id order by count(c.id) desc limit 1)
+order by count(c2.id) desc;
+
+--Muestra top 3 jugadores que han comprado mas articulos y cuanto dinero se han gastado
