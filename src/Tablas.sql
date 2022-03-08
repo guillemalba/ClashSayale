@@ -637,6 +637,7 @@ create table Participa
     primary key (temporada,jugador),
     foreign key (temporada) references Temporada (nombre) --TODO: no hay ninguna tabla que nos relacione esto.
 );
+
 insert into Participa (temporada, jugador)
 select distinct t.nombre , j.id
 from batalla as b join deck as d on b.deck_win = d.id
@@ -669,6 +670,29 @@ select distinct t.nombre, j.id
 from batalla as b join deck as d on b.deck_lose = d.id
 join jugador as j on j.id = d.jugador, temporada as t
 where b.fecha BETWEEN '2018-01-01' AND '2018-08-31' and t.nombre like 'T3';
+
+insert into Participa (temporada, jugador)
+select distinct t.nombre , j.id
+from batalla as b join deck as d on b.deck_win = d.id
+join jugador as j on j.id = d.jugador, temporada as t
+where t.nombre like'T4' and b.fecha BETWEEN '2018-01-01' AND '2018-08-31'
+union
+select distinct t.nombre, j.id
+from batalla as b join deck as d on b.deck_lose = d.id
+join jugador as j on j.id = d.jugador, temporada as t
+where b.fecha BETWEEN '2018-09-01' AND '2018-12-31' and t.nombre like 'T4';
+
+insert into Participa (temporada, jugador)
+select distinct t.nombre , j.id
+from batalla as b join deck as d on b.deck_win = d.id
+join jugador as j on j.id = d.jugador, temporada as t
+where t.nombre like'T5' and b.fecha BETWEEN '2018-01-01' AND '2018-08-31'
+union
+select distinct t.nombre, j.id
+from batalla as b join deck as d on b.deck_lose = d.id
+join jugador as j on j.id = d.jugador, temporada as t
+where b.fecha BETWEEN '2019-01-01' AND '2019-08-31' and t.nombre like 'T5';
+
 
 ------------------------------------------------------- tu de aqui hacia abajo putita
 insert into Participa (temporada, jugador)
@@ -718,13 +742,15 @@ where b.fecha BETWEEN '2021-01-01' AND '2021-08-31' and t.nombre like 'T9';
 insert into Participa (temporada, jugador)
 select distinct t.nombre , j.id
 from batalla as b join deck as d on b.deck_win = d.id
-                  join jugador as j on j.id = d.jugador, temporada as t
+join jugador as j on j.id = d.jugador, temporada as t
 where t.nombre like'T10' and b.fecha BETWEEN '2021-09-01' AND '2021-12-31'
 union
 select distinct t.nombre, j.id
 from batalla as b join deck as d on b.deck_lose = d.id
-                  join jugador as j on j.id = d.jugador, temporada as t
+join jugador as j on j.id = d.jugador, temporada as t
 where b.fecha BETWEEN '2021-09-01' AND '2021-12-31' and t.nombre like 'T10';
+
+select count(temporada) from temporada where temporada like 'T1';
 /************* QUERIES DE PRUEBA *************/
 
 --Muestra el articulo mas comprado de la tienda
