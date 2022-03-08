@@ -86,21 +86,23 @@ create table Insignia
 insert into Insignia (nombre, imagenUrl)
 select distinct name, img from playersbadge;
 
-/*
+
 drop table if exists Adquiere cascade;
 create table Adquiere
 (
+    id      serial,
     clan     varchar(255),
     insignia varchar(255),
     fecha    date,
-    primary key (clan, insignia),
+    primary key (clan, insignia,id),
     foreign key (clan) references Clan (id),
     foreign key (insignia) references Insignia (nombre)
 );
-import into Adquiere(clan,insignia,fecha)
-select distinc clan, insignia, dete
+
+insert into Adquiere(clan,insignia,fecha)
+select distinct clan, insignia, fecha
 from clan_insignia;
-*/
+
 
 
 drop table if exists Batalla_Clan cascade;
@@ -280,12 +282,12 @@ create table Carta
     nombre           varchar(255),
     daño             integer,
     velocidad_ataque integer,
-    rereza           varchar(255),
+    rareza           varchar(255),
     arena            integer,
     primary key (id),
     foreign key (arena) references Arena (id)
 );
-insert into Carta (id, nombre, daño, velocidad_ataque, rereza, arena)
+insert into Carta (id, nombre, daño, velocidad_ataque, rareza, arena)
 select distinct p.id, p.name, c.damage, c.hit_speed, c.rarity, c.arena
 from cards as c right join playerscards as p on c.name = p.name;
 
@@ -693,8 +695,6 @@ from batalla as b join deck as d on b.deck_lose = d.id
 join jugador as j on j.id = d.jugador, temporada as t
 where b.fecha BETWEEN '2019-01-01' AND '2019-08-31' and t.nombre like 'T5';
 
-
-------------------------------------------------------- tu de aqui hacia abajo putita
 insert into Participa (temporada, jugador)
 select distinct t.nombre , j.id
 from batalla as b join deck as d on b.deck_win = d.id
@@ -750,8 +750,10 @@ from batalla as b join deck as d on b.deck_lose = d.id
 join jugador as j on j.id = d.jugador, temporada as t
 where b.fecha BETWEEN '2021-09-01' AND '2021-12-31' and t.nombre like 'T10';
 
-select count(temporada) from temporada where temporada like 'T1';
+select count(temporada) from participa where temporada like 'T10';
 /************* QUERIES DE PRUEBA *************/
+
+
 
 --Muestra el articulo mas comprado de la tienda
 select a2.nombre, a2.coste_real, count(c2.id) as num_compras
@@ -763,9 +765,20 @@ order by count(c2.id) desc;
 
 
 
---cuales son los 5 modificadores con mas daño, que sea estructura, que no depende de ningun otro modificador y que tenga almenos 1100 trofeos.
+--Muestra el nombre y el daño de los 5 modificadores con mas daño, que sea estructura, que no depende de ningun otro modificador y que tenga almenos 1100 trofeos.
 select m.nombre, m.daño
 from modificador as m join estructura as e on m.nombre = e.nombre
 where m.dependencia is null  and m.daño is not null and e.trofeos > 1100
 order by m.daño desc limit 5;
 
+--Muestra el nombre de los 10 primeros jugadores que haya participado en mas temporadas,
+
+select count(p.temporada) as num_temp,p.jugador,j.nombre from participa as p join jugador as j on p.jugador = j.id
+group by j.nombre,p.jugador order by num_temp desc,jugador limit 10;
+
+--Muestra el nombre, el daño, el daño de aparición y su arena, de la carta del tipo tropa
+--que sea epica, y que tenga el mayor daño y daño de aparición en ese orden.
+select c.nombre as nombre, c.daño as daño, t.daño_aparicion as dañoAparicion, c.arena
+from carta as c join tropas as t on c.id = t.carta
+where c.rareza like 'Legendary'
+group by c.nombre,daño,c.arena,t.daño_aparicion order by c.daño desc,t.daño_aparicion desc ;
