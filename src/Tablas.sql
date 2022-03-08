@@ -749,7 +749,7 @@ join jugador as j on j.id = d.jugador, temporada as t
 where b.fecha BETWEEN '2021-09-01' AND '2021-12-31' and t.nombre like 'T10';
 
 
-/************* QUERIES DE PRUEBA *************/
+/************************************* QUERIES DE PRUEBA **************************************************/
 
 
 
@@ -775,7 +775,7 @@ select count(p.temporada) as num_temp,p.jugador,j.nombre from participa as p joi
 group by j.nombre,p.jugador order by num_temp desc,jugador limit 10;
 
 --Muestra el nombre, el daño, el daño de aparición y su arena, de la carta del tipo tropa
---que sea epica, y que tenga el mayor daño y daño de aparición en ese orden.
+--que sea Legendary, y que tenga el mayor daño y daño de aparición en ese orden.
 select c.nombre as nombre, c.daño as daño, t.daño_aparicion as dañoAparicion, c.arena
 from carta as c join tropas as t on c.id = t.carta
 where c.rareza like 'Legendary'
