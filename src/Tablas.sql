@@ -641,17 +641,36 @@ insert into Participa (temporada, jugador)
 select distinct t.nombre , j.id
 from batalla as b join deck as d on b.deck_win = d.id
 join jugador as j on j.id = d.jugador, temporada as t
-where t.nombre like'T1' and b.fecha BETWEEN '2018-01-01' AND '2018-08-31'
+where t.nombre like'T1' and b.fecha BETWEEN '2017-01-01' AND '2017-08-31'
 union
 select distinct t.nombre, j.id
 from batalla as b join deck as d on b.deck_lose = d.id
 join jugador as j on j.id = d.jugador, temporada as t
-where b.fecha BETWEEN '2018-01-01' AND '2018-08-31' and t.nombre like 'T1';
+where b.fecha BETWEEN '2017-01-01' AND '2017-08-31' and t.nombre like 'T1';
 
+insert into Participa (temporada, jugador)
+select distinct t.nombre , j.id
+from batalla as b join deck as d on b.deck_win = d.id
+join jugador as j on j.id = d.jugador, temporada as t
+where t.nombre like'T2' and b.fecha BETWEEN '2017-09-01' AND '2017-12-31'
+union
+select distinct t.nombre, j.id
+from batalla as b join deck as d on b.deck_lose = d.id
+join jugador as j on j.id = d.jugador, temporada as t
+where b.fecha BETWEEN '2017-09-01' AND '2017-12-31' and t.nombre like 'T2';
 
-SELECT count(id) from batalla where fecha BETWEEN '2018-01-01' AND '2018-08-31';
+insert into Participa (temporada, jugador)
+select distinct t.nombre , j.id
+from batalla as b join deck as d on b.deck_win = d.id
+join jugador as j on j.id = d.jugador, temporada as t
+where t.nombre like'T3' and b.fecha BETWEEN '2018-01-01' AND '2018-08-31'
+union
+select distinct t.nombre, j.id
+from batalla as b join deck as d on b.deck_lose = d.id
+join jugador as j on j.id = d.jugador, temporada as t
+where b.fecha BETWEEN '2018-01-01' AND '2018-08-31' and t.nombre like 'T3';
 
-select count(jugador) from participa;
+------------------------------------------------------- tu de aqui hacia abajo putita
 
 /*select distinct *
 from batalla as b join deck as d on b.deck_win = d.id
