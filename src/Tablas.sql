@@ -671,14 +671,60 @@ join jugador as j on j.id = d.jugador, temporada as t
 where b.fecha BETWEEN '2018-01-01' AND '2018-08-31' and t.nombre like 'T3';
 
 ------------------------------------------------------- tu de aqui hacia abajo putita
-
-/*select distinct *
+insert into Participa (temporada, jugador)
+select distinct t.nombre , j.id
 from batalla as b join deck as d on b.deck_win = d.id
-join compuesto as c on d.id = c.deck
-join jugador as j on c.jugador = j.id
-where deck_win = 101;
-*/
+join jugador as j on j.id = d.jugador, temporada as t
+where t.nombre like'T6' and b.fecha BETWEEN '2019-09-01' AND '2019-12-31'
+union
+select distinct t.nombre, j.id
+from batalla as b join deck as d on b.deck_lose = d.id
+join jugador as j on j.id = d.jugador, temporada as t
+where b.fecha BETWEEN '2019-09-01' AND '2019-12-31' and t.nombre like 'T6';
 
+insert into Participa (temporada, jugador)
+select distinct t.nombre , j.id
+from batalla as b join deck as d on b.deck_win = d.id
+join jugador as j on j.id = d.jugador, temporada as t
+where t.nombre like'T7' and b.fecha BETWEEN '2020-01-01' AND '2020-08-31'
+union
+select distinct t.nombre, j.id
+from batalla as b join deck as d on b.deck_lose = d.id
+join jugador as j on j.id = d.jugador, temporada as t
+where b.fecha BETWEEN '2020-01-01' AND '2020-08-31' and t.nombre like 'T7';
+
+insert into Participa (temporada, jugador)
+select distinct t.nombre , j.id
+from batalla as b join deck as d on b.deck_win = d.id
+join jugador as j on j.id = d.jugador, temporada as t
+where t.nombre like'T8' and b.fecha BETWEEN '2020-09-01' AND '2020-12-31'
+union
+select distinct t.nombre, j.id
+from batalla as b join deck as d on b.deck_lose = d.id
+join jugador as j on j.id = d.jugador, temporada as t
+where b.fecha BETWEEN '2020-09-01' AND '2020-12-31' and t.nombre like 'T8';
+
+insert into Participa (temporada, jugador)
+select distinct t.nombre , j.id
+from batalla as b join deck as d on b.deck_win = d.id
+join jugador as j on j.id = d.jugador, temporada as t
+where t.nombre like'T9' and b.fecha BETWEEN '2021-01-01' AND '2021-08-31'
+union
+select distinct t.nombre, j.id
+from batalla as b join deck as d on b.deck_lose = d.id
+join jugador as j on j.id = d.jugador, temporada as t
+where b.fecha BETWEEN '2021-01-01' AND '2021-08-31' and t.nombre like 'T9';
+
+insert into Participa (temporada, jugador)
+select distinct t.nombre , j.id
+from batalla as b join deck as d on b.deck_win = d.id
+                  join jugador as j on j.id = d.jugador, temporada as t
+where t.nombre like'T10' and b.fecha BETWEEN '2021-09-01' AND '2021-12-31'
+union
+select distinct t.nombre, j.id
+from batalla as b join deck as d on b.deck_lose = d.id
+                  join jugador as j on j.id = d.jugador, temporada as t
+where b.fecha BETWEEN '2021-09-01' AND '2021-12-31' and t.nombre like 'T10';
 /************* QUERIES DE PRUEBA *************/
 
 --Muestra el articulo mas comprado de la tienda
