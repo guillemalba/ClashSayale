@@ -97,6 +97,9 @@ create table Adquiere
     foreign key (clan) references Clan (id),
     foreign key (insignia) references Insignia (nombre)
 );
+import into Adquiere(clan,insignia,fecha)
+select distinc clan, insignia, dete
+from clan_insignia;
 */
 
 
@@ -287,7 +290,7 @@ select distinct p.id, p.name, c.damage, c.hit_speed, c.rarity, c.arena
 from cards as c right join playerscards as p on c.name = p.name;
 
 
-drop table if exists Edificio cascade;  --TODO Como se hace para que no detecte los 0 como nulls
+drop table if exists Edificio cascade;
 create table Edificio
 (
     carta integer,
@@ -625,16 +628,30 @@ select player, credit_card, buy_id, date, discount
 from player_purchases;
 
 
-/*
+
 drop table if exists Participa cascade;
 create table Participa
 (
     temporada varchar(255),
     jugador   varchar(255),
-    primary key (temporada, jugador),
+    primary key (temporada,jugador),
     foreign key (temporada) references Temporada (nombre) --TODO: no hay ninguna tabla que nos relacione esto.
 );
-insert into Participa (temporada, jugador)*/
+insert into Participa (temporada, jugador)
+select distinct t.nombre , j.id
+from batalla as b join deck as d on b.deck_win = d.id
+join jugador as j on j.id = d.jugador, temporada as t
+where t.nombre like'T1' and b.fecha BETWEEN '2018-01-01' AND '2018-08-31'
+union
+select distinct t.nombre, j.id
+from batalla as b join deck as d on b.deck_lose = d.id
+join jugador as j on j.id = d.jugador, temporada as t
+where b.fecha BETWEEN '2018-01-01' AND '2018-08-31' and t.nombre like 'T1';
+
+
+SELECT count(id) from batalla where fecha BETWEEN '2018-01-01' AND '2018-08-31';
+
+select count(jugador) from participa;
 
 /*select distinct *
 from batalla as b join deck as d on b.deck_win = d.id
@@ -652,3 +669,12 @@ group by a2.id having count(c2.id) = (select count(c.id) from articulo as a join
 order by count(c2.id) desc;
 
 --Muestra top 3 jugadores que han comprado mas articulos y cuanto dinero se han gastado
+
+
+
+--cuales son los 5 modificadores con mas daño, que sea estructura, que no depende de ningun otro modificador y que tenga almenos 1100 trofeos.
+select m.nombre, m.daño
+from modificador as m join estructura as e on m.nombre = e.nombre
+where m.dependencia is null  and m.daño is not null and e.trofeos > 1100
+order by m.daño desc limit 5;
+
