@@ -303,3 +303,13 @@ CREATE TABLE oro_gemas
     player            VARCHAR(255)
 );
 COPY oro_gemas FROM '/Users/Shared/Bases/Base/oro_gemas.csv' CSV HEADER DELIMITER ',';
+
+
+DROP TABLE IF EXISTS clan_insignia CASCADE;
+CREATE TABLE clan_insignia
+(
+    insignia    VARCHAR(255),
+    clan        VARCHAR(255),
+    fecha       DATE
+);
+COPY clan_insignia FROM '/Users/Shared/Bases/Base/clan_insignia.csv' CSV HEADER DELIMITER ',';

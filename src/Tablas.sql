@@ -90,19 +90,17 @@ select distinct name, img from playersbadge;
 drop table if exists Adquiere cascade;
 create table Adquiere
 (
-    id      serial,
+    id       serial,
     clan     varchar(255),
     insignia varchar(255),
     fecha    date,
-    primary key (clan, insignia,id),
+    primary key (id),
     foreign key (clan) references Clan (id),
     foreign key (insignia) references Insignia (nombre)
 );
-
 insert into Adquiere(clan,insignia,fecha)
 select distinct clan, insignia, fecha
 from clan_insignia;
-
 
 
 drop table if exists Batalla_Clan cascade;
@@ -750,7 +748,7 @@ from batalla as b join deck as d on b.deck_lose = d.id
 join jugador as j on j.id = d.jugador, temporada as t
 where b.fecha BETWEEN '2021-09-01' AND '2021-12-31' and t.nombre like 'T10';
 
-select count(temporada) from participa where temporada like 'T10';
+
 /************* QUERIES DE PRUEBA *************/
 
 
