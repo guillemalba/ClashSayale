@@ -313,3 +313,362 @@ CREATE TABLE clan_insignia
     fecha       DATE
 );
 COPY clan_insignia FROM '/Users/Shared/Bases/Base/clan_insignia.csv' CSV HEADER DELIMITER ',';
+
+
+
+/******************* INSERTS *******************/
+insert into Tarjeta (numero_tarjeta, fecha_caducidad)
+select distinct cardnumber, cardexpiry from players;
+
+
+insert into Jugador (id, nombre, experiencia, trofeos, oro, gemas, tarjeta)
+select distinct tag, name, experience, trophies, oro, gemas, cardnumber
+from players join oro_gemas on player = tag;
+
+
+insert into Clan (id, nombre, descripcion, minimo_trofeos, puntuacion, trofeos_totales)
+select distinct tag, name, description, requiredtrophies, score, trophies from clans;
+
+
+insert into Formado(clan, jugador,fecha,role)
+select distinct clan,player,date,role
+from playersclans;
+
+
+insert into Dona(clan,jugador,oro,fecha)
+select distinct clan,player,gold,date
+from playersclansdonations;
+
+
+insert into Insignia (nombre, imagenUrl)
+select distinct name, img from playersbadge;
+
+
+insert into Adquiere(clan,insignia,fecha)
+select distinct clan, insignia, fecha
+from clan_insignia;
+
+
+insert into Batalla_Clan(id) select distinct battle from clan_battles;
+
+
+insert into Pelea(batalla_clan, clan, fecha_inicio, fecha_fin)
+select battle, clan, start_date, end_date
+from clan_battles;
+
+
+insert into Arena (id, nombre, max_trofeos, min_trofeos)
+select distinct id, name, minTrophies, maxTrophies from arenas;
+
+
+insert into Consigue(insignia, arena, jugador, fecha)
+select distinct name,arena,player,date
+from playersbadge;
+
+
+insert into Mensaje_clan(id, cuerpo, fecha, emisor, receptor, mensaje_respondido)
+select distinct id,text,date,sender,receiver,answer
+from messages_to_clans;
+
+
+insert into Modificador(nombre, coste_oro, descripcion, daño, vel_ataque, daño_aparicion, radio, vida, dependencia)
+select distinct building,cost,description,mod_damage,mod_hit_speed,mod_spawn_damage,mod_radius,mod_lifetime,prerequisite
+from buildings
+UNION
+select distinct technology,cost,description,mod_damage,mod_hit_speed,mod_spawn_damage,mod_radius,mod_lifetime,prerequisite
+from technologies;
+
+
+insert into Tecnologias(nombre, nivel_max, dep_level)
+select distinct technology,max_level,prereq_level
+from technologies;
+
+
+insert into Estructura(nombre, trofeos)
+select distinct building, trophies
+from buildings;
+
+
+insert into Clan_modificador(clan, modificador, nivel, fecha)
+select clan,concat_ws('',tech,structure),level,date
+from clan_tech_structures;
+
+
+insert into Deck(id,titulo,descripcion,fecha,jugador)
+select distinct deck,title,description,date,player
+from playersdeck;
+
+
+insert into Ve(deck,jugador)
+select distinct deck,player
+from shared_decks;
+
+
+insert into Carta (id, nombre, daño, velocidad_ataque, rareza, arena)
+select distinct p.id, p.name, c.damage, c.hit_speed, c.rarity, c.arena
+from cards as c right join playerscards as p on c.name = p.name;
+
+
+insert into Edificio (carta, vida)
+select distinct p.id, c.lifetime
+from cards as c right join playerscards as p on c.name = p.name
+where c.lifetime is not null;
+
+
+insert into Tropas (carta, daño_aparicion)
+select distinct p.id, c.spawn_damage
+from cards as c right join playerscards as p on c.name = p.name
+where c.spawn_damage is not null;
+
+
+insert into Encantamiento (carta, radio_efecto)
+select distinct p.id, c.radious
+from cards as c right join playerscards as p on c.name = p.name
+where radious is not null;
+
+
+insert into compuesto(carta, deck, nivel)
+select card,deck,level
+from playersdeck;
+
+
+insert into Encuentra(jugador, carta, fecha_mejora, nivel_actual)
+select player, id, date, level
+from playerscards;
+
+
+insert into Temporada(nombre, fecha_inicio, fecha_final)
+select distinct name,startDate,enddate
+from seasons;
+
+
+insert into Logro(nombre, descripcion, recompensa_gemas)
+select distinct name,description,gems
+from playersachievements
+group by name,description,gems;
+
+
+insert into Desbloquea(jugador, arena,id_logro, fecha)
+select distinct pa.player, pa.arena, l.id, pa.date
+from playersachievements as pa Join Logro as l on pa.name = l.nombre and pa.description = l.descripcion and pa.gems = l.recompensa_gemas;
+
+
+insert into Mision (id, nombre, descripcion, requerimiento, mision_dep)
+select distinct quest_id, quest_title, quest_description, quest_requirement, quest_depends
+from players_quests;
+
+
+insert into Realiza (mision, jugador, fecha)
+select distinct quest_id, player_tag, unlock
+from players_quests;
+
+
+insert into Mision_arena (mision, arena, experiencia, recompensa_oro)
+select distinct quest_id, arena_id, experience, gold
+from quests_arenas;
+
+
+insert into Batalla(deck_win, deck_lose, fecha, durada, puntos_win, puntos_lose, batalla_clan)
+select winner, loser, date, duration, winner_score, loser_score, clan_battle
+from battles;
+
+
+insert into Mensaje(id, cuerpo, fecha, idMensajeRespondido)
+select distinct id,text,date,answer
+from messages_between_players;
+
+
+insert into Escribe(id_emisor, id_receptor, id_mensaje)
+select distinct sender,receiver,id
+from messages_between_players;
+
+
+insert into Amigo(id_jugador_emisor, id_jugador_receptor)
+select distinct requester,requeted
+from friends;
+
+
+insert into Articulo(id, coste_real, veces_compra, nombre)
+select distinct buy_id, buy_cost, buy_stock, buy_name
+from player_purchases;
+
+
+insert into Emoticono(id_emoticono, nombre, path)
+select distinct buy_id, emote_name, emote_path
+from player_purchases
+where emote_name is not null;
+
+
+insert into Cofre(id_cofre, nombre, rareza, tiempo_desbloqueo, num_cartas)
+select distinct buy_id, chest_name, chest_rarity, chest_unlock_time, chest_num_cards
+from player_purchases
+where chest_name is not null;
+
+
+insert into Paquete_Arena(id_paquete)
+select distinct buy_id
+from player_purchases
+where arenapack_id is not null;
+
+
+insert into Nivel_Arena(arena, paquete, oro)
+select distinct a.arena, p.buy_id, a.gold
+from arena_pack as a join player_purchases as p on p.arenapack_id = a.id;
+
+
+insert into Paquete_Oferta(id_p_oferta, oro_contenido, gemas_contenido)
+select distinct buy_id, bundle_gold, bundle_gems from player_purchases
+where bundle_gold is not null;
+
+
+insert into Compra(jugador, tarjeta, articulo, fecha, descuento)
+select player, credit_card, buy_id, date, discount
+from player_purchases;
+
+
+insert into Participa (temporada, jugador)
+select distinct t.nombre , j.id
+from batalla as b join deck as d on b.deck_win = d.id
+                  join jugador as j on j.id = d.jugador, temporada as t
+where t.nombre like'T1' and b.fecha BETWEEN '2017-01-01' AND '2017-08-31'
+union
+select distinct t.nombre, j.id
+from batalla as b join deck as d on b.deck_lose = d.id
+                  join jugador as j on j.id = d.jugador, temporada as t
+where b.fecha BETWEEN '2017-01-01' AND '2017-08-31' and t.nombre like 'T1';
+
+insert into Participa (temporada, jugador)
+select distinct t.nombre , j.id
+from batalla as b join deck as d on b.deck_win = d.id
+                  join jugador as j on j.id = d.jugador, temporada as t
+where t.nombre like'T2' and b.fecha BETWEEN '2017-09-01' AND '2017-12-31'
+union
+select distinct t.nombre, j.id
+from batalla as b join deck as d on b.deck_lose = d.id
+                  join jugador as j on j.id = d.jugador, temporada as t
+where b.fecha BETWEEN '2017-09-01' AND '2017-12-31' and t.nombre like 'T2';
+
+insert into Participa (temporada, jugador)
+select distinct t.nombre , j.id
+from batalla as b join deck as d on b.deck_win = d.id
+                  join jugador as j on j.id = d.jugador, temporada as t
+where t.nombre like'T3' and b.fecha BETWEEN '2018-01-01' AND '2018-08-31'
+union
+select distinct t.nombre, j.id
+from batalla as b join deck as d on b.deck_lose = d.id
+                  join jugador as j on j.id = d.jugador, temporada as t
+where b.fecha BETWEEN '2018-01-01' AND '2018-08-31' and t.nombre like 'T3';
+
+insert into Participa (temporada, jugador)
+select distinct t.nombre , j.id
+from batalla as b join deck as d on b.deck_win = d.id
+                  join jugador as j on j.id = d.jugador, temporada as t
+where t.nombre like'T4' and b.fecha BETWEEN '2018-01-01' AND '2018-08-31'
+union
+select distinct t.nombre, j.id
+from batalla as b join deck as d on b.deck_lose = d.id
+                  join jugador as j on j.id = d.jugador, temporada as t
+where b.fecha BETWEEN '2018-09-01' AND '2018-12-31' and t.nombre like 'T4';
+
+insert into Participa (temporada, jugador)
+select distinct t.nombre , j.id
+from batalla as b join deck as d on b.deck_win = d.id
+                  join jugador as j on j.id = d.jugador, temporada as t
+where t.nombre like'T5' and b.fecha BETWEEN '2018-01-01' AND '2018-08-31'
+union
+select distinct t.nombre, j.id
+from batalla as b join deck as d on b.deck_lose = d.id
+                  join jugador as j on j.id = d.jugador, temporada as t
+where b.fecha BETWEEN '2019-01-01' AND '2019-08-31' and t.nombre like 'T5';
+
+insert into Participa (temporada, jugador)
+select distinct t.nombre , j.id
+from batalla as b join deck as d on b.deck_win = d.id
+                  join jugador as j on j.id = d.jugador, temporada as t
+where t.nombre like'T6' and b.fecha BETWEEN '2019-09-01' AND '2019-12-31'
+union
+select distinct t.nombre, j.id
+from batalla as b join deck as d on b.deck_lose = d.id
+                  join jugador as j on j.id = d.jugador, temporada as t
+where b.fecha BETWEEN '2019-09-01' AND '2019-12-31' and t.nombre like 'T6';
+
+insert into Participa (temporada, jugador)
+select distinct t.nombre , j.id
+from batalla as b join deck as d on b.deck_win = d.id
+                  join jugador as j on j.id = d.jugador, temporada as t
+where t.nombre like'T7' and b.fecha BETWEEN '2020-01-01' AND '2020-08-31'
+union
+select distinct t.nombre, j.id
+from batalla as b join deck as d on b.deck_lose = d.id
+                  join jugador as j on j.id = d.jugador, temporada as t
+where b.fecha BETWEEN '2020-01-01' AND '2020-08-31' and t.nombre like 'T7';
+
+insert into Participa (temporada, jugador)
+select distinct t.nombre , j.id
+from batalla as b join deck as d on b.deck_win = d.id
+                  join jugador as j on j.id = d.jugador, temporada as t
+where t.nombre like'T8' and b.fecha BETWEEN '2020-09-01' AND '2020-12-31'
+union
+select distinct t.nombre, j.id
+from batalla as b join deck as d on b.deck_lose = d.id
+                  join jugador as j on j.id = d.jugador, temporada as t
+where b.fecha BETWEEN '2020-09-01' AND '2020-12-31' and t.nombre like 'T8';
+
+insert into Participa (temporada, jugador)
+select distinct t.nombre , j.id
+from batalla as b join deck as d on b.deck_win = d.id
+                  join jugador as j on j.id = d.jugador, temporada as t
+where t.nombre like'T9' and b.fecha BETWEEN '2021-01-01' AND '2021-08-31'
+union
+select distinct t.nombre, j.id
+from batalla as b join deck as d on b.deck_lose = d.id
+                  join jugador as j on j.id = d.jugador, temporada as t
+where b.fecha BETWEEN '2021-01-01' AND '2021-08-31' and t.nombre like 'T9';
+
+insert into Participa (temporada, jugador)
+select distinct t.nombre , j.id
+from batalla as b join deck as d on b.deck_win = d.id
+                  join jugador as j on j.id = d.jugador, temporada as t
+where t.nombre like'T10' and b.fecha BETWEEN '2021-09-01' AND '2021-12-31'
+union
+select distinct t.nombre, j.id
+from batalla as b join deck as d on b.deck_lose = d.id
+                  join jugador as j on j.id = d.jugador, temporada as t
+where b.fecha BETWEEN '2021-09-01' AND '2021-12-31' and t.nombre like 'T10';
+
+
+
+
+
+
+/************************************* QUERIES DE PRUEBA **************************************************/
+
+
+
+--Muestra el articulo mas comprado de la tienda
+select a2.nombre, a2.coste_real, count(c2.id) as num_compras
+from Articulo as a2 join compra as c2 on a2.id = c2.articulo
+group by a2.id having count(c2.id) = (select count(c.id) from articulo as a join compra as c on a.id = c.articulo group by a.id order by count(c.id) desc limit 1)
+order by count(c2.id) desc;
+
+--Muestra top 3 jugadores que han comprado mas articulos y cuanto dinero se han gastado
+
+
+
+--Muestra el nombre y el daño de los 5 modificadores con mas daño, que sea estructura, que no depende de ningun otro modificador y que tenga almenos 1100 trofeos.
+select m.nombre, m.daño
+from modificador as m join estructura as e on m.nombre = e.nombre
+where m.dependencia is null  and m.daño is not null and e.trofeos > 1100
+order by m.daño desc limit 5;
+
+--Muestra el nombre de los 10 primeros jugadores que haya participado en mas temporadas,
+
+select count(p.temporada) as num_temp,p.jugador,j.nombre from participa as p join jugador as j on p.jugador = j.id
+group by j.nombre,p.jugador order by num_temp desc,jugador limit 10;
+
+--Muestra el nombre, el daño, el daño de aparición y su arena, de la carta del tipo tropa
+--que sea Legendary, y que tenga el mayor daño y daño de aparición en ese orden.
+select c.nombre as nombre, c.daño as daño, t.daño_aparicion as dañoAparicion, c.arena
+from carta as c join tropas as t on c.id = t.carta
+where c.rareza like 'Legendary'
+group by c.nombre,daño,c.arena,t.daño_aparicion order by c.daño desc,t.daño_aparicion desc ;

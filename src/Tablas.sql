@@ -1,4 +1,3 @@
-/*------------ GUILLEM (VERDE)------------*/
 drop table if exists Tarjeta cascade;
 create table Tarjeta
 (
@@ -6,8 +5,6 @@ create table Tarjeta
     fecha_caducidad date,
     primary key (numero_tarjeta)
 );
-insert into Tarjeta (numero_tarjeta, fecha_caducidad)
-select distinct cardnumber, cardexpiry from players;
 
 
 drop table if exists Jugador cascade;
@@ -23,9 +20,6 @@ create table Jugador
     primary key (id),
     foreign key (tarjeta) references Tarjeta(numero_tarjeta)
 );
-insert into Jugador (id, nombre, experiencia, trofeos, oro, gemas, tarjeta)
-select distinct tag, name, experience, trophies, oro, gemas, cardnumber
-from players join oro_gemas on player = tag;
 
 
 drop table if exists Clan cascade ;
@@ -39,8 +33,6 @@ create table Clan
     puntuacion      int,
     Primary Key (id)
 );
-insert into Clan (id, nombre, descripcion, minimo_trofeos, puntuacion, trofeos_totales)
-select distinct tag, name, description, requiredtrophies, score, trophies from clans;
 
 
 drop table if exists Formado cascade;
@@ -54,9 +46,6 @@ create table Formado
     foreign key (clan) references Clan (id),
     foreign key (jugador) references Jugador (id)
 );
-insert into Formado(clan, jugador,fecha,role)
-select distinct clan,player,date,role
-from playersclans;
 
 
 drop table if exists Dona cascade;
@@ -71,9 +60,6 @@ create table Dona
     foreign key (clan) references Clan (id),
     foreign key (jugador) references Jugador (id)
 );
-insert into Dona(clan,jugador,oro,fecha)
-select distinct clan,player,gold,date
-from playersclansdonations;
 
 
 drop table if exists Insignia cascade;
@@ -83,8 +69,6 @@ create table Insignia
     imagenUrl text,
     primary key (nombre)
 );
-insert into Insignia (nombre, imagenUrl)
-select distinct name, img from playersbadge;
 
 
 drop table if exists Adquiere cascade;
@@ -98,9 +82,6 @@ create table Adquiere
     foreign key (clan) references Clan (id),
     foreign key (insignia) references Insignia (nombre)
 );
-insert into Adquiere(clan,insignia,fecha)
-select distinct clan, insignia, fecha
-from clan_insignia;
 
 
 drop table if exists Batalla_Clan cascade;
@@ -109,7 +90,6 @@ create table Batalla_Clan
     id integer,
     primary key (id)
 );
-insert into Batalla_Clan(id) select distinct battle from clan_battles;
 
 
 drop table if exists Pelea cascade;
@@ -121,9 +101,6 @@ create table Pelea
     fecha_fin     date,
     primary key (batalla_clan, clan)
 );
-insert into Pelea(batalla_clan, clan, fecha_inicio, fecha_fin)
-select battle, clan, start_date, end_date
-from clan_battles;
 
 
 drop table if exists Arena cascade;
@@ -135,8 +112,6 @@ create table Arena
     min_trofeos integer,
     primary key (id)
 );
-insert into Arena (id, nombre, max_trofeos, min_trofeos)
-select distinct id, name, minTrophies, maxTrophies from arenas;
 
 
 drop table if exists Consigue cascade;
@@ -151,9 +126,6 @@ create table Consigue
     foreign key (insignia) references Insignia (nombre),
     foreign key (arena) references Arena (id)
 );
-insert into Consigue(insignia, arena, jugador, fecha)
-select distinct name,arena,player,date
-from playersbadge;
 
 
 drop table if exists Mensaje_clan cascade;
@@ -170,9 +142,6 @@ create table Mensaje_clan
     foreign key (emisor) references Jugador (id),
     foreign key (receptor) references Clan (id)
 );
-insert into Mensaje_clan(id, cuerpo, fecha, emisor, receptor, mensaje_respondido)
-select distinct id,text,date,sender,receiver,answer
-from messages_to_clans;
 
 
 drop table if exists Modificador cascade;
@@ -190,13 +159,6 @@ create table Modificador
     primary key (nombre),
     foreign key (dependencia) references Modificador (nombre)
 );
-insert into Modificador(nombre, coste_oro, descripcion, daño, vel_ataque, daño_aparicion, radio, vida, dependencia)
-select distinct building,cost,description,mod_damage,mod_hit_speed,mod_spawn_damage,mod_radius,mod_lifetime,prerequisite
-from buildings
-UNION
-select distinct technology,cost,description,mod_damage,mod_hit_speed,mod_spawn_damage,mod_radius,mod_lifetime,prerequisite
-from technologies;
-
 
 
 drop table if exists Tecnologias cascade;
@@ -208,9 +170,6 @@ create table Tecnologias
     primary key (nombre),
     foreign key (nombre) references Modificador (nombre)
 );
-insert into Tecnologias(nombre, nivel_max, dep_level)
-select distinct technology,max_level,prereq_level
-from technologies;
 
 
 drop table if exists Estructura cascade;
@@ -221,9 +180,6 @@ create table Estructura
     primary key (nombre),
     foreign key (nombre) references Modificador (nombre)
 );
-insert into Estructura(nombre, trofeos)
-select distinct building, trophies
-from buildings;
 
 
 drop table if exists Clan_modificador cascade;
@@ -237,12 +193,8 @@ Create table Clan_modificador
     foreign key (clan) references Clan (id),
     foreign key (modificador) references Modificador (nombre)
 );
-insert into Clan_modificador(clan, modificador, nivel, fecha)
-select clan,concat_ws('',tech,structure),level,date
-from clan_tech_structures;
 
 
-/*------------ MARIO (AZUL)------------*/
 drop table if exists Deck cascade;
 create table Deck
 (
@@ -254,9 +206,6 @@ create table Deck
     primary key (id),
     foreign key (jugador) references Jugador(id)
 );
-insert into Deck(id,titulo,descripcion,fecha,jugador)
-select distinct deck,title,description,date,player
-from playersdeck;
 
 
 drop table if exists Ve cascade;
@@ -268,9 +217,6 @@ create table Ve
     foreign key (deck) references Deck (id),
     foreign key (jugador) references Jugador (id)
 );
-insert into Ve(deck,jugador)
-select distinct deck,player
-from shared_decks;
 
 
 drop table if exists Carta cascade;
@@ -285,9 +231,6 @@ create table Carta
     primary key (id),
     foreign key (arena) references Arena (id)
 );
-insert into Carta (id, nombre, daño, velocidad_ataque, rareza, arena)
-select distinct p.id, p.name, c.damage, c.hit_speed, c.rarity, c.arena
-from cards as c right join playerscards as p on c.name = p.name;
 
 
 drop table if exists Edificio cascade;
@@ -297,10 +240,6 @@ create table Edificio
     vida  integer,
     foreign key (carta) references Carta (id)
 );
-insert into Edificio (carta, vida)
-select distinct p.id, c.lifetime
-from cards as c right join playerscards as p on c.name = p.name
-where c.lifetime is not null;
 
 
 drop table if exists Tropas cascade;
@@ -310,10 +249,6 @@ create table Tropas
     daño_aparicion integer,
     foreign key (carta) references Carta (id)
 );
-insert into Tropas (carta, daño_aparicion)
-select distinct p.id, c.spawn_damage
-from cards as c right join playerscards as p on c.name = p.name
-where c.spawn_damage is not null;
 
 
 drop table if exists Encantamiento cascade;
@@ -323,10 +258,6 @@ create table Encantamiento
     radio_efecto integer,
     foreign key (carta) references Carta (id)
 );
-insert into Encantamiento (carta, radio_efecto)
-select distinct p.id, c.radious
-from cards as c right join playerscards as p on c.name = p.name
-where radious is not null;
 
 
 drop table if exists compuesto cascade;
@@ -339,9 +270,6 @@ create table compuesto
     foreign key (carta) references Carta (id),
     foreign key (deck) references Deck (id)
 );
-insert into compuesto(carta, deck, nivel)
-select card,deck,level
-from playersdeck;
 
 
 drop table if exists Encuentra cascade;
@@ -355,9 +283,6 @@ create table Encuentra
     foreign key (jugador) references Jugador (id),
     foreign key (carta) references Carta (id)
 );
-insert into Encuentra(jugador, carta, fecha_mejora, nivel_actual)
-select player, id, date, level
-from playerscards;
 
 
 /*------------ DANIEL (AMARILLO)------------*/
@@ -369,9 +294,6 @@ create table Temporada
     fecha_final  date,
     primary key (nombre)
 );
-insert into Temporada(nombre, fecha_inicio, fecha_final)
-select distinct name,startDate,enddate
-from seasons;
 
 
 drop table if exists Logro cascade;
@@ -383,10 +305,6 @@ create table Logro
     recompensa_gemas integer,
     primary key (id)
 );
-insert into Logro(nombre, descripcion, recompensa_gemas)
-select distinct name,description,gems
-from playersachievements
-group by name,description,gems;
 
 
 drop table if exists Desbloquea cascade;
@@ -400,9 +318,6 @@ create table Desbloquea
     foreign key (jugador) references Jugador (id),
     foreign key (arena) references Arena (id)
 );
-insert into Desbloquea(jugador, arena,id_logro, fecha)
-select distinct pa.player, pa.arena, l.id, pa.date
-from playersachievements as pa Join Logro as l on pa.name = l.nombre and pa.description = l.descripcion and pa.gems = l.recompensa_gemas;
 
 
 drop table if exists Mision cascade;
@@ -416,9 +331,6 @@ create table Mision
     primary key (id),
     foreign key (mision_dep) references Mision (id)
 );
-insert into Mision (id, nombre, descripcion, requerimiento, mision_dep)
-select distinct quest_id, quest_title, quest_description, quest_requirement, quest_depends
-from players_quests;
 
 
 drop table if exists Realiza cascade;   --TODO se puede añadir un pk mas con la fecha o se tiene que añadir ID?
@@ -432,9 +344,6 @@ create table Realiza
     foreign key (mision) references Mision (id),
     foreign key (jugador) references Jugador (id)
 );
-insert into Realiza (mision, jugador, fecha)
-select distinct quest_id, player_tag, unlock
-from players_quests;
 
 
 drop table if exists Mision_arena cascade;
@@ -448,9 +357,6 @@ create table Mision_arena
     foreign key (mision) references Mision (id),
     foreign key (arena) references Arena (id)
 );
-insert into Mision_arena (mision, arena, experiencia, recompensa_oro)
-select distinct quest_id, arena_id, experience, gold
-from quests_arenas;
 
 
 drop table if exists Batalla cascade;
@@ -469,9 +375,6 @@ create table batalla
     foreign key (deck_lose) references Deck (id),
     foreign key (batalla_clan) references Batalla_Clan (id)
 );
-insert into Batalla(deck_win, deck_lose, fecha, durada, puntos_win, puntos_lose, batalla_clan)
-select winner, loser, date, duration, winner_score, loser_score, clan_battle
-from battles;
 
 
 /*------------ DIDAC (MORADO)------------*/
@@ -485,9 +388,6 @@ create table Mensaje
     primary key (id),
     foreign key (idMensajeRespondido) references Mensaje (id)
 );
-insert into Mensaje(id, cuerpo, fecha, idMensajeRespondido)
-select distinct id,text,date,answer
-from messages_between_players;
 
 
 drop table if exists Escribe cascade ;
@@ -501,9 +401,6 @@ create table Escribe
     foreign key (id_receptor) references Jugador (id),
     foreign key (id_mensaje) references Mensaje (id)
 );
-insert into Escribe(id_emisor, id_receptor, id_mensaje)
-select distinct sender,receiver,id
-from messages_between_players;
 
 
 drop table if exists Amigo cascade;
@@ -515,9 +412,6 @@ create table Amigo
     foreign key (id_jugador_emisor) references Jugador (id),
     foreign key (id_jugador_receptor) references Jugador (id)
 );
-insert into Amigo(id_jugador_emisor, id_jugador_receptor)
-select distinct requester,requeted
-from friends;
 
 
 drop table if exists Articulo cascade ;
@@ -529,9 +423,6 @@ create table Articulo
     nombre       varchar(50),
     primary key (id)
 );
-insert into Articulo(id, coste_real, veces_compra, nombre)
-select distinct buy_id, buy_cost, buy_stock, buy_name
-from player_purchases;
 
 
 drop table if exists Emoticono cascade;
@@ -543,10 +434,6 @@ create table Emoticono
     primary key (id_emoticono),
     foreign key (id_emoticono) references Articulo (id)
 );
-insert into Emoticono(id_emoticono, nombre, path)
-select distinct buy_id, emote_name, emote_path
-from player_purchases
-where emote_name is not null;
 
 
 drop table if exists Cofre cascade;
@@ -560,10 +447,6 @@ create table Cofre
     primary key (id_cofre),
     foreign key (id_cofre) references Articulo (id)
 );
-insert into Cofre(id_cofre, nombre, rareza, tiempo_desbloqueo, num_cartas)
-select distinct buy_id, chest_name, chest_rarity, chest_unlock_time, chest_num_cards
-from player_purchases
-where chest_name is not null;
 
 
 drop table if exists Paquete_Arena cascade;
@@ -573,10 +456,6 @@ create table Paquete_Arena
     primary key (id_paquete),
     foreign key (id_paquete) references Articulo (id)
 );
-insert into Paquete_Arena(id_paquete)
-select distinct buy_id
-from player_purchases
-where arenapack_id is not null;
 
 
 drop table if exists Nivel_Arena cascade;
@@ -590,9 +469,6 @@ create table Nivel_Arena
     foreign key (arena) references Arena(id),
     foreign key (paquete) references Paquete_Arena(id_paquete)
 );
-insert into Nivel_Arena(arena, paquete, oro)
-select distinct a.arena, p.buy_id, a.gold
-from arena_pack as a join player_purchases as p on p.arenapack_id = a.id;
 
 
 drop table if exists Paquete_Oferta cascade;
@@ -604,9 +480,6 @@ create table Paquete_Oferta
     primary key (id_p_oferta),
     foreign key (id_p_oferta) references Articulo (id)
 );
-insert into Paquete_Oferta(id_p_oferta, oro_contenido, gemas_contenido)
-select distinct buy_id, bundle_gold, bundle_gems from player_purchases
-where bundle_gold is not null;
 
 
 drop table if exists Compra cascade ;
@@ -623,10 +496,6 @@ create table Compra
     foreign key (tarjeta) references Tarjeta (numero_tarjeta),
     foreign key (articulo) references Articulo (id)
 );
-insert into Compra(jugador, tarjeta, articulo, fecha, descuento)
-select player, credit_card, buy_id, date, discount
-from player_purchases;
-
 
 
 drop table if exists Participa cascade;
@@ -637,117 +506,6 @@ create table Participa
     primary key (temporada,jugador),
     foreign key (temporada) references Temporada (nombre) --TODO: no hay ninguna tabla que nos relacione esto.
 );
-
-insert into Participa (temporada, jugador)
-select distinct t.nombre , j.id
-from batalla as b join deck as d on b.deck_win = d.id
-join jugador as j on j.id = d.jugador, temporada as t
-where t.nombre like'T1' and b.fecha BETWEEN '2017-01-01' AND '2017-08-31'
-union
-select distinct t.nombre, j.id
-from batalla as b join deck as d on b.deck_lose = d.id
-join jugador as j on j.id = d.jugador, temporada as t
-where b.fecha BETWEEN '2017-01-01' AND '2017-08-31' and t.nombre like 'T1';
-
-insert into Participa (temporada, jugador)
-select distinct t.nombre , j.id
-from batalla as b join deck as d on b.deck_win = d.id
-join jugador as j on j.id = d.jugador, temporada as t
-where t.nombre like'T2' and b.fecha BETWEEN '2017-09-01' AND '2017-12-31'
-union
-select distinct t.nombre, j.id
-from batalla as b join deck as d on b.deck_lose = d.id
-join jugador as j on j.id = d.jugador, temporada as t
-where b.fecha BETWEEN '2017-09-01' AND '2017-12-31' and t.nombre like 'T2';
-
-insert into Participa (temporada, jugador)
-select distinct t.nombre , j.id
-from batalla as b join deck as d on b.deck_win = d.id
-join jugador as j on j.id = d.jugador, temporada as t
-where t.nombre like'T3' and b.fecha BETWEEN '2018-01-01' AND '2018-08-31'
-union
-select distinct t.nombre, j.id
-from batalla as b join deck as d on b.deck_lose = d.id
-join jugador as j on j.id = d.jugador, temporada as t
-where b.fecha BETWEEN '2018-01-01' AND '2018-08-31' and t.nombre like 'T3';
-
-insert into Participa (temporada, jugador)
-select distinct t.nombre , j.id
-from batalla as b join deck as d on b.deck_win = d.id
-join jugador as j on j.id = d.jugador, temporada as t
-where t.nombre like'T4' and b.fecha BETWEEN '2018-01-01' AND '2018-08-31'
-union
-select distinct t.nombre, j.id
-from batalla as b join deck as d on b.deck_lose = d.id
-join jugador as j on j.id = d.jugador, temporada as t
-where b.fecha BETWEEN '2018-09-01' AND '2018-12-31' and t.nombre like 'T4';
-
-insert into Participa (temporada, jugador)
-select distinct t.nombre , j.id
-from batalla as b join deck as d on b.deck_win = d.id
-join jugador as j on j.id = d.jugador, temporada as t
-where t.nombre like'T5' and b.fecha BETWEEN '2018-01-01' AND '2018-08-31'
-union
-select distinct t.nombre, j.id
-from batalla as b join deck as d on b.deck_lose = d.id
-join jugador as j on j.id = d.jugador, temporada as t
-where b.fecha BETWEEN '2019-01-01' AND '2019-08-31' and t.nombre like 'T5';
-
-insert into Participa (temporada, jugador)
-select distinct t.nombre , j.id
-from batalla as b join deck as d on b.deck_win = d.id
-join jugador as j on j.id = d.jugador, temporada as t
-where t.nombre like'T6' and b.fecha BETWEEN '2019-09-01' AND '2019-12-31'
-union
-select distinct t.nombre, j.id
-from batalla as b join deck as d on b.deck_lose = d.id
-join jugador as j on j.id = d.jugador, temporada as t
-where b.fecha BETWEEN '2019-09-01' AND '2019-12-31' and t.nombre like 'T6';
-
-insert into Participa (temporada, jugador)
-select distinct t.nombre , j.id
-from batalla as b join deck as d on b.deck_win = d.id
-join jugador as j on j.id = d.jugador, temporada as t
-where t.nombre like'T7' and b.fecha BETWEEN '2020-01-01' AND '2020-08-31'
-union
-select distinct t.nombre, j.id
-from batalla as b join deck as d on b.deck_lose = d.id
-join jugador as j on j.id = d.jugador, temporada as t
-where b.fecha BETWEEN '2020-01-01' AND '2020-08-31' and t.nombre like 'T7';
-
-insert into Participa (temporada, jugador)
-select distinct t.nombre , j.id
-from batalla as b join deck as d on b.deck_win = d.id
-join jugador as j on j.id = d.jugador, temporada as t
-where t.nombre like'T8' and b.fecha BETWEEN '2020-09-01' AND '2020-12-31'
-union
-select distinct t.nombre, j.id
-from batalla as b join deck as d on b.deck_lose = d.id
-join jugador as j on j.id = d.jugador, temporada as t
-where b.fecha BETWEEN '2020-09-01' AND '2020-12-31' and t.nombre like 'T8';
-
-insert into Participa (temporada, jugador)
-select distinct t.nombre , j.id
-from batalla as b join deck as d on b.deck_win = d.id
-join jugador as j on j.id = d.jugador, temporada as t
-where t.nombre like'T9' and b.fecha BETWEEN '2021-01-01' AND '2021-08-31'
-union
-select distinct t.nombre, j.id
-from batalla as b join deck as d on b.deck_lose = d.id
-join jugador as j on j.id = d.jugador, temporada as t
-where b.fecha BETWEEN '2021-01-01' AND '2021-08-31' and t.nombre like 'T9';
-
-insert into Participa (temporada, jugador)
-select distinct t.nombre , j.id
-from batalla as b join deck as d on b.deck_win = d.id
-join jugador as j on j.id = d.jugador, temporada as t
-where t.nombre like'T10' and b.fecha BETWEEN '2021-09-01' AND '2021-12-31'
-union
-select distinct t.nombre, j.id
-from batalla as b join deck as d on b.deck_lose = d.id
-join jugador as j on j.id = d.jugador, temporada as t
-where b.fecha BETWEEN '2021-09-01' AND '2021-12-31' and t.nombre like 'T10';
-
 
 /************************************* QUERIES DE PRUEBA **************************************************/
 
