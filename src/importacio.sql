@@ -651,10 +651,6 @@ from Articulo as a2 join compra as c2 on a2.id = c2.articulo
 group by a2.id having count(c2.id) = (select count(c.id) from articulo as a join compra as c on a.id = c.articulo group by a.id order by count(c.id) desc limit 1)
 order by count(c2.id) desc;
 
---Muestra top 3 jugadores que han comprado mas articulos y cuanto dinero se han gastado
-
-
-
 --Muestra el nombre y el daño de los 5 modificadores con mas daño, que sea estructura, que no depende de ningun otro modificador y que tenga almenos 1100 trofeos.
 select m.nombre, m.daño
 from modificador as m join estructura as e on m.nombre = e.nombre
@@ -663,8 +659,11 @@ order by m.daño desc limit 5;
 
 --Muestra el nombre de los 10 primeros jugadores que haya participado en mas temporadas,
 
-select count(p.temporada) as num_temp,p.jugador,j.nombre from participa as p join jugador as j on p.jugador = j.id
-group by j.nombre,p.jugador order by num_temp desc,jugador limit 10;
+select count(p.temporada) as num_temp,p.jugador,j.nombre
+from participa as p join jugador as j on p.jugador = j.id
+group by j.nombre,p.jugador
+order by num_temp desc,jugador
+limit 10;
 
 --Muestra el nombre, el daño, el daño de aparición y su arena, de la carta del tipo tropa
 --que sea Legendary, y que tenga el mayor daño y daño de aparición en ese orden.
@@ -672,3 +671,124 @@ select c.nombre as nombre, c.daño as daño, t.daño_aparicion as dañoAparicion
 from carta as c join tropas as t on c.id = t.carta
 where c.rareza like 'Legendary'
 group by c.nombre,daño,c.arena,t.daño_aparicion order by c.daño desc,t.daño_aparicion desc ;
+
+
+/*JUGADORES*/
+
+-- Encuentra el jugador que mas solicitudes de amistad ha enviado
+select j.id, j.nombre, j.experiencia,j.trofeos, count(a.id_jugador_emisor) as num_solicitudes
+from jugador as j join amigo a on j.id = a.id_jugador_emisor
+group by j.id, j.nombre, j.experiencia,j.trofeos
+order by count(a.id_jugador_emisor) desc
+limit 5;
+
+--Encuentra todos los jugadores que han recibido una solicitud de amistad de "Alireza"
+select j.id
+from jugador as j join amigo a on j.id = a.id_jugador_receptor
+join jugador as j2 on a.id_jugador_emisor = j2.id
+where j2.nombre = 'Alireza';
+
+
+--Top 10 jugadores que han respondido a más mensajes
+select j.id, j.nombre, count(m.id) as num_repuestas
+from jugador as j join escribe as e on j.id = e.id_emisor
+join mensaje as m on e.id_mensaje = m.id
+where m.idmensajerespondido is not null
+group by j.id, j.nombre
+order by count(m.id) desc
+limit 10;
+
+/*BATALLAS*/
+
+--Top 10 clanes que han ganado mas batallas contra otro clan
+select c.id, c.nombre as clan, c.trofeos_totales, count(b.id) as num_victorias
+from clan as c join pelea as p on p.clan = c.id
+join batalla_clan as bc on bc.id = p.batalla_clan
+join batalla as b on b.batalla_clan = bc.id
+join deck as d on d.id = b.deck_win
+join jugador as j on d.jugador = j.id
+join formado as f on j.id = f.jugador
+where c.id = f.clan
+group by c.id, c.nombre, c.trofeos_totales
+limit 10;
+
+--Musetra los clanes con más jugadores
+select c.nombre as clan, count(distinct f.jugador) as num_players
+from clan as c join formado as f on c.id = f.clan
+group by c.nombre
+order by count(distinct f.jugador) desc;
+
+--Muestra el top 10 jugadores que hayan ganado mas batallas de clan y el clan al que pertenecen
+select j.id, j.nombre as jugador, count(distinct b.id), c.nombre as clan
+from jugador as j join deck as d on j.id = d.jugador
+                  join batalla as b on d.id = b.deck_win
+                  join formado as f on j.id = f.jugador
+                  join clan as c on f.clan = c.id
+where b.batalla_clan is  not null
+group by j.id, j.nombre, c.nombre
+order by count(b.id) desc
+limit 20;
+
+
+/*TIENDA*/
+
+--Muestra top 10 jugadores que han comprado mas articulos y cuanto dinero se han gastado
+select j.nombre, count(c.id) as num_compras, sum(a.coste_real) as dinero_total
+from jugador as j join compra as c on j.id = c.jugador
+join articulo as a on c.articulo = a.id
+group by j.nombre
+order by count(c.id) desc
+limit 10;
+
+--Muestra los 10 jugadores que mas han ahorrado con descuentos
+select j.nombre as jugador, sum(c.descuento)
+from jugador as j join compra as c on j.id = c.jugador
+group by j.nombre
+order by sum(c.descuento) desc
+limit 10;
+
+--Muestra top 5 jugadores que  han comprado mas articulos de cada tipo
+(select j.nombre as jugador, count(c.id) as compras, 'Cofre' as tipo_articulo
+from jugador j join compra c on j.id = c.jugador
+join cofre c2 on c.articulo = c2.id_cofre
+group by j.nombre
+order by compras desc
+limit 5)
+union
+(select j.nombre as jugador, count(c.id) as compras, 'Emoticono' as tipo_articulo
+from jugador j join compra c on j.id = c.jugador
+join emoticono e on c.articulo = e.id_emoticono
+group by j.nombre
+order by compras desc
+limit 5)
+union
+(select j.nombre as jugador, count(c.id) as compras, 'Paquete Arena' as tipo_articulo
+from jugador j join compra c on j.id = c.jugador
+join paquete_arena p on c.articulo = p.id_paquete
+group by j.nombre
+order by compras desc
+limit 5)
+union
+(select j.nombre as jugador, count(c.id) as compras, 'Paquete Oferta' as tipo_articulo
+from jugador j join compra c on j.id = c.jugador
+join paquete_oferta p on c.articulo = p.id_p_oferta
+group by j.nombre
+order by compras desc
+limit 5);
+
+/*MISIONES*/
+--Encuentra el top 10 jugadores que mas misiones han hecho
+select j.nombre, count(r.id) as num_misiones
+from jugador as j join realiza as r on j.id = r.jugador
+group by j.nombre
+order by num_misiones desc
+limit 10;
+
+--Encuentra el jugador que mas dinero ha ganado con misiones
+select j.nombre, sum(ma.recompensa_oro) as dinero
+from jugador as j join realiza as r on j.id = r.jugador
+join mision as m on r.mision = m.id
+join mision_arena ma on m.id = ma.mision
+group by j.nombre
+order by dinero desc
+limit 10;

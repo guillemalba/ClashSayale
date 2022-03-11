@@ -482,7 +482,7 @@ create table Paquete_Oferta
 );
 
 
-drop table if exists Compra cascade ;
+drop table if exists Compra cascade;
 create table Compra
 (
     id          serial,
@@ -506,35 +506,3 @@ create table Participa
     primary key (temporada,jugador),
     foreign key (temporada) references Temporada (nombre) --TODO: no hay ninguna tabla que nos relacione esto.
 );
-
-/************************************* QUERIES DE PRUEBA **************************************************/
-
-
-
---Muestra el articulo mas comprado de la tienda
-select a2.nombre, a2.coste_real, count(c2.id) as num_compras
-from Articulo as a2 join compra as c2 on a2.id = c2.articulo
-group by a2.id having count(c2.id) = (select count(c.id) from articulo as a join compra as c on a.id = c.articulo group by a.id order by count(c.id) desc limit 1)
-order by count(c2.id) desc;
-
---Muestra top 3 jugadores que han comprado mas articulos y cuanto dinero se han gastado
-
-
-
---Muestra el nombre y el daño de los 5 modificadores con mas daño, que sea estructura, que no depende de ningun otro modificador y que tenga almenos 1100 trofeos.
-select m.nombre, m.daño
-from modificador as m join estructura as e on m.nombre = e.nombre
-where m.dependencia is null  and m.daño is not null and e.trofeos > 1100
-order by m.daño desc limit 5;
-
---Muestra el nombre de los 10 primeros jugadores que haya participado en mas temporadas,
-
-select count(p.temporada) as num_temp,p.jugador,j.nombre from participa as p join jugador as j on p.jugador = j.id
-group by j.nombre,p.jugador order by num_temp desc,jugador limit 10;
-
---Muestra el nombre, el daño, el daño de aparición y su arena, de la carta del tipo tropa
---que sea Legendary, y que tenga el mayor daño y daño de aparición en ese orden.
-select c.nombre as nombre, c.daño as daño, t.daño_aparicion as dañoAparicion, c.arena
-from carta as c join tropas as t on c.id = t.carta
-where c.rareza like 'Legendary'
-group by c.nombre,daño,c.arena,t.daño_aparicion order by c.daño desc,t.daño_aparicion desc ;
