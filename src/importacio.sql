@@ -310,7 +310,7 @@ CREATE TABLE clan_insignia
 (
     insignia    VARCHAR(255),
     clan        VARCHAR(255),
-    fecha       DATE
+    fecha       date
 );
 COPY clan_insignia FROM '/Users/Shared/Bases/Base/clan_insignia.csv' CSV HEADER DELIMITER ',';
 
@@ -651,11 +651,7 @@ from Articulo as a2 join compra as c2 on a2.id = c2.articulo
 group by a2.id having count(c2.id) = (select count(c.id) from articulo as a join compra as c on a.id = c.articulo group by a.id order by count(c.id) desc limit 1)
 order by count(c2.id) desc;
 
---Muestra el nombre y el daño de los 5 modificadores con mas daño, que sea estructura, que no depende de ningun otro modificador y que tenga almenos 1100 trofeos.
-select m.nombre, m.daño
-from modificador as m join estructura as e on m.nombre = e.nombre
-where m.dependencia is null  and m.daño is not null and e.trofeos > 1100
-order by m.daño desc limit 5;
+
 
 --Muestra el nombre de los 10 primeros jugadores que haya participado en mas temporadas,
 
@@ -665,6 +661,8 @@ group by j.nombre,p.jugador
 order by num_temp desc,jugador
 limit 10;
 
+
+/*CARTAS*/
 --Muestra el nombre, el daño, el daño de aparición y su arena, de la carta del tipo tropa
 --que sea Legendary, y que tenga el mayor daño y daño de aparición en ese orden.
 select c.nombre as nombre, c.daño as daño, t.daño_aparicion as dañoAparicion, c.arena
@@ -672,6 +670,49 @@ from carta as c join tropas as t on c.id = t.carta
 where c.rareza like 'Legendary'
 group by c.nombre,daño,c.arena,t.daño_aparicion order by c.daño desc,t.daño_aparicion desc ;
 
+--Muestra las 5 cartas mas usadas en los decks y su nivel
+select c.nombre as nombre, count(co.carta) as num_veces, co.nivel as nivel
+from carta as c join compuesto co on c.id = co.carta
+group by c.nombre, co.nivel order by num_veces desc limit 5;
+
+
+--Muestra las 5 carta que mas jugadores han encontrado en el año 2020
+
+select c.nombre as nombre, count(e.carta) as num_cartas
+from carta as c join encuentra e on c.id = e.carta and e.fecha_mejora between '2020-01-01' and '2020-12-31'
+group by c.nombre order by num_cartas desc limit 5;
+
+--Muestra nombre y el daño de las cartas del tipo edificio que sea epica o legendaria y tenga mas vida, ordenadas por vida
+select c.nombre as nombre, c.daño as daño, e.vida as vida
+from carta as c join edificio as e on c.id = e.carta
+where c.rareza like 'Legendary' or c.rareza like 'Epic'
+group by c.nombre,daño,e.vida order by e.vida desc;
+
+
+
+/*CLAN*/
+
+--Muestra el nombre y el daño de los 5 modificadores con mas daño, que sea estructura, que no depende de ningun otro modificador y que tenga almenos 1100 trofeos.
+select m.nombre, m.daño
+from modificador as m join estructura as e on m.nombre = e.nombre
+where m.dependencia is null  and m.daño is not null and e.trofeos > 1100
+order by m.daño desc limit 5;
+
+--Muestra los 5 clanes con mayor cantidad y numero de donaciones durante el mes de noviembre del 2021
+select c.nombre as nombre, sum(d.oro) cantidad_oro, count(d.id) as num_donaciones
+from clan as c join dona d on c.id = d.clan and d.fecha between '2021-10-01' and '2021-10-31'
+group by c.nombre order by cantidad_oro desc limit 5;
+
+
+--Muestra los 5 clanes que han obtenido mas insignias
+select c.nombre as nombre, count(a.clan) as num_insignias
+from clan as c join adquiere a on c.id = a.clan
+group by c.nombre order by num_insignias desc limit 5;
+
+--Muestra los clanes donde se han escrito mas mensajes
+select c.nombre as nombre, count(mc.receptor) as num_mensajes
+from clan as c join mensaje_clan as mc on c.id = mc.receptor
+group by c.nombre order by num_mensajes desc limit 5;
 
 /*JUGADORES*/
 
@@ -792,3 +833,42 @@ join mision_arena ma on m.id = ma.mision
 group by j.nombre
 order by dinero desc
 limit 10;
+
+
+/*Logros*/
+--Encuentra el top 10 jugador que mas logros ha conseguido y cuantas gemas ha conseguido con ellos
+
+select j.nombre, sum(l.recompensa_gemas) as gemas_ganadas, count(d.jugador) as num_logros
+from jugador as j join desbloquea d on j.id = d.jugador
+join logro l on d.id_logro = l.id
+group by j.nombre order by num_logros desc, gemas_ganadas desc limit 10;
+
+
+/*Arena*/
+--Encuentra las 5 Arenas en las que se han conseguido mas logros
+select a.nombre, count(d.arena) as num_logros
+from arena as a join desbloquea d on a.id = d.arena
+Group By a.nombre order by num_logros desc limit 5;
+
+--Encuentra las 5 Arenas en las que se han conseguido mas insignias en 2021
+select a.nombre, count(c.arena) as num_insignias
+from arena as a join consigue c on a.id = c.arena join insignia i on c.insignia = i.nombre
+and  c.fecha between '2021-01-01' and '2021-12-31'
+group by a.nombre order by num_insignias desc limit 5;
+
+
+--Que 5 arenas han generado mas oro con los cofres y tenga minimo 3000 copas
+select a.nombre, sum(na.oro) as cantidad_oro
+from arena as a join nivel_arena na on a.id = na.arena
+and a.min_trofeos >= 3000
+group by a.nombre order by cantidad_oro desc limit 5;
+
+
+--En que 5 arenas puedes hacer mas misiones y generar mas dinero?
+select a.nombre, count(ma.arena) as num_misiones, sum(ma.recompensa_oro) as cantidad_oro
+from arena as a join mision_arena ma on a.id = ma.arena
+group by a.nombre order by num_misiones desc, cantidad_oro desc limit 5;
+
+
+
+
