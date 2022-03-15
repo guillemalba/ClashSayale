@@ -99,6 +99,11 @@ order by daño;
  * la mitjana dels jugadors que tenen una "A" en nom seu i pertanyen al clan "NoA". Donar
  * la llista de ordenada dels missatges més antics als més nous.
  */
+select m.cuerpo, m.fecha
+from jugador j join escribe e on j.id = e.id_emisor
+join mensaje m on e.id_mensaje = m.id
+where j.experiencia > (select avg(experiencia) from jugador j join formado f on j.id = f.jugador join clan c on f.clan = c.id where j.nombre like '%a%' and c.nombre = 'NoA' group by c.nombre)
+order by m.fecha desc;
 
 
 /* 2.2
@@ -106,7 +111,17 @@ order by daño;
  * per comprar articles de Pack Arena amb un cost superior a 200 i per comprar articles
  * que el seu nom contingui una "B".
  */
-
+select c.tarjeta, c.fecha, c.descuento
+from compra c join jugador j on c.jugador = j.id
+join articulo a on c.articulo = a.id
+join paquete_arena pa on a.id = pa.id_paquete
+where a.coste_real > 200
+union
+select c.tarjeta, c.fecha, c.descuento
+from compra c join jugador j on c.jugador = j.id
+join articulo a on c.articulo = a.id
+join paquete_arena pa on a.id = pa.id_paquete
+where a.nombre like '%b%';
 
 
 /* 2.3
@@ -114,19 +129,26 @@ order by daño;
  * comprats i l’experiència dels jugadors que els van demanar. Filtra la sortida amb els 5
  * articles en què els usuaris han gastat més diners.
  */
-
+select a.nombre, count(c.articulo) as num_compras, a.coste_real*count(c.articulo) as coste_total
+from compra c join articulo a on c.articulo = a.id
+group by a.id
+order by coste_total desc;
 
 
 /* 2.4
  * Donar els números de les targetes de crèdit que s'han utilitzat més.
  */
-
-
+select t.numero_tarjeta
+from compra c join tarjeta t on c.tarjeta = t.numero_tarjeta
+group by t.numero_tarjeta having count(c.tarjeta) = (select count(c.tarjeta) from compra c join tarjeta t on c.tarjeta = t.numero_tarjeta group by t.numero_tarjeta order by count(c.tarjeta) desc limit 1);
 
 /* 2.5
  * Donar els descomptes totals de les emoticones comprades durant l'any 2020
  */
-
+select sum(c.descuento), count(c.id)
+from compra c join articulo a on c.articulo = a.id
+join emoticono e on a.id = e.id_emoticono
+where c.fecha between '2020-01-01' and '2020-12-31';
 
 
 /* 2.6
