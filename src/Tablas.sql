@@ -333,7 +333,7 @@ create table Mision
 );
 
 
-drop table if exists Realiza cascade;   --TODO se puede añadir un pk mas con la fecha o se tiene que añadir ID?
+drop table if exists Realiza cascade;
 create table Realiza
 (
     id      serial,
