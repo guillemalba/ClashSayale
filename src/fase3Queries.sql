@@ -156,6 +156,15 @@ where c.fecha between '2020-01-01' and '2020-12-31';
  * experiència superior a 150.000. Filtra les targetes de crèdit que no han estat utilitzades
  * per comprar cap article. Donar dues consultes diferents per obtenir el mateix resultat.
  */
+select j.nombre, j.experiencia, t.numero_tarjeta
+from jugador j join tarjeta t on j.tarjeta = t.numero_tarjeta
+left join compra c on j.id = c.jugador
+where c.jugador is null;
+
+--Podemos ver que solo hay un jugador que no ha comprado ningun articulo, por lo tanto
+--la query anterior es correcta
+select count(distinct jugador) as num_jugadores
+from compra;
 
 
 
@@ -164,11 +173,118 @@ where c.fecha between '2020-01-01' and '2020-12-31';
  * jugadors que han escrit més de 4 missatges. Ordeneu els resultats segons el nom de
  * l'article de més a menys valor.
  */
-
+select distinct a.nombre
+from jugador j join compra c on j.id = c.jugador
+join articulo a on c.articulo = a.id
+join encuentra e on j.id = e.jugador
+where j.nombre in (
+    select j.nombre -- Jugadores con mas de 105 cartas
+    from jugador j join encuentra e on j.id = e.jugador
+    group by j.nombre, j.id having count(e.carta) > 105
+    UNION
+    select j.nombre -- Jugadores con mas de 4 mensajes escritos
+    from jugador j join escribe e on j.id = e.id_emisor
+    group by j.nombre having count(e.id_mensaje) > 4
+    )
+order by a.nombre desc;
 
 
 /*  2.8
  * Retorna els missatges (text i data) enviats a l'any 2020 entre jugadors i que hagin estat
  * respostos, o els missatges sense respostes enviats a un clan. Ordena els resultats
  * segons la data del missatge i el text del missatge de més a menys valor.
+ */
+
+
+
+/***************** APARTADO 1 *****************/
+/* 3.1
+ * Llistar els clans (nom i descripció) i el nombre de jugadors que tenen una experiència
+ * superior a 200.000. Filtra la sortida per tenir els clans amb més trofeus requerits.
+ */
+
+
+/* 3.2
+ * Llistar els 15 jugadors amb més experiència, la seva experiència i el nom del clan que pertany si el clan que ha
+ * investigat una tecnologia amb un cost superior a 1000.
+ */
+
+
+/* 3.3
+ * Enumera l’identificador, la data d'inici i la durada de les batalles que van començar després del "01-01-2021" i en
+ * què van participar clans amb trofeus mínims superiors a 6900. Donar només 5 batalles amb la major durada.
+ */
+
+
+/* 3.4
+ * Enumera per a cada clan el nombre d'estructures i el cost total d'or. Considera les estructures creades a l'any 2020
+ * i amb trofeus mínims superiors a 1200. Donar només la informació dels clans que tinguin més de 2 estructures.
+ */
+
+
+/* 3.5
+ * Enumera el nom dels clans, la descripció i els trofeus mínims ordenat de menor a major nivell de trofeus mínims per
+ * als clans amb jugadors que tinguin més de 200.000 d’experiència i el rol co-líder.
+ */
+
+
+/* 3.6
+ * Necessitem canviar algunes dades a la base de dades. Hem d'incrementar un 25% el cost de les tecnologies que
+ * utilitzen els clans amb trofeus mínims superiors a la mitjana de trofeus mínims de tots els clans.
+ */
+
+
+/* 3.7
+ * Enumerar el nom i la descripció de la tecnologia utilitzada pels clans que tenen una estructura "Monument"
+ * construïda després del "01-01-2021". Ordena les dades segons el nom i la descripció de les tecnologies.
+ */
+
+
+/* 3.8
+ * Enumera els clans amb un mínim de trofeus superior a 6900 i que hagin participat a totes les batalles de clans.
+ */
+
+
+
+/***************** APARTADO 1 *****************/
+/* 4.1
+ * Enumera el nom, els trofeus mínims, els trofeus màxims de les arenes que el seu títol comença per "A" i tenen un
+ * paquet d’arena amb or superior a 8000.
+ */
+
+/* 4.2
+ * Llista de nom, data d'inici, data de finalització de les temporades i, de les batalles d'aquestes temporades, el nom
+ * del jugador guanyador si el jugador té més victòries que derrotes i la seva experiència és més gran de 200.000.
+ */
+
+/* 4.3
+ * Llistar la puntuació total dels jugadors guanyadors de batalles de cada temporada. Filtrar la sortida per considerar
+ * només les temporades que han començat i acabat el 2019.
+ */
+
+/* 4.4
+ * Enumerar els noms de les arenes en què els jugadors veterans (experiència superior a 170.000) van obtenir insígnies
+ * després del "25-10-2021". Ordenar el resultat segons el nom de l’arena en ordre ascendent.
+ */
+
+/* 4.5
+ * Enumerar el nom de la insígnia, els noms de les cartes i el dany de les cartes dels jugadors amb una experiència
+ * superior a 290.000 i obtingudes en arenes el nom de les quals comença per "A" o quan la insígnia no té imatge. Així,
+ * considera només els jugadors que tenen una carta el nom de la qual comença per "Lava".
+ */
+
+/* 4.6
+ * Donar el nom de les missions que donen recompenses a totes les arenes el títol de les quals comença per "t" o acaba
+ * per "a". Ordena el resultat pel nom de la missió.
+ */
+
+/* 4.7
+ * Donar el nom de les arenes amb jugadors que al novembre o desembre de 2021 van obtenir insígnies si el nom de
+ * l’arena conté la paraula "Lliga", i les arenes tenen jugadors que al 2021 van obtenir èxits el nom dels quals conté
+ * la paraula "Friend".
+ */
+
+/* 4.8
+ * Retorna el nom de les cartes que pertanyen a jugadors que van completar missions el nom de les quals inclou la
+ * paraula "Armer" i l'or de la missió és més gran que l'or mitjà recompensat en totes les missions de les arenes.
  */
