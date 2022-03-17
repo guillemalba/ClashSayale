@@ -4,7 +4,7 @@
  * velocitat d’atac superior a 100 i el nom del qual contingui el caràcter "k".
  */
 select c.nombre, c.daño
-from carta c join tropas t on c.id = t.carta
+from carta c join tropas t on c.nombre = t.carta
 where velocidad_ataque > 100 and c.nombre like '%k%';
 
 
@@ -25,11 +25,9 @@ group by rareza;
  */
 select d.titulo, d.descripcion, c2.nombre, c.nivel
 from deck d join compuesto c on d.id = c.deck
-join carta c2 on c.carta = c2.id
+join carta c2 on c.carta = c2.nombre
 where c.nivel > (select avg(nivel) from compuesto)
 order by d.titulo desc, c2.nombre desc;
-
-
 
 
 /* 1.4
@@ -38,10 +36,10 @@ order by d.titulo desc, c2.nombre desc;
  * deu millors cartes.
  */
 select c.nombre, c.daño
-from carta c join compuesto c2 on c.id = c2.carta
+from carta c join compuesto c2 on c.nombre = c2.carta
 join deck d on c2.deck = d.id
 where c.rareza = 'Epic' and d.fecha = '2021-11-01'
-group by c.id, c.daño, c.nombre
+group by c.nombre, c.daño
 order by c.daño desc
 limit 10;
 
@@ -52,8 +50,8 @@ limit 10;
  * Base de dades: 2021-2022 Projecte – Fase 3
  */
 select c.nombre, c.daño
-from edificio e join carta c on c.id = e.carta
-join compuesto c2 on c.id = c2.carta
+from edificio e join carta c on c.nombre = e.carta
+join compuesto c2 on c.nombre = c2.carta
 join deck d on c2.deck = d.id
 join jugador j on d.jugador = j.id
 where j.experiencia > 250000
@@ -76,7 +74,13 @@ limit 3;
  * només estan en una pila. Per validar els resultats de la consulta, proporcioneu dues
  * consultes diferents per obtenir el mateix resultat.
  */
-
+select c.nombre
+from carta c left join compuesto c2 on c.nombre = c2.carta
+where c2.carta is null
+union
+select c.nombre
+from carta c left join compuesto c2 on c.nombre = c2.carta
+group by c.nombre having count(c2.carta) = 1;
 
 
 /* 1.8
@@ -194,7 +198,15 @@ order by a.nombre desc;
  * respostos, o els missatges sense respostes enviats a un clan. Ordena els resultats
  * segons la data del missatge i el text del missatge de més a menys valor.
  */
-
+(select cuerpo, fecha
+from mensaje
+where idmensajerespondido is not null and fecha between '2020-01-01' and '2020-12-31'
+order by fecha desc, cuerpo desc)
+union all
+select cuerpo, fecha
+from mensaje_clan
+where mensaje_respondido is null
+order by fecha desc, cuerpo desc;
 
 
 /***************** APARTADO 1 *****************/

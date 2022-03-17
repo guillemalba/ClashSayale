@@ -404,36 +404,40 @@ select distinct deck,player
 from shared_decks;
 
 
-insert into Carta (id, nombre, daño, velocidad_ataque, rareza, arena)
-select distinct p.id, p.name, c.damage, c.hit_speed, c.rarity, c.arena
+insert into Carta (nombre, daño, velocidad_ataque, rareza, arena)
+select distinct p.name, c.damage, c.hit_speed, c.rarity, c.arena
 from cards as c right join playerscards as p on c.name = p.name;
 
+insert into Carta (nombre)
+select distinct c.name
+from cards c left join playerscards p on c.name = p.name
+where p.name is null;
 
 insert into Edificio (carta, vida)
-select distinct p.id, c.lifetime
+select distinct p.name, c.lifetime
 from cards as c right join playerscards as p on c.name = p.name
 where c.lifetime is not null;
 
 
 insert into Tropas (carta, daño_aparicion)
-select distinct p.id, c.spawn_damage
+select distinct p.name, c.spawn_damage
 from cards as c right join playerscards as p on c.name = p.name
 where c.spawn_damage is not null;
 
 
 insert into Encantamiento (carta, radio_efecto)
-select distinct p.id, c.radious
+select distinct p.name, c.radious
 from cards as c right join playerscards as p on c.name = p.name
 where radious is not null;
 
 
 insert into compuesto(carta, deck, nivel)
-select card,deck,level
-from playersdeck;
+select distinct pc.name, pd.deck, pd.level
+from playersdeck pd join playerscards pc on pd.card = pc.id;
 
 
 insert into Encuentra(jugador, carta, fecha_mejora, nivel_actual)
-select player, id, date, level
+select player, name, date, level
 from playerscards;
 
 

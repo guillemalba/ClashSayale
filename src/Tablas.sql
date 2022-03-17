@@ -222,13 +222,12 @@ create table Ve
 drop table if exists Carta cascade;
 create table Carta
 (
-    id               integer,
     nombre           varchar(255),
     daño             integer,
     velocidad_ataque integer,
     rareza           varchar(255),
     arena            integer,
-    primary key (id),
+    primary key (nombre),
     foreign key (arena) references Arena (id)
 );
 
@@ -236,38 +235,38 @@ create table Carta
 drop table if exists Edificio cascade;
 create table Edificio
 (
-    carta integer,
+    carta varchar(255),
     vida  integer,
-    foreign key (carta) references Carta (id)
+    foreign key (carta) references Carta (nombre)
 );
 
 
 drop table if exists Tropas cascade;
 create table Tropas
 (
-    carta          integer,
+    carta          varchar(255),
     daño_aparicion integer,
-    foreign key (carta) references Carta (id)
+    foreign key (carta) references Carta (nombre)
 );
 
 
 drop table if exists Encantamiento cascade;
 create table Encantamiento
 (
-    carta        integer,
+    carta        varchar(255),
     radio_efecto integer,
-    foreign key (carta) references Carta (id)
+    foreign key (carta) references Carta (nombre)
 );
 
 
 drop table if exists compuesto cascade;
 create table compuesto
 (
-    carta   integer,
+    carta   varchar(255),
     deck    integer,
     nivel   integer,
     primary key (carta, deck),
-    foreign key (carta) references Carta (id),
+    foreign key (carta) references Carta (nombre),
     foreign key (deck) references Deck (id)
 );
 
@@ -276,12 +275,12 @@ drop table if exists Encuentra cascade;
 create table Encuentra
 (
     jugador            varchar(255),
-    carta              integer,
+    carta              varchar(255),
     fecha_mejora       date,
     nivel_actual       integer,
     primary key (jugador, carta),
     foreign key (jugador) references Jugador (id),
-    foreign key (carta) references Carta (id)
+    foreign key (carta) references Carta (nombre)
 );
 
 
