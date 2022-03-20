@@ -14,8 +14,7 @@ where velocidad_ataque > 100 and c.nombre like '%k%';
  */
 select avg(daño) as daño_medio, max(daño) as daño_max, min(daño) as daño_min
 from carta
-where rareza = 'Epic'
-group by rareza;
+group by rareza having rareza = 'Epic';
 
 
 /* 1.3
@@ -42,6 +41,8 @@ where c.rareza = 'Epic' and d.fecha = '2021-11-01'
 group by c.nombre, c.daño
 order by c.daño desc
 limit 10;
+
+
 
 
 /* 1.5
@@ -97,7 +98,7 @@ order by daño;
 
 
 
-/***************** APARTADO 1 *****************/
+/***************** APARTADO 2 *****************/
 /* 2.1
  * Enumera els missatges (text i data) escrits pels jugadors que tenen més experiència que
  * la mitjana dels jugadors que tenen una "A" en nom seu i pertanyen al clan "NoA". Donar
@@ -209,7 +210,7 @@ where mensaje_respondido is null
 order by fecha desc, cuerpo desc;
 
 
-/***************** APARTADO 1 *****************/
+/***************** APARTADO 3 *****************/
 /* 3.1
  * Llistar els clans (nom i descripció) i el nombre de jugadors que tenen una experiència
  * superior a 200.000. Filtra la sortida per tenir els clans amb més trofeus requerits.
@@ -258,7 +259,7 @@ order by fecha desc, cuerpo desc;
 
 
 
-/***************** APARTADO 1 *****************/
+/***************** APARTADO 4 *****************/
 /* 4.1
  * Enumera el nom, els trofeus mínims, els trofeus màxims de les arenes que el seu títol comença per "A" i tenen un
  * paquet d’arena amb or superior a 8000.
@@ -299,4 +300,103 @@ order by fecha desc, cuerpo desc;
 /* 4.8
  * Retorna el nom de les cartes que pertanyen a jugadors que van completar missions el nom de les quals inclou la
  * paraula "Armer" i l'or de la missió és més gran que l'or mitjà recompensat en totes les missions de les arenes.
+ */
+
+
+/***************** APARTADO 5 *****************/
+
+/* 5.1
+ * Mostrar el nombre de jugadors que té cada clan, però només considerant els jugadors amb nom de rol que
+ * contingui el text "elder". Restringir la sortida per als 5 primers clans amb més jugadors.
+ */
+select c.nombre, count(f.jugador) as num_players
+from clan as c join formado f on c.id = f.clan
+where f.role like '%elder%'
+group by c.nombre order by num_players desc limit 5;
+
+
+
+/* 5.2
+ *  Mostrar el nom dels jugadors,el text dels missatges i la data dels missatges enviats pels jugadors
+ *  que tenen la carta Skeleton Army i han comprat articles abans del 01-01-2019.
+ */
+select j.nombre, m.cuerpo, m.fecha
+from jugador as j join escribe e on j.id = e.id_emisor
+    join mensaje m on m.id = e.id_mensaje join deck d on j.id = d.jugador
+    join compuesto c on d.id = c.deck join compra c2 on j.id = c2.jugador
+where /*c.carta like 'Skeleton Army' and*/ c2.fecha < '2019-01-01'
+group by j.nombre, m.cuerpo, m.fecha;
+
+
+/* 5.3
+ *  Llistar els 10 primers jugadors amb experiència superior a 100.000 que han creat més piles i han guanyat
+ *  batalles a la temporada T7.
+ */
+
+select j.nombre, count(d.jugador) as decks_creats
+from jugador as j join deck d on j.id = d.jugador join batalla b on d.id = b.deck_win
+where j.experiencia > 100000 and b.fecha between '2020-01-01' and '2020-08-31'
+group by j.nombre order by decks_creats desc limit 10;
+
+/* 5.4
+ * Enumera els articles que han estat comprats més vegades i el seu cost total.
+ */
+select a.nombre as articulo, a.coste_real ,count(c.articulo) as nombre_vecesCompra
+from articulo as a join compra c on a.id = c.articulo
+group by a.nombre,coste_real order by nombre_vecesCompra desc;
+
+
+/* 5.5
+ * Mostrar la identificació de les batalles, la durada, la data d'inici i la data de finalització dels
+ * clans que la seva descripció no contingui el text "Chuck Norris". Considera només les batalles amb una
+ * durada inferior a la durada mitjana de totes les batalles.
+ */
+select b.id, b.durada, p.fecha_inicio, p.fecha_fin
+from clan as c join pelea as p on p.clan = c.id join batalla_clan as bc on p.batalla_clan = bc.id
+    join batalla b on p.batalla_clan = b.batalla_clan
+where c.descripcion like '%Chuck Norris%' and b.durada < (select avg(durada) from batalla)
+group by b.id, b.durada, p.fecha_inicio, p.fecha_fin order by  b.durada
+
+
+
+
+/* 5.6
+ * Enumerar el nom i l'experiència dels jugadors que pertanyen a un clan que té una tecnologia el nom
+ * del qual conté la paraula "Militar" i aquests jugadors havien comprat el 2021 més de 5 articles.
+ */
+
+/* 5.7
+ * Indiqueu el nom dels jugadors que tenen totes les cartes amb el major valor de dany.
+ */
+
+/* 5.8
+ * Retorna el nom de les cartes i el dany que pertanyen a les piles el nom de les quals conté la paraula
+ * "Madrid" i van ser creats per jugadors amb experiència superior a 150.000. Considereu només les cartes
+ * amb dany superior a 200 i els jugadors que van aconseguir un èxit en el 2021. Enumera el resultat des
+ * dels valors més alts del nom de la carta fins als valors més baixos del nom de la carta.
+ */
+
+/* 5.9
+ * Enumerar el nom, l’experiència i el nombre de trofeus dels jugadors que no han comprat res. Així, el nom,
+ * l'experiència i el número de trofeus dels jugadors que no han enviat cap missatge. Ordenar la sortida de
+ * menor a més valor en el nom del jugador.
+ */
+
+/* 5.10
+ * Llistar les cartes comunes que no estan incloses en cap pila i que pertanyen a jugadors amb experiència
+ * superior a 200.000. Ordena la sortida amb el nom de la carta.
+ */
+
+/* 5.11
+ * Llistar el nom dels jugadors que han sol·licitat amics, però no han estat sol·licitats com a amics.
+ */
+
+/* 5.12
+ * Enumerar el nom dels jugadors i el nombre d'articles comprats que tenen un cost superior al cost mitjà
+ * de tots els articles. Ordenar el resultat de menor a major valor del nombre de comandes.
+ */
+
+/* 5.13
+ * Poseu a zero els valors d'or i gemmes als jugadors que no han enviat cap missatge o que han enviat el
+ * mateix nombre de missatges que el jugador que més missatges ha enviat.
  */
