@@ -355,7 +355,7 @@ select b.id, b.durada, p.fecha_inicio, p.fecha_fin
 from clan as c join pelea as p on p.clan = c.id join batalla_clan as bc on p.batalla_clan = bc.id
     join batalla b on p.batalla_clan = b.batalla_clan
 where c.descripcion like '%Chuck Norris%' and b.durada < (select avg(durada) from batalla)
-group by b.id, b.durada, p.fecha_inicio, p.fecha_fin order by  b.durada
+group by b.id, b.durada, p.fecha_inicio, p.fecha_fin order by  b.durada;
 
 
 
@@ -364,10 +364,21 @@ group by b.id, b.durada, p.fecha_inicio, p.fecha_fin order by  b.durada
  * Enumerar el nom i l'experiència dels jugadors que pertanyen a un clan que té una tecnologia el nom
  * del qual conté la paraula "Militar" i aquests jugadors havien comprat el 2021 més de 5 articles.
  */
+select j.nombre, j.experiencia,count(c2.jugador)
+from jugador as j join formado f on j.id = f.jugador join clan c on c.id = f.clan
+    join clan_modificador cm on c.id = cm.clan join modificador m on cm.modificador = m.nombre
+    join tecnologias t on m.nombre = t.nombre join compra c2 on j.id = c2.jugador
+where t.nombre like '%Militar%' and c2.fecha between '2021-01-01' and '2021-12-31'
+group by j.nombre, j.experiencia having count(c2.jugador) > 5;
+
 
 /* 5.7
  * Indiqueu el nom dels jugadors que tenen totes les cartes amb el major valor de dany.
  */
+ select j.nombre from jugador as j join deck d on j.id = d.jugador
+     join compuesto c on d.id = c.deck join carta c2 on c.carta = c2.nombre
+where j.nombre in (select )
+group by j.nombre; --Esta por acabar
 
 /* 5.8
  * Retorna el nom de les cartes i el dany que pertanyen a les piles el nom de les quals conté la paraula
@@ -376,27 +387,71 @@ group by b.id, b.durada, p.fecha_inicio, p.fecha_fin order by  b.durada
  * dels valors més alts del nom de la carta fins als valors més baixos del nom de la carta.
  */
 
+select c.nombre, c.daño
+from carta c join compuesto c2 on c.nombre = c2.carta join deck d on d.id = c2.deck
+    join jugador j on d.jugador = j.id join desbloquea d2 on j.id = d2.jugador
+where d.titulo like '%Madrid%' and j.experiencia > 150000 and d2.fecha between '2021-01-01' and '2021-12-31'
+group by c.nombre, c.daño having c.daño > 200 order by c.nombre desc
+
+
+
 /* 5.9
  * Enumerar el nom, l’experiència i el nombre de trofeus dels jugadors que no han comprat res. Així, el nom,
  * l'experiència i el número de trofeus dels jugadors que no han enviat cap missatge. Ordenar la sortida de
  * menor a més valor en el nom del jugador.
  */
 
+(select j.nombre, j.experiencia, j.trofeos from jugador as j group by j.nombre, j.experiencia, j.trofeos
+except
+select j.nombre, j.experiencia, j.trofeos
+from jugador as j join compra c on j.id = c.jugador group by j.nombre, j.experiencia, j.trofeos)
+union
+(select j.nombre, j.experiencia, j.trofeos from jugador as j group by j.nombre, j.experiencia, j.trofeos
+except
+select j.nombre, j.experiencia, j.trofeos
+from jugador as j join escribe e on j.id = e.id_emisor group by j.nombre, j.experiencia, j.trofeos)
+order by nombre asc;
+
+
+
 /* 5.10
  * Llistar les cartes comunes que no estan incloses en cap pila i que pertanyen a jugadors amb experiència
  * superior a 200.000. Ordena la sortida amb el nom de la carta.
  */
+(select c.nombre
+from carta as c join encuentra e on c.nombre = e.carta
+    join jugador j on j.id = e.jugador
+--where j.experiencia >200000
+group by c.nombre order by c.nombre)
+except
+(select c.nombre from carta as c join compuesto c2 on c.nombre = c2.carta
+    group by c.nombre order by nombre)
+
+
 
 /* 5.11
  * Llistar el nom dels jugadors que han sol·licitat amics, però no han estat sol·licitats com a amics.
  */
+select j.nombre from jugador as j join amigo a on j.id = a.id_jugador_emisor group by j.nombre
+except
+select j.nombre from jugador as j join amigo a2 on j.id = a2.id_jugador_receptor group by j.nombre;
+
+
 
 /* 5.12
  * Enumerar el nom dels jugadors i el nombre d'articles comprats que tenen un cost superior al cost mitjà
  * de tots els articles. Ordenar el resultat de menor a major valor del nombre de comandes.
  */
 
+select j.nombre, a.nombre from jugador as j join compra c on j.id = c.jugador
+    join articulo a on a.id = c.articulo
+where a.coste_real > (select avg(coste_real) from articulo)
+group by j.nombre, a.nombre
+order by count(c.jugador) asc;
+
 /* 5.13
  * Poseu a zero els valors d'or i gemmes als jugadors que no han enviat cap missatge o que han enviat el
  * mateix nombre de missatges que el jugador que més missatges ha enviat.
  */
+
+ --alter table pal final mejor i guess
