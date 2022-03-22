@@ -484,3 +484,38 @@ order by j.id;
  * Retorna el nom de les cartes que pertanyen a jugadors que van completar missions el nom de les quals inclou la
  * paraula "Armer" i l'or de la missió és més gran que l'or mitjà recompensat en totes les missions de les arenes.
  */
+
+ select *
+from mision
+where mision.descripcion like '%Armer%';
+
+select * from mision_arena;
+
+select carta.nombre as nombre_carta, j.id as id_jugador
+from carta
+    join encuentra e on carta.nombre = e.carta
+    join jugador j on e.jugador = j.id
+where j.id in (select j.id
+               from jugador j
+                        join realiza r on j.id = r.jugador
+                        join mision m on r.mision = m.id
+                        join mision_arena ma on m.id = ma.mision
+               where m.descripcion like '%Armer%'
+                 and ma.recompensa_oro > (select AVG(mision_arena.recompensa_oro) as media
+                                          from mision_arena)
+               group by j.id);
+
+/* devolvemos lista de jugadores*/
+select j.id
+from jugador j
+         join realiza r on j.id = r.jugador
+         join mision m on r.mision = m.id
+         join mision_arena ma on m.id = ma.mision
+where m.descripcion like '%Armer%'
+  and ma.recompensa_oro > (select AVG(mision_arena.recompensa_oro) as media
+                           from mision_arena)
+group by j.id;
+
+/* Calculamos media de las recompensas de todas las misiones*/
+select AVG(mision_arena.recompensa_oro) as media
+from mision_arena;
