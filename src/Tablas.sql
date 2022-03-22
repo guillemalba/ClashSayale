@@ -503,5 +503,6 @@ create table Participa
     temporada varchar(255),
     jugador   varchar(255),
     primary key (temporada,jugador),
-    foreign key (temporada) references Temporada (nombre) --TODO: no hay ninguna tabla que nos relacione esto.
+    foreign key (temporada) references Temporada (nombre), --TODO: no hay ninguna tabla que nos relacione esto.
+    foreign key (jugador) references Jugador (id) --TODO: no hay ninguna tabla que nos relacione esto.
 );

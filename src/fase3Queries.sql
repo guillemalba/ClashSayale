@@ -263,27 +263,143 @@ order by fecha desc, cuerpo desc;
  * Enumera el nom, els trofeus mínims, els trofeus màxims de les arenes que el seu títol comença per "A" i tenen un
  * paquet d’arena amb or superior a 8000.
  */
+select a.nombre, a.max_trofeos, a.min_trofeos
+from arena a
+    join nivel_arena na on a.id = na.arena
+where nombre like 'A%'
+and oro >= 8000;
 
 /* 4.2
  * Llista de nom, data d'inici, data de finalització de les temporades i, de les batalles d'aquestes temporades, el nom
  * del jugador guanyador si el jugador té més victòries que derrotes i la seva experiència és més gran de 200.000.
  */
+select * from temporada;
+
+select * from jugador;
+
+select * from batalla;
+
+select j.nombre
+from jugador j
+where experiencia > 200000;
+
+select d.jugador, COUNT(d.id) as num_wins
+from deck d join batalla b on d.id = b.deck_win
+group by d.jugador
+order by num_wins desc;
+
+select d.jugador, COUNT(d.id) as num_loses
+from deck d join batalla b on d.id = b.deck_lose
+group by d.jugador
+order by num_loses desc;
+
+
+select w.jugador, w.num_wins, l.num_loses, w.num_wins - l.num_loses as difference
+from (select d.jugador, COUNT(d.id) as num_wins
+      from deck d
+               join batalla b on d.id = b.deck_win
+      group by d.jugador) as w
+         join (select d.jugador, COUNT(d.id) as num_loses
+               from deck d
+                        join batalla b on d.id = b.deck_lose
+               group by d.jugador) as l on w.jugador = l.jugador
+where w.num_wins - l.num_loses > 0
+  and w.jugador in (select j.id
+                    from jugador j
+                    where j.experiencia > 200000);
+
+select t.nombre, t.fecha_inicio, t.fecha_final, j.nombre as nombre_jugador, d.jugador as id_jugador, b.fecha as fecha_batalla
+from temporada as t
+         join participa p on t.nombre = p.temporada
+         join jugador as j on p.jugador = j.id
+         join deck d on j.id = d.jugador
+         join batalla b on d.id = b.deck_win
+where b.fecha >= t.fecha_inicio
+  and b.fecha <= t.fecha_final
+  and j.id in (select w.jugador
+              from (select d.jugador, COUNT(d.id) as num_wins
+                    from deck d
+                             join batalla b on d.id = b.deck_win
+                    group by d.jugador) as w
+                       join (select d.jugador, COUNT(d.id) as num_loses
+                             from deck d
+                                      join batalla b on d.id = b.deck_lose
+                             group by d.jugador) as l on w.jugador = l.jugador
+              where w.num_wins - l.num_loses > 0
+                and w.jugador in (select jj.id
+                                  from jugador jj
+                                  where jj.experiencia > 200000))
+order by t.fecha_inicio asc;
+
+select * from temporada
+order by temporada.fecha_inicio asc;
+
+select *
+from batalla
+where batalla.id not in (select b.id
+                         from temporada as t
+                                  join participa p on t.nombre = p.temporada
+                                  join jugador as j on p.jugador = j.id
+                                  join deck d on j.id = d.jugador
+                                  join batalla b on d.id = b.deck_win
+                         where b.fecha >= t.fecha_inicio
+                           and b.fecha <= t.fecha_final);
+
+select * from deck
+where deck.id = 167;
+
+select * from jugador
+where jugador.id = '#GVJLCYC';
+
+select * from participa
+where participa.jugador = '#GVJLCYC';
+
+
+
+select * from batalla
+order by batalla.fecha desc;
+
 
 /* 4.3
  * Llistar la puntuació total dels jugadors guanyadors de batalles de cada temporada. Filtrar la sortida per considerar
  * només les temporades que han començat i acabat el 2019.
  */
+select j.nombre, count(b.puntos_win) as total_points
+from jugador j,
+     batalla b,
+     deck d
+where b.deck_win = d.id
+  and j.id = d.jugador
+  and EXTRACT(YEAR FROM b.fecha) = 2019
+group by j.nombre
+order by total_points desc;
 
 /* 4.4
  * Enumerar els noms de les arenes en què els jugadors veterans (experiència superior a 170.000) van obtenir insígnies
  * després del "25-10-2021". Ordenar el resultat segons el nom de l’arena en ordre ascendent.
  */
+select a.nombre
+from arena a,
+     jugador j,
+     insignia i,
+     consigue c
+where j.experiencia > 170000
+  and c.jugador = j.id
+  and a.id = c.arena
+  and i.nombre = c.insignia
+  and c.fecha >= '2021-10-25'
+group by a.nombre
+order by a.nombre asc;
+this is 1
+this is 2
+
 
 /* 4.5
  * Enumerar el nom de la insígnia, els noms de les cartes i el dany de les cartes dels jugadors amb una experiència
  * superior a 290.000 i obtingudes en arenes el nom de les quals comença per "A" o quan la insígnia no té imatge. Així,
  * considera només els jugadors que tenen una carta el nom de la qual comença per "Lava".
  */
+
 
 /* 4.6
  * Donar el nom de les missions que donen recompenses a totes les arenes el títol de les quals comença per "t" o acaba
