@@ -14,8 +14,7 @@ where velocidad_ataque > 100 and c.nombre like '%k%';
  */
 select avg(daño) as daño_medio, max(daño) as daño_max, min(daño) as daño_min
 from carta
-where rareza = 'Epic'
-group by rareza;
+group by rareza having rareza = 'Epic';
 
 
 /* 1.3
@@ -42,6 +41,8 @@ where c.rareza = 'Epic' and d.fecha = '2021-11-01'
 group by c.nombre, c.daño
 order by c.daño desc
 limit 10;
+
+
 
 
 /* 1.5
@@ -97,7 +98,7 @@ order by daño;
 
 
 
-/***************** APARTADO 1 *****************/
+/***************** APARTADO 2 *****************/
 /* 2.1
  * Enumera els missatges (text i data) escrits pels jugadors que tenen més experiència que
  * la mitjana dels jugadors que tenen una "A" en nom seu i pertanyen al clan "NoA". Donar
@@ -209,7 +210,7 @@ where mensaje_respondido is null
 order by fecha desc, cuerpo desc;
 
 
-/***************** APARTADO 1 *****************/
+/***************** APARTADO 3 *****************/
 /* 3.1
  * Llistar els clans (nom i descripció) i el nombre de jugadors que tenen una experiència
  * superior a 200.000. Filtra la sortida per tenir els clans amb més trofeus requerits.
@@ -258,155 +259,26 @@ order by fecha desc, cuerpo desc;
 
 
 
-/***************** APARTADO 1 *****************/
+/***************** APARTADO 4 *****************/
 /* 4.1
  * Enumera el nom, els trofeus mínims, els trofeus màxims de les arenes que el seu títol comença per "A" i tenen un
  * paquet d’arena amb or superior a 8000.
  */
-select a.nombre, a.max_trofeos, a.min_trofeos
-from arena a
-    join nivel_arena na on a.id = na.arena
-where nombre like 'A%'
-and oro >= 8000;
 
 /* 4.2
  * Llista de nom, data d'inici, data de finalització de les temporades i, de les batalles d'aquestes temporades, el nom
  * del jugador guanyador si el jugador té més victòries que derrotes i la seva experiència és més gran de 200.000.
  */
 
-select t.nombre,
-       t.fecha_inicio,
-       t.fecha_final,
-       j.nombre  as nombre_jugador,
-       d.jugador as id_jugador,
-       b.fecha   as fecha_batalla
-from temporada as t
-         join participa p on t.nombre = p.temporada
-         join jugador as j on p.jugador = j.id
-         join deck d on j.id = d.jugador
-         join batalla b on d.id = b.deck_win
-where b.fecha >= t.fecha_inicio
-  and b.fecha <= t.fecha_final
-  and j.id in (select w.jugador
-               from (select d.jugador, COUNT(d.id) as num_wins
-                     from deck d
-                              join batalla b on d.id = b.deck_win
-                     group by d.jugador) as w
-                        join (select d.jugador, COUNT(d.id) as num_loses
-                              from deck d
-                                       join batalla b on d.id = b.deck_lose
-                              group by d.jugador) as l on w.jugador = l.jugador
-               where w.num_wins - l.num_loses > 0
-                 and w.jugador in (select jj.id
-                                   from jugador jj
-                                   where jj.experiencia > 200000))
-order by t.fecha_inicio asc;
-
-select * from temporada;
-
-select * from jugador;
-
-select * from batalla;
-
-select j.nombre
-from jugador j
-where experiencia > 200000;
-
-select d.jugador, COUNT(d.id) as num_wins
-from deck d join batalla b on d.id = b.deck_win
-group by d.jugador
-order by num_wins desc;
-
-select d.jugador, COUNT(d.id) as num_loses
-from deck d join batalla b on d.id = b.deck_lose
-group by d.jugador
-order by num_loses desc;
-
-
-select w.jugador, w.num_wins, l.num_loses, w.num_wins - l.num_loses as difference
-from (select d.jugador, COUNT(d.id) as num_wins
-      from deck d
-               join batalla b on d.id = b.deck_win
-      group by d.jugador) as w
-         join (select d.jugador, COUNT(d.id) as num_loses
-               from deck d
-                        join batalla b on d.id = b.deck_lose
-               group by d.jugador) as l on w.jugador = l.jugador
-where w.num_wins - l.num_loses > 0
-  and w.jugador in (select j.id
-                    from jugador j
-                    where j.experiencia > 200000);
-
-select * from temporada
-order by temporada.fecha_inicio asc;
-
-select *
-from batalla
-where batalla.id not in (select b.id
-                         from temporada as t
-                                  join participa p on t.nombre = p.temporada
-                                  join jugador as j on p.jugador = j.id
-                                  join deck d on j.id = d.jugador
-                                  join batalla b on d.id = b.deck_win
-                         where b.fecha >= t.fecha_inicio
-                           and b.fecha <= t.fecha_final);
-
-select * from deck
-where deck.id = 167;
-
-select * from jugador
-where jugador.id = '#GVJLCYC';
-
-select * from participa
-where participa.jugador = '#GVJLCYC';
-
-
-
-select * from batalla
-order by batalla.fecha desc;
-
-
 /* 4.3
  * Llistar la puntuació total dels jugadors guanyadors de batalles de cada temporada. Filtrar la sortida per considerar
  * només les temporades que han començat i acabat el 2019.
  */
-select t.nombre as temporada,
-       j.nombre  as nombre_jugador,
-       d.jugador as id_jugador,
-       SUM(b.puntos_win) as suma_puntos
-from temporada as t
-         join participa p on t.nombre = p.temporada
-         join jugador as j on p.jugador = j.id
-         join deck d on j.id = d.jugador
-         join batalla b on d.id = b.deck_win
-where b.fecha >= t.fecha_inicio
-  and b.fecha <= t.fecha_final
-  and EXTRACT(YEAR FROM t.fecha_inicio) = 2019
-  and EXTRACT(YEAR FROM t.fecha_final) = 2019
-  and j.id in (select w.jugador
-               from (select d.jugador
-                     from deck d
-                              join batalla b on d.id = b.deck_win
-                     group by d.jugador) as w)
-group by t.nombre, j.nombre, d.jugador
-order by t.nombre asc, suma_puntos desc;
 
 /* 4.4
  * Enumerar els noms de les arenes en què els jugadors veterans (experiència superior a 170.000) van obtenir insígnies
  * després del "25-10-2021". Ordenar el resultat segons el nom de l’arena en ordre ascendent.
  */
-select a.nombre
-from arena a,
-     jugador j,
-     insignia i,
-     consigue c
-where j.experiencia > 170000
-  and c.jugador = j.id
-  and a.id = c.arena
-  and i.nombre = c.insignia
-  and c.fecha >= '2021-10-25'
-group by a.nombre
-order by a.nombre asc;
 
 /* 4.5
  * Enumerar el nom de la insígnia, els noms de les cartes i el dany de les cartes dels jugadors amb una experiència
@@ -414,116 +286,172 @@ order by a.nombre asc;
  * considera només els jugadors que tenen una carta el nom de la qual comença per "Lava".
  */
 
-/* Lista de las insignias que ha conseguido el jugador*/
-select i.nombre as nombre_insignia, j.id as id_jugador
-from consigue as c
-         join arena a on a.id = c.arena
-         join jugador j on j.id = c.jugador
-         join insignia i on i.nombre = c.insignia
-where j.experiencia > 290000
-and (a.nombre like 'A%' or i.imagenurl is null)
-order by j.id asc;
-
-/* Lista de las cartas que ha conseguido el jugador*/
-select c.nombre as nombre_carta, j.id as id_jugador
-from encuentra as e
-         join jugador j on j.id = e.jugador
-         join carta c on c.nombre = e.carta
-         join arena a on c.arena = a.id
-where j.experiencia > 290000
-  and a.nombre like 'A%'
-order by j.id asc;
-
-
-
-
 /* 4.6
  * Donar el nom de les missions que donen recompenses a totes les arenes el títol de les quals comença per "t" o acaba
  * per "a". Ordena el resultat pel nom de la missió.
  */
-select m.nombre as nombre_mission, a.nombre as nombre_arena
-from mision as m
-         join mision_arena ma on m.id = ma.mision
-         join arena as a on ma.arena = a.id
-where a.nombre like 't%'
-   or a.nombre like '%a'
-order by m.nombre asc;
-
 
 /* 4.7
  * Donar el nom de les arenes amb jugadors que al novembre o desembre de 2021 van obtenir insígnies si el nom de
  * l’arena conté la paraula "Lliga", i les arenes tenen jugadors que al 2021 van obtenir èxits el nom dels quals conté
  * la paraula "Friend".
  */
-select *
-from arena;
-where insignia.nombre like '%Lliga%';
-
-select a.nombre as nombre_arena
-from consigue as c
-         join arena a on a.id = c.arena
-         join jugador j on j.id = c.jugador
-         join insignia i on i.nombre = c.insignia
-where a.nombre like '%Lliga%'
-and EXTRACT(YEAR FROM c.fecha) = 2021
-and (EXTRACT(MONTH FROM c.fecha) = 11 or EXTRACT(MONTH FROM c.fecha) = 12)
-and j.id in (select j.id
-             from desbloquea d
-                      join arena a on a.id = d.arena
-                      join jugador j on j.id = d.jugador
-                      join logro l on l.id = d.id_logro
-             where l.nombre like '%Friend%'
-               and EXTRACT(YEAR FROM d.fecha) = 2021
-             group by j.id)
-order by a.nombre;
-
-/* Selecciona els ids dels jugadors que que al 2021 van obtenir èxits el nom dels quals conté la paraula "Friend".*/
-select j.id
-from desbloquea d
-         join arena a on a.id = d.arena
-         join jugador j on j.id = d.jugador
-         join logro l on l.id = d.id_logro
-where l.nombre like '%Friend%'
-and EXTRACT(YEAR FROM d.fecha) = 2021
-group by j.id
-order by j.id;
 
 /* 4.8
  * Retorna el nom de les cartes que pertanyen a jugadors que van completar missions el nom de les quals inclou la
  * paraula "Armer" i l'or de la missió és més gran que l'or mitjà recompensat en totes les missions de les arenes.
  */
 
- select *
-from mision
-where mision.descripcion like '%Armer%';
 
-select * from carta;
+/***************** APARTADO 5 *****************/
 
-select carta.nombre as nombre_carta, j.id as id_jugador
-from carta
-    join encuentra e on carta.nombre = e.carta
-    join jugador j on e.jugador = j.id
-where j.id in (select j.id
-               from jugador j
-                        join realiza r on j.id = r.jugador
-                        join mision m on r.mision = m.id
-                        join mision_arena ma on m.id = ma.mision
-               where m.descripcion like '%Armer%'
-                 and ma.recompensa_oro > (select AVG(mision_arena.recompensa_oro) as media
-                                          from mision_arena)
-               group by j.id);
+/* 5.1
+ * Mostrar el nombre de jugadors que té cada clan, però només considerant els jugadors amb nom de rol que
+ * contingui el text "elder". Restringir la sortida per als 5 primers clans amb més jugadors.
+ */
+select c.nombre, count(f.jugador) as num_players
+from clan as c join formado f on c.id = f.clan
+where f.role like '%elder%'
+group by c.nombre order by num_players desc limit 5;
 
-/* devolvemos lista de jugadores*/
-select j.id
-from jugador j
-         join realiza r on j.id = r.jugador
-         join mision m on r.mision = m.id
-         join mision_arena ma on m.id = ma.mision
-where m.descripcion like '%Armer%'
-  and ma.recompensa_oro > (select AVG(mision_arena.recompensa_oro) as media
-                           from mision_arena)
-group by j.id;
 
-/* Calculamos media de las recompensas de todas las misiones*/
-select AVG(mision_arena.recompensa_oro) as media
-from mision_arena;
+
+/* 5.2
+ *  Mostrar el nom dels jugadors,el text dels missatges i la data dels missatges enviats pels jugadors
+ *  que tenen la carta Skeleton Army i han comprat articles abans del 01-01-2019.
+ */
+select j.nombre, m.cuerpo, m.fecha
+from jugador as j join escribe e on j.id = e.id_emisor
+    join mensaje m on m.id = e.id_mensaje join deck d on j.id = d.jugador
+    join compuesto c on d.id = c.deck join compra c2 on j.id = c2.jugador
+where /*c.carta like 'Skeleton Army' and*/ c2.fecha < '2019-01-01'
+group by j.nombre, m.cuerpo, m.fecha;
+
+
+/* 5.3
+ *  Llistar els 10 primers jugadors amb experiència superior a 100.000 que han creat més piles i han guanyat
+ *  batalles a la temporada T7.
+ */
+
+select j.nombre, count(d.jugador) as decks_creats
+from jugador as j join deck d on j.id = d.jugador join batalla b on d.id = b.deck_win
+where j.experiencia > 100000 and b.fecha between '2020-01-01' and '2020-08-31'
+group by j.nombre order by decks_creats desc limit 10;
+
+/* 5.4
+ * Enumera els articles que han estat comprats més vegades i el seu cost total.
+ */
+select a.nombre as articulo, a.coste_real ,count(c.articulo) as nombre_vecesCompra
+from articulo as a join compra c on a.id = c.articulo
+group by a.nombre,coste_real order by nombre_vecesCompra desc;
+
+
+/* 5.5
+ * Mostrar la identificació de les batalles, la durada, la data d'inici i la data de finalització dels
+ * clans que la seva descripció no contingui el text "Chuck Norris". Considera només les batalles amb una
+ * durada inferior a la durada mitjana de totes les batalles.
+ */
+select b.id, b.durada, p.fecha_inicio, p.fecha_fin
+from clan as c join pelea as p on p.clan = c.id join batalla_clan as bc on p.batalla_clan = bc.id
+    join batalla b on p.batalla_clan = b.batalla_clan
+where c.descripcion like '%Chuck Norris%' and b.durada < (select avg(durada) from batalla)
+group by b.id, b.durada, p.fecha_inicio, p.fecha_fin order by  b.durada;
+
+
+
+
+/* 5.6
+ * Enumerar el nom i l'experiència dels jugadors que pertanyen a un clan que té una tecnologia el nom
+ * del qual conté la paraula "Militar" i aquests jugadors havien comprat el 2021 més de 5 articles.
+ */
+select j.nombre, j.experiencia,count(c2.jugador)
+from jugador as j join formado f on j.id = f.jugador join clan c on c.id = f.clan
+    join clan_modificador cm on c.id = cm.clan join modificador m on cm.modificador = m.nombre
+    join tecnologias t on m.nombre = t.nombre join compra c2 on j.id = c2.jugador
+where t.nombre like '%Militar%' and c2.fecha between '2021-01-01' and '2021-12-31'
+group by j.nombre, j.experiencia having count(c2.jugador) > 5;
+
+
+/* 5.7
+ * Indiqueu el nom dels jugadors que tenen totes les cartes amb el major valor de dany.
+ */
+ select j.nombre from jugador as j join deck d on j.id = d.jugador
+     join compuesto c on d.id = c.deck join carta c2 on c.carta = c2.nombre
+where j.nombre in (select )
+group by j.nombre; --Esta por acabar
+
+/* 5.8
+ * Retorna el nom de les cartes i el dany que pertanyen a les piles el nom de les quals conté la paraula
+ * "Madrid" i van ser creats per jugadors amb experiència superior a 150.000. Considereu només les cartes
+ * amb dany superior a 200 i els jugadors que van aconseguir un èxit en el 2021. Enumera el resultat des
+ * dels valors més alts del nom de la carta fins als valors més baixos del nom de la carta.
+ */
+
+select c.nombre, c.daño
+from carta c join compuesto c2 on c.nombre = c2.carta join deck d on d.id = c2.deck
+    join jugador j on d.jugador = j.id join desbloquea d2 on j.id = d2.jugador
+where d.titulo like '%Madrid%' and j.experiencia > 150000 and d2.fecha between '2021-01-01' and '2021-12-31'
+group by c.nombre, c.daño having c.daño > 200 order by c.nombre desc
+
+
+
+/* 5.9
+ * Enumerar el nom, l’experiència i el nombre de trofeus dels jugadors que no han comprat res. Així, el nom,
+ * l'experiència i el número de trofeus dels jugadors que no han enviat cap missatge. Ordenar la sortida de
+ * menor a més valor en el nom del jugador.
+ */
+
+(select j.nombre, j.experiencia, j.trofeos from jugador as j group by j.nombre, j.experiencia, j.trofeos
+except
+select j.nombre, j.experiencia, j.trofeos
+from jugador as j join compra c on j.id = c.jugador group by j.nombre, j.experiencia, j.trofeos)
+union
+(select j.nombre, j.experiencia, j.trofeos from jugador as j group by j.nombre, j.experiencia, j.trofeos
+except
+select j.nombre, j.experiencia, j.trofeos
+from jugador as j join escribe e on j.id = e.id_emisor group by j.nombre, j.experiencia, j.trofeos)
+order by nombre asc;
+
+
+
+/* 5.10
+ * Llistar les cartes comunes que no estan incloses en cap pila i que pertanyen a jugadors amb experiència
+ * superior a 200.000. Ordena la sortida amb el nom de la carta.
+ */
+(select c.nombre
+from carta as c join encuentra e on c.nombre = e.carta
+    join jugador j on j.id = e.jugador
+--where j.experiencia >200000
+group by c.nombre order by c.nombre)
+except
+(select c.nombre from carta as c join compuesto c2 on c.nombre = c2.carta
+    group by c.nombre order by nombre)
+
+
+
+/* 5.11
+ * Llistar el nom dels jugadors que han sol·licitat amics, però no han estat sol·licitats com a amics.
+ */
+select j.nombre from jugador as j join amigo a on j.id = a.id_jugador_emisor group by j.nombre
+except
+select j.nombre from jugador as j join amigo a2 on j.id = a2.id_jugador_receptor group by j.nombre;
+
+
+
+/* 5.12
+ * Enumerar el nom dels jugadors i el nombre d'articles comprats que tenen un cost superior al cost mitjà
+ * de tots els articles. Ordenar el resultat de menor a major valor del nombre de comandes.
+ */
+
+select j.nombre, a.nombre from jugador as j join compra c on j.id = c.jugador
+    join articulo a on a.id = c.articulo
+where a.coste_real > (select avg(coste_real) from articulo)
+group by j.nombre, a.nombre
+order by count(c.jugador) asc;
+
+/* 5.13
+ * Poseu a zero els valors d'or i gemmes als jugadors que no han enviat cap missatge o que han enviat el
+ * mateix nombre de missatges que el jugador que més missatges ha enviat.
+ */
+
+ --alter table pal final mejor i guess
