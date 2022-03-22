@@ -422,9 +422,6 @@ where j.experiencia > 170000
 group by a.nombre
 order by a.nombre asc;
 
-select * from arena;
-
-
 /* 4.5
  * Enumerar el nom de la insígnia, els noms de les cartes i el dany de les cartes dels jugadors amb una experiència
  * superior a 290.000 i obtingudes en arenes el nom de les quals comença per "A" o quan la insígnia no té imatge. Així,
@@ -436,11 +433,6 @@ select * from arena;
  * Donar el nom de les missions que donen recompenses a totes les arenes el títol de les quals comença per "t" o acaba
  * per "a". Ordena el resultat pel nom de la missió.
  */
- select * from mision
-order by mision.nombre;
- select * from arena;
- select * from mision_arena;
-
 select m.nombre as nombre_mission, a.nombre as nombre_arena
 from mision as m
          join mision_arena ma on m.id = ma.mision
@@ -455,6 +447,38 @@ order by m.nombre asc;
  * l’arena conté la paraula "Lliga", i les arenes tenen jugadors que al 2021 van obtenir èxits el nom dels quals conté
  * la paraula "Friend".
  */
+select *
+from arena;
+where insignia.nombre like '%Lliga%';
+
+select a.nombre as nombre_arena
+from consigue as c
+         join arena a on a.id = c.arena
+         join jugador j on j.id = c.jugador
+         join insignia i on i.nombre = c.insignia
+where a.nombre like '%Lliga%'
+and EXTRACT(YEAR FROM c.fecha) = 2021
+and (EXTRACT(MONTH FROM c.fecha) = 11 or EXTRACT(MONTH FROM c.fecha) = 12)
+and j.id in (select j.id
+             from desbloquea d
+                      join arena a on a.id = d.arena
+                      join jugador j on j.id = d.jugador
+                      join logro l on l.id = d.id_logro
+             where l.nombre like '%Friend%'
+               and EXTRACT(YEAR FROM d.fecha) = 2021
+             group by j.id)
+order by a.nombre;
+
+/* Selecciona els ids dels jugadors que que al 2021 van obtenir èxits el nom dels quals conté la paraula "Friend".*/
+select j.id
+from desbloquea d
+         join arena a on a.id = d.arena
+         join jugador j on j.id = d.jugador
+         join logro l on l.id = d.id_logro
+where l.nombre like '%Friend%'
+and EXTRACT(YEAR FROM d.fecha) = 2021
+group by j.id
+order by j.id;
 
 /* 4.8
  * Retorna el nom de les cartes que pertanyen a jugadors que van completar missions el nom de les quals inclou la
