@@ -370,13 +370,10 @@ order by batalla.fecha desc;
  * Llistar la puntuació total dels jugadors guanyadors de batalles de cada temporada. Filtrar la sortida per considerar
  * només les temporades que han començat i acabat el 2019.
  */
-select t.nombre,
-       t.fecha_inicio,
-       t.fecha_final,
+select t.nombre as temporada,
        j.nombre  as nombre_jugador,
        d.jugador as id_jugador,
-       b.fecha   as fecha_batalla,
-       b.puntos_win
+       SUM(b.puntos_win) as suma_puntos
 from temporada as t
          join participa p on t.nombre = p.temporada
          join jugador as j on p.jugador = j.id
@@ -384,26 +381,15 @@ from temporada as t
          join batalla b on d.id = b.deck_win
 where b.fecha >= t.fecha_inicio
   and b.fecha <= t.fecha_final
+  and EXTRACT(YEAR FROM t.fecha_inicio) = 2019
+  and EXTRACT(YEAR FROM t.fecha_final) = 2019
   and j.id in (select w.jugador
                from (select d.jugador
                      from deck d
                               join batalla b on d.id = b.deck_win
                      group by d.jugador) as w)
-order by j.nombre asc, t.nombre asc;
-
-
-select j.nombre,
-       SUM(b.puntos_win) as total_points
-from jugador j,
-     batalla b,
-     deck d
-where b.deck_win = d.id
-  and j.id = d.jugador
-  and EXTRACT(YEAR FROM b.fecha) = 2019
-group by j.nombre
-order by total_points desc;
-
-select * from batalla;
+group by t.nombre, j.nombre, d.jugador
+order by t.nombre asc, suma_puntos desc;
 
 /* 4.4
  * Enumerar els noms de les arenes en què els jugadors veterans (experiència superior a 170.000) van obtenir insígnies
@@ -427,6 +413,28 @@ order by a.nombre asc;
  * superior a 290.000 i obtingudes en arenes el nom de les quals comença per "A" o quan la insígnia no té imatge. Així,
  * considera només els jugadors que tenen una carta el nom de la qual comença per "Lava".
  */
+
+/* Lista de las insignias que ha conseguido el jugador*/
+select i.nombre as nombre_insignia, j.id as id_jugador
+from consigue as c
+         join arena a on a.id = c.arena
+         join jugador j on j.id = c.jugador
+         join insignia i on i.nombre = c.insignia
+where j.experiencia > 290000
+and (a.nombre like 'A%' or i.imagenurl is null)
+order by j.id asc;
+
+/* Lista de las cartas que ha conseguido el jugador*/
+select c.nombre as nombre_carta, j.id as id_jugador
+from encuentra as e
+         join jugador j on j.id = e.jugador
+         join carta c on c.nombre = e.carta
+         join arena a on c.arena = a.id
+where j.experiencia > 290000
+  and a.nombre like 'A%'
+order by j.id asc;
+
+
 
 
 /* 4.6
@@ -489,7 +497,7 @@ order by j.id;
 from mision
 where mision.descripcion like '%Armer%';
 
-select * from mision_arena;
+select * from carta;
 
 select carta.nombre as nombre_carta, j.id as id_jugador
 from carta
