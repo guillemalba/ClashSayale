@@ -442,7 +442,7 @@ where j.id in (select j.id
  * Mostrar el nombre de jugadors que té cada clan, però només considerant els jugadors amb nom de rol que
  * contingui el text "elder". Restringir la sortida per als 5 primers clans amb més jugadors.
  */
-select c.nombre, count(f.jugador) as num_players
+select c.nombre, count(distinct f.jugador) as num_players
 from clan as c join formado f on c.id = f.clan
 where f.role like '%elder%'
 group by c.nombre order by num_players desc limit 5;
