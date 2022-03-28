@@ -75,6 +75,8 @@ limit 3;
  * només estan en una pila. Per validar els resultats de la consulta, proporcioneu dues
  * consultes diferents per obtenir el mateix resultat.
  */
+
+--Query 1
 select c.nombre
 from carta c left join compuesto c2 on c.nombre = c2.carta
 where c2.carta is null
@@ -82,6 +84,18 @@ union
 select c.nombre
 from carta c left join compuesto c2 on c.nombre = c2.carta
 group by c.nombre having count(c2.carta) = 1;
+
+
+--Query 2
+select c.nombre
+from carta c left join compuesto c2 on c.nombre = c2.carta
+group by c.nombre having count(c2.carta) <= 1;
+
+
+--Comprobacion que solo hay 2 cartas con 0 decks y ninguna con 1 deck
+select c.nombre, count(c2.carta)
+from carta c left join compuesto c2 on c.nombre = c2.carta
+group by c.nombre;
 
 
 /* 1.8
@@ -107,7 +121,9 @@ order by daño;
 select m.cuerpo, m.fecha
 from jugador j join escribe e on j.id = e.id_emisor
 join mensaje m on e.id_mensaje = m.id
-where j.experiencia > (select avg(experiencia) from jugador j join formado f on j.id = f.jugador join clan c on f.clan = c.id where j.nombre like '%a%' and c.nombre = 'NoA' group by c.nombre)
+where j.experiencia > (select avg(experiencia) from jugador j join formado f on j.id = f.jugador
+    join clan c on f.clan = c.id where j.nombre like '%a%'
+    group by c.nombre having c.nombre = 'NoA')
 order by m.fecha desc;
 
 
@@ -140,7 +156,6 @@ join jugador j on c.jugador = j.id
 group by a.id
 order by coste_total desc;
 
-
 /* 2.4
  * Donar els números de les targetes de crèdit que s'han utilitzat més.
  */
@@ -162,10 +177,24 @@ where c.fecha between '2020-01-01' and '2020-12-31';
  * experiència superior a 150.000. Filtra les targetes de crèdit que no han estat utilitzades
  * per comprar cap article. Donar dues consultes diferents per obtenir el mateix resultat.
  */
+
+ --Query 1
 select j.nombre, j.experiencia, t.numero_tarjeta
 from jugador j join tarjeta t on j.tarjeta = t.numero_tarjeta
 left join compra c on j.id = c.jugador
 where c.jugador is null;
+
+
+--Query 2
+select j.nombre, j.experiencia, t.numero_tarjeta
+from jugador j join tarjeta t on j.tarjeta = t.numero_tarjeta
+               left join compra c on j.id = c.jugador
+except
+select j.nombre, j.experiencia, t.numero_tarjeta
+from jugador j join tarjeta t on j.tarjeta = t.numero_tarjeta
+               left join compra c on j.id = c.jugador
+where c.jugador is not null;
+
 
 --Podemos ver que solo hay un jugador que no ha comprado ningun articulo, por lo tanto
 --la query anterior es correcta
