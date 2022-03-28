@@ -529,7 +529,7 @@ select c.nombre, c.daño
 from carta c join compuesto c2 on c.nombre = c2.carta join deck d on d.id = c2.deck
     join jugador j on d.jugador = j.id join desbloquea d2 on j.id = d2.jugador
 where d.titulo like '%Madrid%' and j.experiencia > 150000 and d2.fecha between '2021-01-01' and '2021-12-31'
-group by c.nombre, c.daño having c.daño > 200 order by c.nombre desc
+group by c.nombre, c.daño having c.daño > 200 order by c.nombre desc;
 
 
 
@@ -563,7 +563,7 @@ from carta as c join encuentra e on c.nombre = e.carta
 group by c.nombre order by c.nombre)
 except
 (select c.nombre from carta as c join compuesto c2 on c.nombre = c2.carta
-    group by c.nombre order by nombre)
+    group by c.nombre order by nombre);
 
 
 
