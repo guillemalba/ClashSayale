@@ -163,6 +163,7 @@ select t.numero_tarjeta
 from compra c join tarjeta t on c.tarjeta = t.numero_tarjeta
 group by t.numero_tarjeta having count(c.tarjeta) = (select count(c.tarjeta) from compra c join tarjeta t on c.tarjeta = t.numero_tarjeta group by t.numero_tarjeta order by count(c.tarjeta) desc limit 1);
 
+
 /* 2.5
  * Donar els descomptes totals de les emoticones comprades durant l'any 2020
  */
@@ -245,48 +246,100 @@ order by fecha desc, cuerpo desc;
  * Llistar els clans (nom i descripció) i el nombre de jugadors que tenen una experiència
  * superior a 200.000. Filtra la sortida per tenir els clans amb més trofeus requerits.
  */
-
+select c.nombre as clan, c.descripcion, count(f.jugador) as num_judaors_XP200000
+from clan c join formado f on c.id = f.clan join jugador j on j.id = f.jugador
+where j.experiencia > 200000
+group by c.nombre, c.descripcion, c.minimo_trofeos
+order by c.minimo_trofeos desc;
 
 /* 3.2
- * Llistar els 15 jugadors amb més experiència, la seva experiència i el nom del clan que pertany si el clan que ha
- * investigat una tecnologia amb un cost superior a 1000.
+ * Llistar els 15 jugadors amb més experiència, la seva experiència i el nom del clan que pertany
+ * si el clan que ha investigat una tecnologia amb un cost superior a 1000.
  */
+select j.nombre, j.experiencia, c.nombre
+from jugador as j join formado f on j.id = f.jugador join clan c on c.id = f.clan
+                  join clan_modificador cm on c.id = cm.clan join modificador m on cm.modificador = m.nombre
+                  join tecnologias t on m.nombre = t.nombre
+where m.coste_oro > 1000
+group by j.nombre, j.experiencia, c.nombre
+order by j.experiencia desc limit 15;
+
 
 
 /* 3.3
  * Enumera l’identificador, la data d'inici i la durada de les batalles que van començar després del "01-01-2021" i en
  * què van participar clans amb trofeus mínims superiors a 6900. Donar només 5 batalles amb la major durada.
  */
-
+select b.id, b.fecha, b.durada
+from batalla as b join batalla_clan bc on bc.id = b.batalla_clan
+                  join pelea p on bc.id = p.batalla_clan join clan c on c.id = p.clan
+where b.fecha > '01-01-2021' and c.minimo_trofeos > 6900
+group by b.id, b.fecha, b.durada
+order by durada desc limit 5;
 
 /* 3.4
  * Enumera per a cada clan el nombre d'estructures i el cost total d'or. Considera les estructures creades a l'any 2020
  * i amb trofeus mínims superiors a 1200. Donar només la informació dels clans que tinguin més de 2 estructures.
  */
-
+select c.nombre, count(e.nombre) as nombre_estructuras, sum(m.coste_oro) as coste_total_oro
+from clan as c join clan_modificador cm on c.id = cm.clan
+               join modificador m on cm.modificador = m.nombre join estructura e on m.nombre = e.nombre
+where exists(select e2.nombre, cm2.fecha as data_creacio, c2.minimo_trofeos as trofeus_minims
+             from estructura e2 join modificador m2 on e2.nombre = m2.nombre
+                                join clan_modificador cm2 on m2.nombre = cm2.modificador join clan c2 on cm2.clan = c2.id
+             where cm2.fecha >= '01-01-2020' and cm2.fecha <= '31-12-2020' and c2.minimo_trofeos > 1200)
+group by c.nombre having count(e.nombre) > 2;
 
 /* 3.5
  * Enumera el nom dels clans, la descripció i els trofeus mínims ordenat de menor a major nivell de trofeus mínims per
  * als clans amb jugadors que tinguin més de 200.000 d’experiència i el rol co-líder.
  */
-
+select c.nombre, c.descripcion, c.minimo_trofeos
+from clan c join formado f on c.id = f.clan join jugador j on j.id = f.jugador
+where j.experiencia > 200000 and f.role LIKE 'coLeader%'
+group by c.nombre, c.descripcion, c.minimo_trofeos
+order by c.minimo_trofeos asc;
 
 /* 3.6
  * Necessitem canviar algunes dades a la base de dades. Hem d'incrementar un 25% el cost de les tecnologies que
  * utilitzen els clans amb trofeus mínims superiors a la mitjana de trofeus mínims de tots els clans.
  */
+/*select c.nombre, c.minimo_trofeos, avg(c.minimo_trofeos)
+from clan c join clan_modificador cm on c.id = cm.clan join modificador m on cm.modificador = m.nombre
+            join tecnologias t on m.nombre = t.nombre
+group by c.nombre, c.minimo_trofeos ;--having c.minimo_trofeos > avg(c.minimo_trofeos)
+
+select c.nombre, avg(c.minimo_trofeos)
+from clan c
+group by c.nombre;
+--group by c.nombre--, c.minimo_trofeos*/
+
 
 
 /* 3.7
  * Enumerar el nom i la descripció de la tecnologia utilitzada pels clans que tenen una estructura "Monument"
  * construïda després del "01-01-2021". Ordena les dades segons el nom i la descripció de les tecnologies.
  */
-
+select t.nombre, m.descripcion
+from tecnologias t right join modificador m on t.nombre = m.nombre
+                   join clan_modificador cm on m.nombre = cm.modificador
+where m.nombre like 'Monument' and cm.fecha > '2021-01-01'
+order by t.nombre, m.descripcion desc;
 
 /* 3.8
  * Enumera els clans amb un mínim de trofeus superior a 6900 i que hagin participat a totes les batalles de clans.
  */
+select c.nombre, count(p.batalla_clan)
+from clan c join pelea p on p.clan = c.id join batalla_clan bc on bc.id = p.batalla_clan
+where c.minimo_trofeos > 6900
+group by c.nombre;
 
+select c.nombre, count(distinct batalla_clan) as batallas
+from pelea p join clan c on c.id = p.clan
+group by c.nombre
+order by batallas desc;
+
+select count(id) from batalla_clan;
 
 
 /***************** APARTADO 4 *****************/
