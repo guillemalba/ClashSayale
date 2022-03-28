@@ -134,8 +134,9 @@ where a.nombre like '%b%';
  * comprats i l’experiència dels jugadors que els van demanar. Filtra la sortida amb els 5
  * articles en què els usuaris han gastat més diners.
  */
-select a.nombre, count(c.articulo) as num_compras, a.coste_real*count(c.articulo) as coste_total
+select a.nombre, count(c.articulo) as num_compras, a.coste_real*count(c.articulo) as coste_total, avg(j.experiencia) as experiencia
 from compra c join articulo a on c.articulo = a.id
+join jugador j on c.jugador = j.id
 group by a.id
 order by coste_total desc;
 
@@ -507,10 +508,15 @@ group by j.nombre, j.experiencia having count(c2.jugador) > 5;
 /* 5.7
  * Indiqueu el nom dels jugadors que tenen totes les cartes amb el major valor de dany.
  */
- select j.nombre from jugador as j join deck d on j.id = d.jugador
-     join compuesto c on d.id = c.deck join carta c2 on c.carta = c2.nombre
-where j.nombre in (select )
-group by j.nombre; --Esta por acabar
+
+select j.nombre as jugador, j.id, c.nombre as carta, e.nivel_actual as nivel
+from jugador as j join encuentra e on e.jugador = j.id
+join carta c on e.carta = c.nombre
+where e.nivel_actual = (select MAX(nivel_actual)
+                        from encuentra e2 join carta c2 on e2.carta = c2.nombre
+                        where c2.nombre = c.nombre
+                        group by c2.nombre);
+
 
 /* 5.8
  * Retorna el nom de les cartes i el dany que pertanyen a les piles el nom de les quals conté la paraula
