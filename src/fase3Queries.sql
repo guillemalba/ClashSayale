@@ -67,7 +67,11 @@ limit 3;
  * Proporcioneu les ordres SQL per fer les modificacions sense eliminar les dades i
  * reimportar-les.
  */
-
+select c.nombre as clan, c.descripcion, count(j.id) as num_judaors_XP200000
+from clan c join formado f on c.id = f.clan join jugador j on j.id = f.jugador
+where j.experiencia > 200000
+group by c.nombre, c.descripcion, c.minimo_trofeos
+order by c.minimo_trofeos desc;
 
 
 /* 1.7
@@ -265,6 +269,7 @@ group by j.nombre, j.experiencia, c.nombre
 order by j.experiencia desc limit 15;
 
 
+select nombre, experiencia from jugador order by experiencia desc;
 
 /* 3.3
  * Enumera l’identificador, la data d'inici i la durada de les batalles que van començar després del "01-01-2021" i en
@@ -314,6 +319,10 @@ group by c.nombre;
 --group by c.nombre--, c.minimo_trofeos*/
 
 
+select c.nombre, avg(c.minimo_trofeos)
+from clan c
+group by c.nombre;
+--group by c.nombre--, c.minimo_trofeos
 
 /* 3.7
  * Enumerar el nom i la descripció de la tecnologia utilitzada pels clans que tenen una estructura "Monument"
@@ -356,6 +365,23 @@ group by a.nombre, a.max_trofeos, a.min_trofeos having nombre like 'A%';
  * Llista de nom, data d'inici, data de finalització de les temporades i, de les batalles d'aquestes temporades, el nom
  * del jugador guanyador si el jugador té més victòries que derrotes i la seva experiència és més gran de 200.000.
  */
+-- temporades
+select t.nombre, t.fecha_inicio, t.fecha_final, b.id as batalla, j.nombre as jugador_guanyador
+from temporada t join batalla b on (t.fecha_inicio <= b.fecha and t.fecha_final >= b.fecha)
+    join deck d on b.deck_win = d.id join jugador j on d.jugador = j.id
+where j.id in
+      (select w.jugador--, j.nombre, (w.batalla_ganadas - l.batalla_perdidas) as victorias
+               from    (select d.jugador, count(b.id) as batalla_ganadas
+                        from deck d join batalla b on d.id = b.deck_win
+                        group by d.jugador) as w
+                           join
+                       (select d.jugador, count(b.id) as batalla_perdidas
+                        from deck d join batalla b on d.id = b.deck_lose
+                        group by d.jugador) as l on w.jugador = l.jugador
+                           join jugador j on j.id = w.jugador
+               where w.batalla_ganadas - l.batalla_perdidas > 0 and j.experiencia >= 200000)
+order by t.fecha_inicio asc;
+
 select t.nombre,
        t.fecha_inicio,
        t.fecha_final,
@@ -387,6 +413,13 @@ order by t.fecha_inicio asc;
  * Llistar la puntuació total dels jugadors guanyadors de batalles de cada temporada. Filtrar la sortida per considerar
  * només les temporades que han començat i acabat el 2019.
  */
+select t.nombre as temporada, j.nombre as ganador, j.id ,SUM(b.puntos_win) as total_puntos
+from deck d join jugador j on d.jugador = j.id join batalla b on d.id = b.deck_win
+    join temporada t on (t.fecha_inicio <= b.fecha and t.fecha_final >= b.fecha)
+where EXTRACT(YEAR FROM t.fecha_inicio) = 2019 and EXTRACT(YEAR FROM t.fecha_final) = 2019
+group by t.nombre, j.nombre, j.id
+order by total_puntos desc ;
+
 select t.nombre as temporada,
        j.nombre  as nombre_jugador,
        d.jugador as id_jugador,
@@ -430,6 +463,23 @@ order by a.nombre asc;
  * superior a 290.000 i obtingudes en arenes el nom de les quals comença per "A" o quan la insígnia no té imatge. Així,
  * considera només els jugadors que tenen una carta el nom de la qual comença per "Lava".
  */
+select i.nombre, ca.nombre, ca.daño
+from insignia i join consigue co on i.nombre = co.insignia join jugador j on j.id = co.jugador
+    join encuentra e on j.id = e.jugador join carta ca on ca.id = e.carta
+    join arena a on ca.arena = a.id
+where j.experiencia >= 290000 and a.nombre like 'A%' or i.imagenurl is null
+    and j.nombre in (select j.nombre
+                      from jugador j join encuentra e on j.id = e.jugador
+                          join carta c on c.id = e.carta
+                      where c.nombre like 'Lava%');
+
+select j.nombre, j.experiencia, c.nombre
+from jugador as j join formado f on j.id = f.jugador join clan c on c.id = f.clan
+                  join clan_modificador cm on c.id = cm.clan join modificador m on cm.modificador = m.nombre
+                  join tecnologias t on m.nombre = t.nombre
+where m.coste_oro > 1000
+group by j.nombre, j.experiencia, c.nombre
+order by j.experiencia desc limit 15;
 
 /* Lista de las insignias que ha conseguido el jugador*/
 select i.nombre as nombre_insignia, j.id as id_jugador
@@ -491,6 +541,7 @@ where a.nombre like '%Lliga%'
                where l.nombre like '%Friend%'
                  and EXTRACT(YEAR FROM d.fecha) = 2021
                group by j.id)
+group by a.nombre
 order by a.nombre;
 
 /* Selecciona els ids dels jugadors que que al 2021 van obtenir èxits el nom dels quals conté la paraula "Friend".*/
@@ -550,6 +601,10 @@ group by j.nombre, m.cuerpo, m.fecha;
  *  Llistar els 10 primers jugadors amb experiència superior a 100.000 que han creat més piles i han guanyat
  *  batalles a la temporada T7.
  */
+select c.nombre, c.minimo_trofeos, avg(c.minimo_trofeos)
+from clan c join clan_modificador cm on c.id = cm.clan join modificador m on cm.modificador = m.nombre
+            join tecnologias t on m.nombre = t.nombre
+group by c.nombre, c.minimo_trofeos; --having c.minimo_trofeos > avg(c.minimo_trofeos)
 
 select j.nombre, count(d.jugador) as decks_creats
 from jugador as j join deck d on j.id = d.jugador join batalla b on d.id = b.deck_win
