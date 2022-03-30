@@ -643,12 +643,13 @@ order by nombre asc;
  */
 (select c.nombre
 from carta as c join encuentra e on c.nombre = e.carta
-    join jugador j on j.id = e.jugador
---where j.experiencia >200000
-group by c.nombre order by c.nombre)
+join jugador j on j.id = e.jugador
+where j.experiencia >200000
+group by c.nombre, c.rareza having c.rareza = 'Common'
+order by c.nombre)
 except
 (select c.nombre from carta as c join compuesto c2 on c.nombre = c2.carta
-    group by c.nombre order by nombre);
+group by c.nombre order by nombre);
 
 
 
@@ -665,12 +666,13 @@ select j.nombre from jugador as j join amigo a2 on j.id = a2.id_jugador_receptor
  * Enumerar el nom dels jugadors i el nombre d'articles comprats que tenen un cost superior al cost mitjà
  * de tots els articles. Ordenar el resultat de menor a major valor del nombre de comandes.
  */
-
-select j.nombre, a.nombre from jugador as j join compra c on j.id = c.jugador
-    join articulo a on a.id = c.articulo
+select j.nombre, count(c.id)
+from jugador as j join compra c on j.id = c.jugador
+join articulo a on a.id = c.articulo
 where a.coste_real > (select avg(coste_real) from articulo)
-group by j.nombre, a.nombre
-order by count(c.jugador) asc;
+group by j.nombre
+order by count(j.nombre) asc;
+
 
 /* 5.13
  * Poseu a zero els valors d'or i gemmes als jugadors que no han enviat cap missatge o que han enviat el
