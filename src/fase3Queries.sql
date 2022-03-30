@@ -348,9 +348,9 @@ group by c.id, c.nombre having count(distinct bc.id) = (select count(distinct id
  */
 select a.nombre, a.max_trofeos, a.min_trofeos
 from arena a
-         join nivel_arena na on a.id = na.arena
-where nombre like 'A%'
-  and oro >= 8000;
+join nivel_arena na on a.id = na.arena
+where oro >= 8000
+group by a.nombre, a.max_trofeos, a.min_trofeos having nombre like 'A%';
 
 /* 4.2
  * Llista de nom, data d'inici, data de finalització de les temporades i, de les batalles d'aquestes temporades, el nom
@@ -451,16 +451,22 @@ where j.experiencia > 290000
   and a.nombre like 'A%'
 order by j.id asc;
 
+select j.nombre, count(i.nombre) as num_insignias
+from jugador j join consigue c on j.id = c.jugador
+join insignia i on c.insignia = i.nombre
+group by j.nombre, j.id
+order by num_insignias desc;
+
+
 /* 4.6
  * Donar el nom de les missions que donen recompenses a totes les arenes el títol de les quals comença per "t" o acaba
  * per "a". Ordena el resultat pel nom de la missió.
  */
 select m.nombre as nombre_mission, a.nombre as nombre_arena
 from mision as m
-         join mision_arena ma on m.id = ma.mision
-         join arena as a on ma.arena = a.id
-where a.nombre like 't%'
-   or a.nombre like '%a'
+join mision_arena ma on m.id = ma.mision
+join arena as a on ma.arena = a.id
+where a.nombre like 'T%' or a.nombre like '%a'
 order by m.nombre asc;
 
 
@@ -502,19 +508,17 @@ order by j.id;
  * Retorna el nom de les cartes que pertanyen a jugadors que van completar missions el nom de les quals inclou la
  * paraula "Armer" i l'or de la missió és més gran que l'or mitjà recompensat en totes les missions de les arenes.
  */
-select carta.nombre as nombre_carta, j.id as id_jugador
-from carta
-         join encuentra e on carta.nombre = e.carta
-         join jugador j on e.jugador = j.id
-where j.id in (select j.id
-               from jugador j
-                        join realiza r on j.id = r.jugador
-                        join mision m on r.mision = m.id
-                        join mision_arena ma on m.id = ma.mision
-               where m.descripcion like '%Armer%'
-                 and ma.recompensa_oro > (select AVG(mision_arena.recompensa_oro) as media
-                                          from mision_arena)
-               group by j.id);
+select c.nombre as nombre_carta
+from carta c join encuentra e on c.nombre = e.carta
+join jugador j on e.jugador = j.id
+where j.id in (select j2.id
+    from jugador j2 join realiza r on j2.id = r.jugador
+    join mision m on r.mision = m.id
+    join mision_arena ma on m.id = ma.mision
+    where m.descripcion like '%Armer%' and ma.recompensa_oro > (select AVG(mision_arena.recompensa_oro) as media from mision_arena)
+    group by j2.id
+)
+group by c.nombre;
 
 
 /***************** APARTADO 5 *****************/
