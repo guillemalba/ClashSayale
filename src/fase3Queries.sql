@@ -67,11 +67,19 @@ limit 3;
  * Proporcioneu les ordres SQL per fer les modificacions sense eliminar les dades i
  * reimportar-les.
  */
-select c.nombre as clan, c.descripcion, count(j.id) as num_judaors_XP200000
-from clan c join formado f on c.id = f.clan join jugador j on j.id = f.jugador
-where j.experiencia > 200000
-group by c.nombre, c.descripcion, c.minimo_trofeos
-order by c.minimo_trofeos desc;
+ /* TODO: aun estoy en ello*/
+select *
+from carta
+where carta.nombre = 'Rascals';
+
+
+select *
+from carta
+where carta.nombre = 'Hal Roachs Rascals';
+/*221*/
+update carta
+set daño = 221
+where nombre = 'Rascals';
 
 
 /* 1.7
@@ -330,21 +338,30 @@ group by c.nombre;
  */
 select t.nombre, m.descripcion
 from tecnologias t join modificador m on t.nombre = m.nombre
-join clan_modificador cm on m.nombre = cm.modificador
-join clan c on cm.clan = c.id
+                   join clan_modificador cm on m.nombre = cm.modificador
+                   join clan c on cm.clan = c.id
 where c.nombre in (
-        select c2.nombre
-        from clan c2 join clan_modificador cm2 on c2.id = cm2.clan
-        join modificador m2 on cm2.modificador = m2.nombre
-        join estructura e2 on m2.nombre = e2.nombre
-        where e2.nombre = 'Monument' and cm2.fecha > '10-10-2021')
+    select c2.nombre
+    from clan c2 join clan_modificador cm2 on c2.id = cm2.clan
+                 join modificador m2 on cm2.modificador = m2.nombre
+                 join estructura e2 on m2.nombre = e2.nombre
+    where e2.nombre = 'Monument' and cm2.fecha > '01-05-2021')
 group by t.nombre, m.descripcion;
 
 
 /* 3.8
  * Enumera els clans amb un mínim de trofeus superior a 6900 i que hagin participat a totes les batalles de clans.
  */
-select c.nombre, count(bc.id)
+--Añadimos el clan
+insert into clan(id, nombre, descripcion, trofeos_totales, minimo_trofeos, puntuacion)
+values ('#JDI23H9S', 'La Salle', 'Este es el clan de los estudiantes de la salle.', 20, 7000, 6800);
+
+--Añdadimos todas sus batallas
+insert into pelea (batalla_clan, clan, fecha_inicio, fecha_fin)
+select id, '#JDI23H9S', '2019-02-21', '2021-12-31' from batalla_clan;
+
+--Query del enunciado
+select c.nombre
 from clan c join pelea p on p.clan = c.id join batalla_clan bc on bc.id = p.batalla_clan
 where c.minimo_trofeos > 6900
 group by c.id, c.nombre having count(distinct bc.id) = (select count(distinct id) from batalla_clan);
@@ -365,23 +382,7 @@ group by a.nombre, a.max_trofeos, a.min_trofeos having nombre like 'A%';
  * Llista de nom, data d'inici, data de finalització de les temporades i, de les batalles d'aquestes temporades, el nom
  * del jugador guanyador si el jugador té més victòries que derrotes i la seva experiència és més gran de 200.000.
  */
--- temporades
-select t.nombre, t.fecha_inicio, t.fecha_final, b.id as batalla, j.nombre as jugador_guanyador
-from temporada t join batalla b on (t.fecha_inicio <= b.fecha and t.fecha_final >= b.fecha)
-    join deck d on b.deck_win = d.id join jugador j on d.jugador = j.id
-where j.id in
-      (select w.jugador--, j.nombre, (w.batalla_ganadas - l.batalla_perdidas) as victorias
-               from    (select d.jugador, count(b.id) as batalla_ganadas
-                        from deck d join batalla b on d.id = b.deck_win
-                        group by d.jugador) as w
-                           join
-                       (select d.jugador, count(b.id) as batalla_perdidas
-                        from deck d join batalla b on d.id = b.deck_lose
-                        group by d.jugador) as l on w.jugador = l.jugador
-                           join jugador j on j.id = w.jugador
-               where w.batalla_ganadas - l.batalla_perdidas > 0 and j.experiencia >= 200000)
-order by t.fecha_inicio asc;
-
+ /* TODO: revisar otra vez*/
 select t.nombre,
        t.fecha_inicio,
        t.fecha_final,
@@ -408,6 +409,23 @@ where b.fecha >= t.fecha_inicio
                                    from jugador jj
                                    where jj.experiencia > 200000))
 order by t.fecha_inicio asc;
+
+-- temporades
+/*select t.nombre, t.fecha_inicio, t.fecha_final, b.id as batalla, j.nombre as jugador_guanyador
+from temporada t join batalla b on (t.fecha_inicio <= b.fecha and t.fecha_final >= b.fecha)
+    join deck d on b.deck_win = d.id join jugador j on d.jugador = j.id
+where j.id in
+      (select w.jugador--, j.nombre, (w.batalla_ganadas - l.batalla_perdidas) as victorias
+               from    (select d.jugador, count(b.id) as batalla_ganadas
+                        from deck d join batalla b on d.id = b.deck_win
+                        group by d.jugador) as w
+                           join
+                       (select d.jugador, count(b.id) as batalla_perdidas
+                        from deck d join batalla b on d.id = b.deck_lose
+                        group by d.jugador) as l on w.jugador = l.jugador
+                           join jugador j on j.id = w.jugador
+               where w.batalla_ganadas - l.batalla_perdidas > 0 and j.experiencia >= 200000)
+order by t.fecha_inicio asc;*/
 
 /* 4.3
  * Llistar la puntuació total dels jugadors guanyadors de batalles de cada temporada. Filtrar la sortida per considerar
@@ -463,14 +481,37 @@ order by a.nombre asc;
  * superior a 290.000 i obtingudes en arenes el nom de les quals comença per "A" o quan la insígnia no té imatge. Així,
  * considera només els jugadors que tenen una carta el nom de la qual comença per "Lava".
  */
+ /* TODO: volver a revisar que piden exactamente y que hay que mostrar*/
+/* FINAL RESULT WITH BOTH QUERIES */
+select q1.nombre_insignia, q1.id_jugador, q2.nombre_carta
+from (select i.nombre as nombre_insignia, j.id as id_jugador
+      from consigue as c
+               join arena a on a.id = c.arena
+               join jugador j on j.id = c.jugador
+               join insignia i on i.nombre = c.insignia
+      where j.experiencia > 290000
+        and (a.nombre like 'A%' or i.imagenurl is null)) as q1,
+     (select c.nombre as nombre_carta, j.id as id_jugador
+      from encuentra as e
+               join jugador j on j.id = e.jugador
+               join carta c on c.nombre = e.carta
+               join arena a on c.arena = a.id
+      where j.experiencia > 290000
+        and a.nombre like 'A%') as q2
+where q1.id_jugador = q2.id_jugador
+group by q1.nombre_insignia, q1.id_jugador, q2.nombre_carta
+order by q1.id_jugador asc;
+
+
+/* Tests */
 select i.nombre, ca.nombre, ca.daño
 from insignia i join consigue co on i.nombre = co.insignia join jugador j on j.id = co.jugador
-    join encuentra e on j.id = e.jugador join carta ca on ca.id = e.carta
+    join encuentra e on j.id = e.jugador join carta ca on ca.nombre = e.carta
     join arena a on ca.arena = a.id
 where j.experiencia >= 290000 and a.nombre like 'A%' or i.imagenurl is null
     and j.nombre in (select j.nombre
                       from jugador j join encuentra e on j.id = e.jugador
-                          join carta c on c.id = e.carta
+                          join carta c on c.nombre = e.carta
                       where c.nombre like 'Lava%');
 
 select j.nombre, j.experiencia, c.nombre
@@ -481,7 +522,7 @@ where m.coste_oro > 1000
 group by j.nombre, j.experiencia, c.nombre
 order by j.experiencia desc limit 15;
 
-/* Lista de las insignias que ha conseguido el jugador*/
+/* Lista de las insignias que ha conseguido el jugador */
 select i.nombre as nombre_insignia, j.id as id_jugador
 from consigue as c
          join arena a on a.id = c.arena
@@ -501,6 +542,7 @@ where j.experiencia > 290000
   and a.nombre like 'A%'
 order by j.id asc;
 
+/* Tests */
 select j.nombre, count(i.nombre) as num_insignias
 from jugador j join consigue c on j.id = c.jugador
 join insignia i on c.insignia = i.nombre
@@ -525,12 +567,13 @@ order by m.nombre asc;
  * l’arena conté la paraula "Lliga", i les arenes tenen jugadors que al 2021 van obtenir èxits el nom dels quals conté
  * la paraula "Friend".
  */
+ /* TODO: he cambiado la palabra "Lliga" por "Legendary" para que salga algun resultado*/
 select a.nombre as nombre_arena
 from consigue as c
          join arena a on a.id = c.arena
          join jugador j on j.id = c.jugador
          join insignia i on i.nombre = c.insignia
-where a.nombre like '%Lliga%'
+where a.nombre like '%Legendary%'
   and EXTRACT(YEAR FROM c.fecha) = 2021
   and (EXTRACT(MONTH FROM c.fecha) = 11 or EXTRACT(MONTH FROM c.fecha) = 12)
   and j.id in (select j.id
@@ -696,15 +739,44 @@ order by nombre asc;
  * Llistar les cartes comunes que no estan incloses en cap pila i que pertanyen a jugadors amb experiència
  * superior a 200.000. Ordena la sortida amb el nom de la carta.
  */
+--Insertamos 4 cartas nuevas
+insert into carta (nombre, daño, velocidad_ataque, rareza, arena)
+values ('Barbaros', 103, 200, 'Common', 54000028);
+
+insert into carta (nombre, daño, velocidad_ataque, rareza, arena)
+values ('Gus', 103, 200, 'Common', 54000028);
+
+insert into carta (nombre, daño, velocidad_ataque, rareza, arena)
+values ('Putin', 103, 200, 'Common', 54000028);
+
+insert into carta (nombre, daño, velocidad_ataque, rareza, arena)
+values ('Mortero', 103, 200, 'Common', 54000028);
+
+
+--Creamos una relacion de dos jugadores con dos cartas de las 4 que hemos creado anteriormente.
+insert into encuentra (jugador, carta, fecha_mejora, nivel_actual)
+values ('#LUGVG9PC', 'Barbaros', '01-01-2021', 5);
+
+insert into encuentra (jugador, carta, fecha_mejora, nivel_actual)
+values ('#LUGVG9PC', 'Gus', '01-01-2021', 5);
+
+insert into encuentra (jugador, carta, fecha_mejora, nivel_actual)
+values ('#PQLGJ90Y', 'Putin', '01-01-2021', 5);
+
+insert into encuentra (jugador, carta, fecha_mejora, nivel_actual)
+values ('#PQLGJ90Y', 'Mortero', '01-01-2021', 5);
+
+
+--Ejecutamos la query y vemos que en el output salen las 4 cartas que hemos creado.
 (select c.nombre
-from carta as c join encuentra e on c.nombre = e.carta
-join jugador j on j.id = e.jugador
-where j.experiencia >200000
-group by c.nombre, c.rareza having c.rareza = 'Common'
-order by c.nombre)
+ from carta as c join encuentra e on c.nombre = e.carta
+                 join jugador j on j.id = e.jugador
+ where j.experiencia >200000
+ group by c.nombre, c.rareza having c.rareza = 'Common'
+ order by c.nombre)
 except
 (select c.nombre from carta as c join compuesto c2 on c.nombre = c2.carta
-group by c.nombre order by nombre);
+ group by c.nombre order by nombre);
 
 
 
@@ -733,5 +805,146 @@ order by count(j.nombre) asc;
  * Poseu a zero els valors d'or i gemmes als jugadors que no han enviat cap missatge o que han enviat el
  * mateix nombre de missatges que el jugador que més missatges ha enviat.
  */
+ /* TODO: AUN ESTOY EN ELLO, TODAVIA NO LA HE TERMINADO*/
+select jugador.id,  jugador.nombre, jugador.oro, jugador.gemas, count(id_mensaje) as num_mensajes_enviados
+from jugador
+    join escribe on jugador.id = escribe.id_emisor
+    join mensaje on escribe.id_mensaje = mensaje.id
+group by jugador.id
+having count(id_mensaje) = 0
+order by jugador.id asc;
+
+/* Selects players with number of messages sended to a clan */
+select jugador.id, jugador.nombre, count(emisor) as num_mensajes_enviados
+from clan
+    join mensaje_clan mc on clan.id = mc.receptor
+    join jugador on mc.emisor = jugador.id
+group by jugador.id, jugador.nombre
+union all
+/* Selects players with number of messages sended to players */
+select jugador.id, jugador.nombre, count(id_mensaje) as num_mensajes_enviados
+from jugador
+         join escribe on jugador.id = escribe.id_emisor
+         join mensaje on escribe.id_mensaje = mensaje.id
+group by jugador.id;
+
+/* Devuelve una lista con el total de mensajes enviados por jugadores a jugadores y jugadores a clanes */
+select t.id, t.nombre, sum(num_mensajes_enviados) as total_mensajes_enviados
+from
+    (
+        /* Selects players with number of messages sended to clans */
+        select jugador.id, jugador.nombre, count(emisor) as num_mensajes_enviados
+        from clan
+                 join mensaje_clan mc on clan.id = mc.receptor
+                 join jugador on mc.emisor = jugador.id
+        group by jugador.id, jugador.nombre
+        union all
+        /* Selects players with number of messages sended to players */
+        select jugador.id, jugador.nombre, count(id_mensaje) as num_mensajes_enviados_a_clanes
+        from jugador
+                 join escribe on jugador.id = escribe.id_emisor
+                 join mensaje on escribe.id_mensaje = mensaje.id
+        group by jugador.id
+    ) t
+group by t.nombre, t.id
+having sum(num_mensajes_enviados) = (
+    select MAX(total_mensajes_enviados)
+    from (
+             /* Devuelve una lista con el total de mensajes enviados por jugadores a jugadores y jugadores a clanes */
+             select t.id, t.nombre, SUM(num_mensajes_enviados) as total_mensajes_enviados
+             from
+                 (
+                     /* Selects players with number of messages sended to clans */
+                     select jugador.id, jugador.nombre, count(emisor) as num_mensajes_enviados
+                     from clan
+                              join mensaje_clan mc on clan.id = mc.receptor
+                              join jugador on mc.emisor = jugador.id
+                     group by jugador.id, jugador.nombre
+                     union all
+                     /* Selects players with number of messages sended to players */
+                     select jugador.id, jugador.nombre, count(id_mensaje) as num_mensajes_enviados
+                     from jugador
+                              join escribe on jugador.id = escribe.id_emisor
+                              join mensaje on escribe.id_mensaje = mensaje.id
+                     group by jugador.id
+                 ) t
+             group by t.nombre, t.id
+         ) t2
+    )
+order by total_mensajes_enviados desc;
+
+
+/* CON EL MAAAAX*/
+select MAX(total_mensajes_enviados)
+from (
+         /* Devuelve una lista con el total de mensajes enviados por jugadores a jugadores y jugadores a clanes */
+         select t.id, t.nombre, SUM(num_mensajes_enviados) as total_mensajes_enviados
+         from
+             (
+                 /* Selects players with number of messages sended to clans */
+                 select jugador.id, jugador.nombre, count(emisor) as num_mensajes_enviados
+                 from clan
+                          join mensaje_clan mc on clan.id = mc.receptor
+                          join jugador on mc.emisor = jugador.id
+                 group by jugador.id, jugador.nombre
+                 union all
+                 /* Selects players with number of messages sended to players */
+                 select jugador.id, jugador.nombre, count(id_mensaje) as num_mensajes_enviados
+                 from jugador
+                          join escribe on jugador.id = escribe.id_emisor
+                          join mensaje on escribe.id_mensaje = mensaje.id
+                 group by jugador.id
+             ) t
+         group by t.nombre, t.id
+         ) t2;
+
+
+select * from jugador where id = '#22UCVR0CL';
+
+
+update jugador
+set oro = 0 and gemas = 0
+where jugador.id in (select t.id, t.nombre, sum(num_mensajes_enviados) as total_mensajes_enviados
+                     from
+                         (
+                             /* Selects players with number of messages sended to clans */
+                             select jugador.id, jugador.nombre, count(emisor) as num_mensajes_enviados
+                             from clan
+                                      join mensaje_clan mc on clan.id = mc.receptor
+                                      join jugador on mc.emisor = jugador.id
+                             group by jugador.id, jugador.nombre
+                             union all
+                             /* Selects players with number of messages sended to players */
+                             select jugador.id, jugador.nombre, count(id_mensaje) as num_mensajes_enviados_a_clanes
+                             from jugador
+                                      join escribe on jugador.id = escribe.id_emisor
+                                      join mensaje on escribe.id_mensaje = mensaje.id
+                             group by jugador.id
+                         ) t
+                     group by t.nombre, t.id
+                     having sum(num_mensajes_enviados) = (
+                         select MAX(total_mensajes_enviados)
+                         from (
+                                  /* Devuelve una lista con el total de mensajes enviados por jugadores a jugadores y jugadores a clanes */
+                                  select t.id, t.nombre, SUM(num_mensajes_enviados) as total_mensajes_enviados
+                                  from
+                                      (
+                                          /* Selects players with number of messages sended to clans */
+                                          select jugador.id, jugador.nombre, count(emisor) as num_mensajes_enviados
+                                          from clan
+                                                   join mensaje_clan mc on clan.id = mc.receptor
+                                                   join jugador on mc.emisor = jugador.id
+                                          group by jugador.id, jugador.nombre
+                                          union all
+                                          /* Selects players with number of messages sended to players */
+                                          select jugador.id, jugador.nombre, count(id_mensaje) as num_mensajes_enviados
+                                          from jugador
+                                                   join escribe on jugador.id = escribe.id_emisor
+                                                   join mensaje on escribe.id_mensaje = mensaje.id
+                                          group by jugador.id
+                                      ) t
+                                  group by t.nombre, t.id
+                              ) t2
+                     ));
 
  --alter table pal final mejor i guess
