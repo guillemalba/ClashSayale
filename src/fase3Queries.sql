@@ -867,5 +867,3 @@ where jugador.id in (
              join mensaje on escribe.id_mensaje = mensaje.id
     group by jugador.id
 );
-
- --alter table pal final mejor i guess
