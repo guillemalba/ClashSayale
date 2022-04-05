@@ -806,27 +806,7 @@ order by count(j.nombre) asc;
  * mateix nombre de missatges que el jugador que més missatges ha enviat.
  */
  /* TODO: AUN ESTOY EN ELLO, TODAVIA NO LA HE TERMINADO*/
-select jugador.id,  jugador.nombre, jugador.oro, jugador.gemas, count(id_mensaje) as num_mensajes_enviados
-from jugador
-    join escribe on jugador.id = escribe.id_emisor
-    join mensaje on escribe.id_mensaje = mensaje.id
-group by jugador.id
-having count(id_mensaje) = 0
-order by jugador.id asc;
 
-/* Selects players with number of messages sended to a clan */
-select jugador.id, jugador.nombre, count(emisor) as num_mensajes_enviados
-from clan
-    join mensaje_clan mc on clan.id = mc.receptor
-    join jugador on mc.emisor = jugador.id
-group by jugador.id, jugador.nombre
-union all
-/* Selects players with number of messages sended to players */
-select jugador.id, jugador.nombre, count(id_mensaje) as num_mensajes_enviados
-from jugador
-         join escribe on jugador.id = escribe.id_emisor
-         join mensaje on escribe.id_mensaje = mensaje.id
-group by jugador.id;
 
 /* Devuelve una lista con el total de mensajes enviados por jugadores a jugadores y jugadores a clanes */
 select t.id, t.nombre, sum(num_mensajes_enviados) as total_mensajes_enviados
@@ -900,11 +880,24 @@ from (
 
 
 select * from jugador where id = '#22UCVR0CL';
-
+select * from jugador where id = '#22UCV0000';
 
 update jugador
-set oro = 0 and gemas = 0
-where jugador.id in (select t.id, t.nombre, sum(num_mensajes_enviados) as total_mensajes_enviados
+set oro = 1000, gemas = 100
+where jugador.id = '#22UCV0000';
+
+update jugador
+set oro = 0, gemas = 0
+where jugador.id = '#22UCVR0CL';
+
+/*oro = 560559 gemas = 55783*/
+
+insert into jugador (id, nombre, experiencia, trofeos, oro, gemas, tarjeta)
+VALUES ('#22UCV0000', 'Manolo', 100, 100, 1000, 200, null);
+
+update jugador
+set oro = 0, gemas = 0
+where jugador.id in (select t.id
                      from
                          (
                              /* Selects players with number of messages sended to clans */
@@ -945,6 +938,21 @@ where jugador.id in (select t.id, t.nombre, sum(num_mensajes_enviados) as total_
                                       ) t
                                   group by t.nombre, t.id
                               ) t2
-                     ));
+                     ))
+    or jugador.id not in (
+    /* Selects players with number of messages sended to a clan */
+    select jugador.id
+    from clan
+             join mensaje_clan mc on clan.id = mc.receptor
+             join jugador on mc.emisor = jugador.id
+    group by jugador.id, jugador.nombre
+    union all
+    /* Selects players with number of messages sended to players */
+    select jugador.id
+    from jugador
+             join escribe on jugador.id = escribe.id_emisor
+             join mensaje on escribe.id_mensaje = mensaje.id
+    group by jugador.id
+    );
 
  --alter table pal final mejor i guess
