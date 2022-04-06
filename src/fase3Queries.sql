@@ -314,21 +314,20 @@ order by c.minimo_trofeos asc;
  * Necessitem canviar algunes dades a la base de dades. Hem d'incrementar un 25% el cost de les tecnologies que
  * utilitzen els clans amb trofeus mínims superiors a la mitjana de trofeus mínims de tots els clans.
  */
-/*select c.nombre, c.minimo_trofeos, avg(c.minimo_trofeos)
-from clan c join clan_modificador cm on c.id = cm.clan join modificador m on cm.modificador = m.nombre
-            join tecnologias t on m.nombre = t.nombre
-group by c.nombre, c.minimo_trofeos ;--having c.minimo_trofeos > avg(c.minimo_trofeos)
+update modificador
+set coste_oro = coste_oro + coste_oro*0.25
+where nombre in (
+    select m.nombre
+    from tecnologias t left join modificador m on t.nombre = m.nombre
+    join clan_modificador cm on m.nombre = cm.modificador
+    where cm.clan in (
+        select id
+        from clan
+        where minimo_trofeos > (select avg(minimo_trofeos) from clan)
+    )
+    group by m.nombre
+    );
 
-select c.nombre, avg(c.minimo_trofeos)
-from clan c
-group by c.nombre;
---group by c.nombre--, c.minimo_trofeos*/
-
-
-select c.nombre, avg(c.minimo_trofeos)
-from clan c
-group by c.nombre;
---group by c.nombre--, c.minimo_trofeos
 
 /* 3.7
  * Enumerar el nom i la descripció de la tecnologia utilitzada pels clans que tenen una estructura "Monument"
