@@ -5,7 +5,11 @@
  */
 select c.nombre, c.daño
 from carta c join tropas t on c.nombre = t.carta
-where velocidad_ataque > 100 and c.nombre like '%k%';
+where velocidad_ataque > 100 and (c.nombre like '%k%' or c.nombre like '%K%');
+
+select c.nombre, c.velocidad_ataque
+from carta c join tropas t on c.nombre = t.carta
+order by c.velocidad_ataque desc;
 
 
 /* 1.2
