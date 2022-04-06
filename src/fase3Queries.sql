@@ -122,7 +122,6 @@ where rareza = 'Epic' and daño > (select avg(daño) from carta where rareza = '
 order by daño;
 
 
-
 /***************** APARTADO 2 *****************/
 /* 2.1
  * Enumera els missatges (text i data) escrits pels jugadors que tenen més experiència que
