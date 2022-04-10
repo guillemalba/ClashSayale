@@ -375,9 +375,11 @@ group by c.id, c.nombre having count(distinct bc.id) = (select count(distinct id
  */
 select a.nombre, a.max_trofeos, a.min_trofeos
 from arena a
-join nivel_arena na on a.id = na.arena
+         join nivel_arena na on a.id = na.arena
+         join paquete_arena pa on na.paquete = pa.id_paquete
 where oro >= 8000
-group by a.nombre, a.max_trofeos, a.min_trofeos having nombre like 'A%';
+group by a.nombre, a.max_trofeos, a.min_trofeos
+having nombre like 'A%';
 
 /* 4.2
  * Llista de nom, data d'inici, data de finalització de les temporades i, de les batalles d'aquestes temporades, el nom
