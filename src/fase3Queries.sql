@@ -482,8 +482,6 @@ order by a.nombre asc;
  * superior a 290.000 i obtingudes en arenes el nom de les quals comença per "A" o quan la insígnia no té imatge. Així,
  * considera només els jugadors que tenen una carta el nom de la qual comença per "Lava".
  */
- /* TODO: volver a revisar que piden exactamente y que hay que mostrar*/
-/* FINAL RESULT WITH BOTH QUERIES */
 select q1.nombre_insignia, q1.id_jugador, q2.nombre_carta
 from (select i.nombre as nombre_insignia, j.id as id_jugador
       from consigue as c
@@ -502,54 +500,6 @@ from (select i.nombre as nombre_insignia, j.id as id_jugador
 where q1.id_jugador = q2.id_jugador
 group by q1.nombre_insignia, q1.id_jugador, q2.nombre_carta
 order by q1.id_jugador asc;
-
-
-/* Tests */
-select i.nombre, ca.nombre, ca.daño
-from insignia i join consigue co on i.nombre = co.insignia join jugador j on j.id = co.jugador
-    join encuentra e on j.id = e.jugador join carta ca on ca.nombre = e.carta
-    join arena a on ca.arena = a.id
-where j.experiencia >= 290000 and a.nombre like 'A%' or i.imagenurl is null
-    and j.nombre in (select j.nombre
-                      from jugador j join encuentra e on j.id = e.jugador
-                          join carta c on c.nombre = e.carta
-                      where c.nombre like 'Lava%');
-
-select j.nombre, j.experiencia, c.nombre
-from jugador as j join formado f on j.id = f.jugador join clan c on c.id = f.clan
-                  join clan_modificador cm on c.id = cm.clan join modificador m on cm.modificador = m.nombre
-                  join tecnologias t on m.nombre = t.nombre
-where m.coste_oro > 1000
-group by j.nombre, j.experiencia, c.nombre
-order by j.experiencia desc limit 15;
-
-/* Lista de las insignias que ha conseguido el jugador */
-select i.nombre as nombre_insignia, j.id as id_jugador
-from consigue as c
-         join arena a on a.id = c.arena
-         join jugador j on j.id = c.jugador
-         join insignia i on i.nombre = c.insignia
-where j.experiencia > 290000
-  and (a.nombre like 'A%' or i.imagenurl is null)
-order by j.id asc;
-
-/* Lista de las cartas que ha conseguido el jugador*/
-select c.nombre as nombre_carta, j.id as id_jugador
-from encuentra as e
-         join jugador j on j.id = e.jugador
-         join carta c on c.nombre = e.carta
-         join arena a on c.arena = a.id
-where j.experiencia > 290000
-  and a.nombre like 'A%'
-order by j.id asc;
-
-/* Tests */
-select j.nombre, count(i.nombre) as num_insignias
-from jugador j join consigue c on j.id = c.jugador
-join insignia i on c.insignia = i.nombre
-group by j.nombre, j.id
-order by num_insignias desc;
-
 
 /* 4.6
  * Donar el nom de les missions que donen recompenses a totes les arenes el títol de les quals comença per "t" o acaba
