@@ -148,7 +148,13 @@ from carta
 where rareza = 'Epic' and daño > (select avg(daño) from carta where rareza = 'Legendary')
 order by daño;
 
+--Query de validación
+select nombre, daño
+from carta
+where rareza = 'Epic'
+order by daño;
 
+select avg(daño) from carta where rareza = 'Legendary';
 /***************** APARTADO 2 *****************/
 /* 2.1
  * Enumera els missatges (text i data) escrits pels jugadors que tenen més experiència que
