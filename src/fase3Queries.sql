@@ -20,6 +20,8 @@ select avg(daño) as daño_medio, max(daño) as daño_max, min(daño) as daño_m
 from carta
 group by rareza having rareza = 'Epic';
 
+--Query para comprobar que los valores son correctos.
+select nombre, daño, rareza from carta order by daño desc;
 
 /* 1.3
  * Enumera el nom i la descripció de les piles i el nom de les cartes que tenen un nivell de
@@ -46,7 +48,8 @@ group by c.nombre, c.daño
 order by c.daño desc
 limit 10;
 
-
+--Query para comprobar que los valores son correctos.
+select titulo from deck where fecha = '2021-11-01';
 
 
 /* 1.5
@@ -55,14 +58,21 @@ limit 10;
  * Base de dades: 2021-2022 Projecte – Fase 3
  */
 select c.nombre, c.daño
-from edificio e join carta c on c.nombre = e.carta
-join compuesto c2 on c.nombre = c2.carta
-join deck d on c2.deck = d.id
-join jugador j on d.jugador = j.id
+from edificio ed join carta c on c.nombre = ed.carta
+join encuentra e on c.nombre = e.carta
+join jugador j on e.jugador = j.id
 where j.experiencia > 250000
 group by c.nombre, c.daño
 order by c.daño desc
 limit 3;
+
+--Query de validación
+select c.nombre, c.daño, j.nombre, j.experiencia
+from edificio ed join carta c on c.nombre = ed.carta
+join encuentra e on c.nombre = e.carta
+join jugador j on e.jugador = j.id
+where j.experiencia > 250000
+order by c.daño desc;
 
 
 /* 1.6
@@ -92,6 +102,19 @@ where nombre = 'Rascals';
  * consultes diferents per obtenir el mateix resultat.
  */
 
+--Creamos una nueva carta
+insert into carta (nombre, daño, velocidad_ataque, rareza, arena)
+values ('Enanos Felices', 103, 200, 'Common', 54000028);
+
+--Creamos su relacion con el deck Cantabria goblins del jugador #YC0JJ2PV
+insert into compuesto(carta, deck, nivel)
+values ('Enanos Felices', 585, 5);
+
+insert into encuentra(jugador, carta, fecha_mejora, nivel_actual)
+values ('#YC0JJ2PV', 'Enanos Felices', '2021-04-04', 5);
+
+
+
 --Query 1
 select c.nombre
 from carta c left join compuesto c2 on c.nombre = c2.carta
@@ -111,7 +134,7 @@ group by c.nombre having count(c2.carta) <= 1;
 --Comprobacion que solo hay 2 cartas con 0 decks y ninguna con 1 deck
 select c.nombre, count(c2.carta)
 from carta c left join compuesto c2 on c.nombre = c2.carta
-group by c.nombre;
+group by c.nombre having count(c2.carta) < 2;
 
 
 /* 1.8
