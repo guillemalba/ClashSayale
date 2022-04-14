@@ -164,11 +164,31 @@ select avg(daño) from carta where rareza = 'Legendary';
 select m.cuerpo, m.fecha
 from jugador j join escribe e on j.id = e.id_emisor
 join mensaje m on e.id_mensaje = m.id
-where j.experiencia > (select avg(experiencia) from jugador j join formado f on j.id = f.jugador
-    join clan c on f.clan = c.id where j.nombre like '%a%'
+where j.experiencia > (
+    select avg(experiencia)
+    from jugador j join formado f on j.id = f.jugador
+    join clan c on f.clan = c.id
+    where j.nombre like '%a%' or j.nombre like '%A%'
     group by c.nombre having c.nombre = 'NoA')
 order by m.fecha desc;
 
+--Consultas de validación
+select avg(experiencia)
+from jugador j join formado f on j.id = f.jugador
+join clan c on f.clan = c.id
+where j.nombre like '%a%' or j.nombre like '%A%'
+group by c.nombre having c.nombre = 'NoA';
+
+select j.nombre, j.experiencia, c.nombre
+from jugador j join formado f on j.id = f.jugador
+join clan c on c.id = f.clan
+where c.nombre = 'NoA';
+
+select m.cuerpo, m.fecha, j.experiencia
+from jugador j join escribe e on j.id = e.id_emisor
+join mensaje m on e.id_mensaje = m.id
+where j.nombre = 'King Tyler'
+order by m.fecha desc;
 
 /* 2.2
  * Enumera el número de la targeta de crèdit, la data i el descompte utilitzat pels jugadors
@@ -185,8 +205,18 @@ select c.tarjeta, c.fecha, c.descuento
 from compra c join jugador j on c.jugador = j.id
 join articulo a on c.articulo = a.id
 join paquete_arena pa on a.id = pa.id_paquete
-where a.nombre like '%b%';
+where a.nombre like '%b%' or a.nombre like '%B%';
 
+--Conslutas de veridificación
+select a.nombre, a.coste_real
+from compra c join jugador j on c.jugador = j.id
+join articulo a on c.articulo = a.id
+join paquete_arena pa on a.id = pa.id_paquete;
+
+select a.nombre, a.coste_real
+from compra c join jugador j on c.jugador = j.id
+join articulo a on c.articulo = a.id
+join paquete_arena pa on a.id = pa.id_paquete;
 
 /* 2.3
  * Enumerar el nom i el nombre d’articles comprats, així com el cost total dels articles
@@ -197,23 +227,40 @@ select a.nombre, count(c.articulo) as num_compras, a.coste_real*count(c.articulo
 from compra c join articulo a on c.articulo = a.id
 join jugador j on c.jugador = j.id
 group by a.id
-order by coste_total desc;
+order by coste_total desc
+limit 5;
+
+--Consultas de validación
+select a.coste_real, j.nombre, j.experiencia
+from compra c join articulo a on c.articulo = a.id
+join jugador j on c.jugador = j.id
+where a.nombre = 'White Goldenrod';
 
 /* 2.4
  * Donar els números de les targetes de crèdit que s'han utilitzat més.
  */
 select t.numero_tarjeta
 from compra c join tarjeta t on c.tarjeta = t.numero_tarjeta
-group by t.numero_tarjeta having count(c.tarjeta) = (select count(c.tarjeta) from compra c join tarjeta t on c.tarjeta = t.numero_tarjeta group by t.numero_tarjeta order by count(c.tarjeta) desc limit 1);
+group by t.numero_tarjeta having count(c.tarjeta) = (
+    select count(c.tarjeta)
+    from compra c join tarjeta t on c.tarjeta = t.numero_tarjeta
+    group by t.numero_tarjeta
+    order by count(c.tarjeta) desc
+    limit 1);
 
 
 /* 2.5
  * Donar els descomptes totals de les emoticones comprades durant l'any 2020
  */
-select sum(c.descuento), count(c.id)
+select sum(c.descuento)
 from compra c join articulo a on c.articulo = a.id
 join emoticono e on a.id = e.id_emoticono
 where c.fecha between '2020-01-01' and '2020-12-31';
+
+--Consulta de validación
+select c.descuento, extract(year from c.fecha)
+from compra c join articulo a on c.articulo = a.id
+join emoticono e on a.id = e.id_emoticono;
 
 
 /* 2.6
@@ -275,13 +322,23 @@ order by a.nombre desc;
  */
 (select cuerpo, fecha
 from mensaje
-where idmensajerespondido is not null and fecha between '2020-01-01' and '2020-12-31'
+where id in (
+    select distinct idmensajerespondido
+    from mensaje
+    where extract(year from fecha) = '2020')
 order by fecha desc, cuerpo desc)
 union all
 select cuerpo, fecha
 from mensaje_clan
-where mensaje_respondido is null
+where id in (
+    select m.id
+    from mensaje_clan m left join mensaje_clan m2 on m2.mensaje_respondido = m.id
+    where m2.id is null
+    )
 order by fecha desc, cuerpo desc;
+
+select *
+from mensaje;
 
 
 /***************** APARTADO 3 *****************/
