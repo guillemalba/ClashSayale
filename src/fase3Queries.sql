@@ -499,34 +499,10 @@ where b.fecha >= t.fecha_inicio
                                    where jj.experiencia > 200000))
 order by t.fecha_inicio asc;
 
--- temporades
-/*select t.nombre, t.fecha_inicio, t.fecha_final, b.id as batalla, j.nombre as jugador_guanyador
-from temporada t join batalla b on (t.fecha_inicio <= b.fecha and t.fecha_final >= b.fecha)
-    join deck d on b.deck_win = d.id join jugador j on d.jugador = j.id
-where j.id in
-      (select w.jugador--, j.nombre, (w.batalla_ganadas - l.batalla_perdidas) as victorias
-               from    (select d.jugador, count(b.id) as batalla_ganadas
-                        from deck d join batalla b on d.id = b.deck_win
-                        group by d.jugador) as w
-                           join
-                       (select d.jugador, count(b.id) as batalla_perdidas
-                        from deck d join batalla b on d.id = b.deck_lose
-                        group by d.jugador) as l on w.jugador = l.jugador
-                           join jugador j on j.id = w.jugador
-               where w.batalla_ganadas - l.batalla_perdidas > 0 and j.experiencia >= 200000)
-order by t.fecha_inicio asc;*/
-
 /* 4.3
  * Llistar la puntuació total dels jugadors guanyadors de batalles de cada temporada. Filtrar la sortida per considerar
  * només les temporades que han començat i acabat el 2019.
  */
-select t.nombre as temporada, j.nombre as ganador, j.id ,SUM(b.puntos_win) as total_puntos
-from deck d join jugador j on d.jugador = j.id join batalla b on d.id = b.deck_win
-    join temporada t on (t.fecha_inicio <= b.fecha and t.fecha_final >= b.fecha)
-where EXTRACT(YEAR FROM t.fecha_inicio) = 2019 and EXTRACT(YEAR FROM t.fecha_final) = 2019
-group by t.nombre, j.nombre, j.id
-order by total_puntos desc ;
-
 select t.nombre as temporada,
        j.nombre  as nombre_jugador,
        d.jugador as id_jugador,
@@ -595,9 +571,10 @@ order by q1.id_jugador asc;
  */
 select m.nombre as nombre_mission, a.nombre as nombre_arena
 from mision as m
-join mision_arena ma on m.id = ma.mision
-join arena as a on ma.arena = a.id
-where a.nombre like 'T%' or a.nombre like '%a'
+         join mision_arena ma on m.id = ma.mision
+         join arena as a on ma.arena = a.id
+where a.nombre like 'T%'
+   or a.nombre like '%a'
 order by m.nombre asc;
 
 
@@ -606,7 +583,26 @@ order by m.nombre asc;
  * l’arena conté la paraula "Lliga", i les arenes tenen jugadors que al 2021 van obtenir èxits el nom dels quals conté
  * la paraula "Friend".
  */
- /* TODO: he cambiado la palabra "Lliga" por "Legendary" para que salga algun resultado*/
+select a.nombre as nombre_arena
+from consigue as c
+         join arena a on a.id = c.arena
+         join jugador j on j.id = c.jugador
+         join insignia i on i.nombre = c.insignia
+where a.nombre like '%Lliga%'
+  and EXTRACT(YEAR FROM c.fecha) = 2021
+  and (EXTRACT(MONTH FROM c.fecha) = 11 or EXTRACT(MONTH FROM c.fecha) = 12)
+  and j.id in (select j.id
+               from desbloquea d
+                        join arena a on a.id = d.arena
+                        join jugador j on j.id = d.jugador
+                        join logro l on l.id = d.id_logro
+               where l.nombre like '%Friend%'
+                 and EXTRACT(YEAR FROM d.fecha) = 2021
+               group by j.id)
+group by a.nombre
+order by a.nombre;
+
+/* TODO: he cambiado la palabra "Lliga" por "Legendary" para que salga algun resultado*/
 select a.nombre as nombre_arena
 from consigue as c
          join arena a on a.id = c.arena
@@ -626,30 +622,22 @@ where a.nombre like '%Legendary%'
 group by a.nombre
 order by a.nombre;
 
-/* Selecciona els ids dels jugadors que que al 2021 van obtenir èxits el nom dels quals conté la paraula "Friend".*/
-select j.id
-from desbloquea d
-         join arena a on a.id = d.arena
-         join jugador j on j.id = d.jugador
-         join logro l on l.id = d.id_logro
-where l.nombre like '%Friend%'
-  and EXTRACT(YEAR FROM d.fecha) = 2021
-group by j.id
-order by j.id;
-
 /* 4.8
  * Retorna el nom de les cartes que pertanyen a jugadors que van completar missions el nom de les quals inclou la
  * paraula "Armer" i l'or de la missió és més gran que l'or mitjà recompensat en totes les missions de les arenes.
  */
 select c.nombre as nombre_carta
-from carta c join encuentra e on c.nombre = e.carta
-join jugador j on e.jugador = j.id
+from carta c
+         join encuentra e on c.nombre = e.carta
+         join jugador j on e.jugador = j.id
 where j.id in (select j2.id
-    from jugador j2 join realiza r on j2.id = r.jugador
-    join mision m on r.mision = m.id
-    join mision_arena ma on m.id = ma.mision
-    where m.descripcion like '%Armer%' and ma.recompensa_oro > (select AVG(mision_arena.recompensa_oro) as media from mision_arena)
-    group by j2.id
+               from jugador j2
+                        join realiza r on j2.id = r.jugador
+                        join mision m on r.mision = m.id
+                        join mision_arena ma on m.id = ma.mision
+               where m.descripcion like '%Armer%'
+                 and ma.recompensa_oro > (select AVG(mision_arena.recompensa_oro) as media from mision_arena)
+               group by j2.id
 )
 group by c.nombre;
 
@@ -845,7 +833,11 @@ order by count(j.nombre) asc;
  * mateix nombre de missatges que el jugador que més missatges ha enviat.
  */
 insert into jugador (id, nombre, experiencia, trofeos, oro, gemas, tarjeta)
-VALUES ('#22UCV0000', 'Manolo', 100, 100, 1000, 200, null);
+values ('#22UCV0000', 'Manolo', 100, 100, 1000, 200, null);
+
+select *
+from jugador
+where jugador.id = '#22UCV0000';
 
 update jugador
 set oro   = 0,
@@ -906,3 +898,10 @@ where jugador.id in (
              join mensaje on escribe.id_mensaje = mensaje.id
     group by jugador.id
 );
+
+select *
+from jugador
+where jugador.id = '#22UCV0000';
+
+delete from jugador
+where jugador.id = '#22UCV0000';
