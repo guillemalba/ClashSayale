@@ -84,23 +84,23 @@ order by c.daño desc;
 --Update rareza
 update carta
 set rareza = 'Common'
-where rareza = 'Proletari';
+where rareza like 'Proletari';
 
 --Update nombre
 update carta
-set nombre = 'Hal Roachs Rascals'
-where nombre = 'Rascals';
+set nombre = 'Hal Roach''s Rascals'
+where nombre like 'Rascals';
 
 update compuesto
-set carta = 'Hal Roachs Rascals'
+set carta = 'Hal Roach''s Rascals'
 where carta = 'Rascals';
 
 update encuentra
-set carta = 'Hal Roachs Rascals'
+set carta = 'Hal Roach''s Rascals'
 where carta = 'Rascals';
 
 update tropas
-set carta = 'Hal Roachs Rascals'
+set carta = 'Hal Roach''s Rascals'
 where carta = 'Rascals';
 
 /********************************************************************/
@@ -143,21 +143,21 @@ order by nombre;
 --update nombre
 select *
 from carta
-where carta.nombre = 'Hal Roachs Rascals';
+where carta.nombre = 'Hal Roach''s Rascals';
 
 select *
 from compuesto
-where carta = 'Hal Roachs Rascals'
+where carta = 'Hal Roach''s Rascals'
 order by deck;
 
 select *
 from encuentra
-where carta = 'Hal Roachs Rascals'
+where carta = 'Hal Roach''s Rascals'
 order by jugador;
 
-select carta, daño_aparicion, 'Hal Roachs Rascals' as tipo
+select carta, daño_aparicion, 'Hal Roach''s Rascals' as tipo
 from tropas
-where carta = 'Hal Roachs Rascals';
+where carta = 'Hal Roach''s Rascals';
 
 
 
@@ -614,24 +614,17 @@ order by a.nombre asc;
  * superior a 290.000 i obtingudes en arenes el nom de les quals comença per "A" o quan la insígnia no té imatge. Així,
  * considera només els jugadors que tenen una carta el nom de la qual comença per "Lava".
  */
-select q1.nombre_insignia, q1.id_jugador, q2.nombre_carta
-from (select i.nombre as nombre_insignia, j.id as id_jugador
-      from consigue as c
-               join arena a on a.id = c.arena
-               join jugador j on j.id = c.jugador
-               join insignia i on i.nombre = c.insignia
-      where j.experiencia > 290000
-        and (a.nombre like 'A%' or i.imagenurl is null)) as q1,
-     (select c.nombre as nombre_carta, j.id as id_jugador
-      from encuentra as e
-               join jugador j on j.id = e.jugador
-               join carta c on c.nombre = e.carta
-               join arena a on c.arena = a.id
-      where j.experiencia > 290000
-        and a.nombre like 'A%') as q2
-where q1.id_jugador = q2.id_jugador
-group by q1.nombre_insignia, q1.id_jugador, q2.nombre_carta
-order by q1.id_jugador asc;
+select i.nombre, c.nombre, c.daño
+from insignia i join consigue co on i.nombre = co.insignia join jugador j on co.jugador = j.id
+    join encuentra e on j.id = e.jugador join carta c on c.nombre = e.carta
+    join arena a on a.id = c.arena
+where j.experiencia > 290000 and a.nombre like 'A%' or i.imagenurl is null
+    and j.nombre in (select j.nombre
+                     from carta c join encuentra e on c.nombre = e.carta join jugador j on e.jugador = j.id
+                     where c.nombre like 'Lava%')
+group by i.nombre, c.nombre, c.daño
+order by i.nombre, c.nombre, c.daño;
+
 
 /* 4.6
  * Donar el nom de les missions que donen recompenses a totes les arenes el títol de les quals comença per "t" o acaba
