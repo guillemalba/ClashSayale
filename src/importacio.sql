@@ -645,7 +645,41 @@ where b.fecha BETWEEN '2021-09-01' AND '2021-12-31' and t.nombre like 'T10';
 
 
 
+/*INSERTS PARA TENER UN OUTPUT CORRECTO EN TODAS LAS CONSULTAS LA FASE 3*/
+--Añadimos el clan
+insert into clan(id, nombre, descripcion, trofeos_totales, minimo_trofeos, puntuacion)
+values ('#JDI23H9S', 'La Salle', 'Este es el clan de los estudiantes de la salle.', 20, 7000, 6800);
+
+--Añdadimos todas sus batallas
+insert into pelea (batalla_clan, clan, fecha_inicio, fecha_fin)
+select id, '#JDI23H9S', '2019-02-21', '2021-12-31' from batalla_clan;
 
 
+--Insertamos 4 cartas nuevas
+insert into carta (nombre, daño, velocidad_ataque, rareza, arena)
+values ('Barbaros', 103, 200, 'Common', 54000028);
+
+insert into carta (nombre, daño, velocidad_ataque, rareza, arena)
+values ('Gus', 103, 200, 'Common', 54000028);
+
+insert into carta (nombre, daño, velocidad_ataque, rareza, arena)
+values ('Putin', 103, 200, 'Common', 54000028);
+
+insert into carta (nombre, daño, velocidad_ataque, rareza, arena)
+values ('Mortero', 103, 200, 'Common', 54000028);
+
+
+--Creamos una relacion de dos jugadores con dos cartas de las 4 que hemos creado anteriormente.
+insert into encuentra (jugador, carta, fecha_mejora, nivel_actual)
+values ('#LUGVG9PC', 'Barbaros', '01-01-2021', 5);
+
+insert into encuentra (jugador, carta, fecha_mejora, nivel_actual)
+values ('#LUGVG9PC', 'Gus', '01-01-2021', 5);
+
+insert into encuentra (jugador, carta, fecha_mejora, nivel_actual)
+values ('#PQLGJ90Y', 'Putin', '01-01-2021', 5);
+
+insert into encuentra (jugador, carta, fecha_mejora, nivel_actual)
+values ('#PQLGJ90Y', 'Mortero', '01-01-2021', 5);
 
 

@@ -81,19 +81,87 @@ order by c.daño desc;
  * Proporcioneu les ordres SQL per fer les modificacions sense eliminar les dades i
  * reimportar-les.
  */
- /* TODO: aun estoy en ello*/
+--Update rareza
+update carta
+set rareza = 'Common'
+where rareza = 'Proletari';
+
+--Update nombre
+update carta
+set nombre = 'Hal Roachs Rascals'
+where nombre = 'Rascals';
+
+update compuesto
+set carta = 'Hal Roachs Rascals'
+where carta = 'Rascals';
+
+update encuentra
+set carta = 'Hal Roachs Rascals'
+where carta = 'Rascals';
+
+update tropas
+set carta = 'Hal Roachs Rascals'
+where carta = 'Rascals';
+
+/********************************************************************/
+/*****************Queries de validación pre update*******************/
+/********************************************************************/
+--update rareza
+select *
+from carta
+where rareza = 'Common'
+order by nombre;
+
+--update nombre
 select *
 from carta
 where carta.nombre = 'Rascals';
 
+select *
+from compuesto
+where carta = 'Rascals'
+order by deck;
 
+select *
+from encuentra
+where carta = 'Rascals'
+order by jugador;
+
+select carta, daño_aparicion, 'tropas' as tipo
+from tropas
+where carta = 'Rascals';
+
+/**************************************************************************/
+/********************Queries de validación post update*********************/
+/**************************************************************************/
+--Update rareza
+select *
+from carta
+where rareza = 'Proletari'
+order by nombre;
+
+--update nombre
 select *
 from carta
 where carta.nombre = 'Hal Roachs Rascals';
-/*221*/
-update carta
-set daño = 221
-where nombre = 'Rascals';
+
+select *
+from compuesto
+where carta = 'Hal Roachs Rascals'
+order by deck;
+
+select *
+from encuentra
+where carta = 'Hal Roachs Rascals'
+order by jugador;
+
+select carta, daño_aparicion, 'Hal Roachs Rascals' as tipo
+from tropas
+where carta = 'Hal Roachs Rascals';
+
+
+
+
 
 
 /* 1.7

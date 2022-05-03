@@ -246,7 +246,7 @@ create table Tropas
 (
     carta          varchar(255),
     daño_aparicion integer,
-    foreign key (carta) references Carta (nombre)
+    foreign key (carta) references Carta (nombre) on update cascade
 );
 
 
@@ -266,7 +266,7 @@ create table compuesto
     deck    integer,
     nivel   integer,
     primary key (carta, deck),
-    foreign key (carta) references Carta (nombre),
+    foreign key (carta) references Carta (nombre) on update cascade,
     foreign key (deck) references Deck (id)
 );
 
@@ -280,7 +280,7 @@ create table Encuentra
     nivel_actual       integer,
     primary key (jugador, carta),
     foreign key (jugador) references Jugador (id),
-    foreign key (carta) references Carta (nombre)
+    foreign key (carta) references Carta (nombre) on update cascade
 );
 
 

@@ -1,0 +1,1 @@
+create or replace trigger rarity_warning after
