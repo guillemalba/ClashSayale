@@ -4,12 +4,21 @@
 drop function if exists proportions_rarity;
 create or replace function proportions_rarity() returns trigger as $$
 begin
+
     --Proporciones Common
     if ((((select count(distinct nombre) from carta where rareza = 'Common')*100)/(select count(distinct nombre) from carta)) not between 30.1 and 31.9) then
         insert into warnings(affected_table, error_mesage,date, usr)
         values('Carta', 'Proporcions de raresa no respectades: ' || 'Common' || ' la proporció actual és '||
                     (((select count(distinct nombre) from carta where rareza = 'Common')*100)/(select count(distinct nombre) from carta))
                     ||'% quan hauria de ser ' || 31 || '%', current_date, user);
+    end if;
+
+    --Proporciones Rare
+    if ((((select count(distinct nombre) from carta where rareza = 'Rare')*100)/(select count(distinct nombre) from carta)) not between 25.1 and 26.9) then
+        insert into warnings(affected_table, error_mesage,date, usr)
+        values('Carta', 'Proporcions de raresa no respectades: ' || 'Rare' || ' la proporció actual és '||
+                        (((select count(distinct nombre) from carta where rareza = 'Rare')*100)/(select count(distinct nombre) from carta))
+                            ||'% quan hauria de ser ' || 26 || '%', current_date, user);
     end if;
 
     --Proporciones Epic
@@ -28,7 +37,7 @@ begin
                     ||'% quan hauria de ser ' || 17 || '%', current_date, user);
     end if;
 
-    --Proporciones Legendary
+    --Proporciones Champion
     if ((((select count(distinct nombre) from carta where rareza = 'Champion')*100)/(select count(distinct nombre) from carta)) not between 2.1 and 3.9) then
         insert into warnings(affected_table, error_mesage,date, usr)
         values('Carta', 'Proporcions de raresa no respectades: ' || 'Champion' || ' la proporció actual és '||
@@ -40,7 +49,6 @@ end;
 $$ language plpgsql;
 
 drop trigger if exists rarity_proportions_warning on carta;
-
 create trigger rarity_proportions_warning after insert on carta
 for each row
 execute function proportions_rarity();
@@ -132,7 +140,37 @@ values ('Añadida7', 100, 100, 'Champion');
 
 delete from carta where nombre = 'Añadida1' or nombre = 'Añadida2' or nombre = 'Añadida3' or nombre = 'Añadida4' or nombre = 'Añadida5' or nombre = 'Añadida6' or nombre = 'Añadida7';
 
+
+
 /*
  * 1.2) Regal d'actualització de cartes
  */
 
+drop function if exists actualization_gift;
+create or replace function actualization_gift() returns trigger as $$
+begin
+    update encuentra
+    set nivel_actual = 14
+    where carta = new.carta and jugador = new.jugador;
+    return null;
+end;
+$$ language plpgsql;
+
+
+drop trigger if exists card_actualization_gift on encuentra;
+create trigger card_actualization_gift after insert on encuentra
+for each row
+execute function actualization_gift();
+
+
+--Consultas e insert de prueba
+insert into encuentra (jugador, carta, fecha_mejora, nivel_actual)
+values('#VQJ9UUP','Putin',current_date,1);
+
+select e.jugador, e.carta, e.fecha_mejora, e.nivel_actual from encuentra e
+where jugador = '#VQJ9UUP' and carta = 'Putin';
+
+
+/*
+ * 1.3) Targetes OP que necessiten revisió
+ */
