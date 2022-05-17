@@ -614,16 +614,26 @@ order by a.nombre asc;
  * superior a 290.000 i obtingudes en arenes el nom de les quals comença per "A" o quan la insígnia no té imatge. Així,
  * considera només els jugadors que tenen una carta el nom de la qual comença per "Lava".
  */
-select i.nombre, c.nombre, c.daño
+select distinct i.nombre, c.nombre, c.daño
 from insignia i join consigue co on i.nombre = co.insignia join jugador j on co.jugador = j.id
-    join encuentra e on j.id = e.jugador join carta c on c.nombre = e.carta
-    join arena a on a.id = c.arena
-where j.experiencia > 290000 and a.nombre like 'A%' or i.imagenurl is null
+                join encuentra e on j.id = e.jugador join carta c on c.nombre = e.carta
+                join arena a on a.id = c.arena
+where (j.experiencia > 290000 and a.nombre like 'A%') or i.imagenurl is null
     and j.nombre in (select j.nombre
                      from carta c join encuentra e on c.nombre = e.carta join jugador j on e.jugador = j.id
                      where c.nombre like 'Lava%')
-group by i.nombre, c.nombre, c.daño
 order by i.nombre, c.nombre, c.daño;
+
+-- Query de validacion
+select * from insignia where imagenurl is null;
+
+-- Insertamos la insignia en la tabla Insignia
+insert into insignia(nombre)
+values ('#insigniaGrupo9');
+
+-- Insertamos la insignia en consigue para ligarla con jugador y así salga como resultado en la query general
+insert into consigue(insignia, arena, jugador, fecha)
+values('#insigniaGrupo9', '54000002', '#VQJ9UUP', '2022-06-04');
 
 
 /* 4.6
