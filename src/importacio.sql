@@ -683,3 +683,75 @@ insert into encuentra (jugador, carta, fecha_mejora, nivel_actual)
 values ('#PQLGJ90Y', 'Mortero', '01-01-2021', 5);
 
 
+-- Drops de los CSV utilizados para la importación de datos.
+drop table if exists arena_pack cascade;
+
+drop table if exists arenas cascade ;
+
+drop table if exists battles cascade;
+
+drop table if exists buildings cascade;
+
+drop table if exists cards cascade;
+
+drop table if exists clan_battles cascade;
+
+drop table if exists clan_tech_structures cascade;
+
+drop table if exists clans cascade;
+
+drop table if exists friends cascade;
+
+drop table if exists messages_between_players cascade;
+
+drop table if exists messages_to_clans cascade;
+
+drop table if exists player_purchases cascade;
+
+Drop table if exists players_quests cascade;
+
+Drop table if exists players cascade;
+
+Drop table if exists playersachievements cascade;
+
+Drop table if exists playersbadge cascade;
+
+Drop table if exists playerscards cascade;
+
+Drop table if exists playersClans cascade;
+
+DROP TABLE IF EXISTS playersClansdonations CASCADE;
+
+DROP TABLE IF EXISTS playersdeck CASCADE;
+
+DROP TABLE IF EXISTS quests_arenas CASCADE;
+
+DROP TABLE IF EXISTS seasons CASCADE;
+
+DROP TABLE IF EXISTS shared_decks CASCADE;
+
+DROP TABLE IF EXISTS technologies CASCADE;
+
+DROP TABLE IF EXISTS batalla CASCADE;
+
+DROP TABLE IF EXISTS batalla_clan CASCADE;
+
+DROP TABLE IF EXISTS clan_insignia CASCADE;
+
+DROP TABLE IF EXISTS clan_modificador CASCADE;
+
+DROP TABLE IF EXISTS compuesto CASCADE;
+
+DROP TABLE IF EXISTS mensaje_clan CASCADE;
+
+DROP TABLE IF EXISTS modificador CASCADE;
+
+DROP TABLE IF EXISTS nivel_arena CASCADE;
+
+DROP TABLE IF EXISTS oro_gemas CASCADE;
+
+DROP TABLE IF EXISTS pelea CASCADE;
+
+DROP TABLE IF EXISTS tecnologias CASCADE;
+
+DROP TABLE IF EXISTS mision_arena CASCADE;
