@@ -646,6 +646,21 @@ where b.fecha BETWEEN '2021-09-01' AND '2021-12-31' and t.nombre like 'T10';
 
 
 /*INSERTS PARA TENER UN OUTPUT CORRECTO EN TODAS LAS CONSULTAS LA FASE 3*/
+
+
+--------------------1.7
+insert into carta (nombre, daño, velocidad_ataque, rareza, arena)
+values ('Enanos Felices', 103, 200, 'Common', 54000028);
+
+--Creamos su relacion con el deck Cantabria goblins del jugador #YC0JJ2PV
+insert into compuesto(carta, deck, nivel)
+values ('Enanos Felices', 585, 5);
+
+insert into encuentra(jugador, carta, fecha_mejora, nivel_actual)
+values ('#YC0JJ2PV', 'Enanos Felices', '2021-04-04', 5);
+
+
+-------------3.8
 --Añadimos el clan
 insert into clan(id, nombre, descripcion, trofeos_totales, minimo_trofeos, puntuacion)
 values ('#JDI23H9S', 'La Salle', 'Este es el clan de los estudiantes de la salle.', 20, 7000, 6800);
@@ -655,6 +670,16 @@ insert into pelea (batalla_clan, clan, fecha_inicio, fecha_fin)
 select id, '#JDI23H9S', '2019-02-21', '2021-12-31' from batalla_clan;
 
 
+--------4.5
+insert into insignia(nombre)
+values ('#insigniaGrupo9');
+
+-- Insertamos la insignia en consigue para ligarla con jugador y así salga como resultado en la query general
+insert into consigue(insignia, arena, jugador, fecha)
+values('#insigniaGrupo9', '54000002', '#VQJ9UUP', '2022-06-04');
+
+
+---------------5.10
 --Insertamos 4 cartas nuevas
 insert into carta (nombre, daño, velocidad_ataque, rareza, arena)
 values ('Barbaros', 103, 200, 'Common', 54000028);
@@ -681,6 +706,10 @@ values ('#PQLGJ90Y', 'Putin', '01-01-2021', 5);
 
 insert into encuentra (jugador, carta, fecha_mejora, nivel_actual)
 values ('#PQLGJ90Y', 'Mortero', '01-01-2021', 5);
+
+--consulta 5.13
+insert into jugador (id, nombre, experiencia, trofeos, oro, gemas, tarjeta)
+values ('#22UCV0000', 'Manolo', 100, 100, 1000, 200, null);
 
 
 -- Drops de los CSV utilizados para la importación de datos.
