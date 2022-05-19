@@ -170,19 +170,6 @@ where carta = 'Hal Roach''s Rascals';
  * consultes diferents per obtenir el mateix resultat.
  */
 
---Creamos una nueva carta
-insert into carta (nombre, daño, velocidad_ataque, rareza, arena)
-values ('Enanos Felices', 103, 200, 'Common', 54000028);
-
---Creamos su relacion con el deck Cantabria goblins del jugador #YC0JJ2PV
-insert into compuesto(carta, deck, nivel)
-values ('Enanos Felices', 585, 5);
-
-insert into encuentra(jugador, carta, fecha_mejora, nivel_actual)
-values ('#YC0JJ2PV', 'Enanos Felices', '2021-04-04', 5);
-
-
-
 --Query 1
 select c.nombre
 from carta c left join compuesto c2 on c.nombre = c2.carta
@@ -507,13 +494,6 @@ group by t.nombre, m.descripcion;
 /* 3.8
  * Enumera els clans amb un mínim de trofeus superior a 6900 i que hagin participat a totes les batalles de clans.
  */
---Añadimos el clan
-insert into clan(id, nombre, descripcion, trofeos_totales, minimo_trofeos, puntuacion)
-values ('#JDI23H9S', 'La Salle', 'Este es el clan de los estudiantes de la salle.', 20, 7000, 6800);
-
---Añdadimos todas sus batallas
-insert into pelea (batalla_clan, clan, fecha_inicio, fecha_fin)
-select id, '#JDI23H9S', '2019-02-21', '2021-12-31' from batalla_clan;
 
 --Query del enunciado
 select c.nombre
@@ -626,14 +606,6 @@ order by i.nombre, c.nombre, c.daño;
 
 -- Query de validacion
 select * from insignia where imagenurl is null;
-
--- Insertamos la insignia en la tabla Insignia
-insert into insignia(nombre)
-values ('#insigniaGrupo9');
-
--- Insertamos la insignia en consigue para ligarla con jugador y así salga como resultado en la query general
-insert into consigue(insignia, arena, jugador, fecha)
-values('#insigniaGrupo9', '54000002', '#VQJ9UUP', '2022-06-04');
 
 
 /* 4.6
@@ -958,32 +930,10 @@ group by j.nombre,j.experiencia,j.trofeos;
  * Llistar les cartes comunes que no estan incloses en cap pila i que pertanyen a jugadors amb experiència
  * superior a 200.000. Ordena la sortida amb el nom de la carta.
  */
---Insertamos 4 cartas nuevas
-insert into carta (nombre, daño, velocidad_ataque, rareza, arena)
-values ('Barbaros', 103, 200, 'Common', 54000028);
-
-insert into carta (nombre, daño, velocidad_ataque, rareza, arena)
-values ('Gus', 103, 200, 'Common', 54000028);
-
-insert into carta (nombre, daño, velocidad_ataque, rareza, arena)
-values ('Putin', 103, 200, 'Common', 54000028);
-
-insert into carta (nombre, daño, velocidad_ataque, rareza, arena)
-values ('Mortero', 103, 200, 'Common', 54000028);
 
 
---Creamos una relacion de dos jugadores con dos cartas de las 4 que hemos creado anteriormente.
-insert into encuentra (jugador, carta, fecha_mejora, nivel_actual)
-values ('#LUGVG9PC', 'Barbaros', '01-01-2021', 5);
 
-insert into encuentra (jugador, carta, fecha_mejora, nivel_actual)
-values ('#LUGVG9PC', 'Gus', '01-01-2021', 5);
 
-insert into encuentra (jugador, carta, fecha_mejora, nivel_actual)
-values ('#PQLGJ90Y', 'Putin', '01-01-2021', 5);
-
-insert into encuentra (jugador, carta, fecha_mejora, nivel_actual)
-values ('#PQLGJ90Y', 'Mortero', '01-01-2021', 5);
 
 
 --Ejecutamos la query y vemos que en el output salen las 4 cartas que hemos creado.
@@ -1049,8 +999,6 @@ order by count(j.nombre) asc;
  * Poseu a zero els valors d'or i gemmes als jugadors que no han enviat cap missatge o que han enviat el
  * mateix nombre de missatges que el jugador que més missatges ha enviat.
  */
-insert into jugador (id, nombre, experiencia, trofeos, oro, gemas, tarjeta)
-values ('#22UCV0000', 'Manolo', 100, 100, 1000, 200, null);
 
 select *
 from jugador
