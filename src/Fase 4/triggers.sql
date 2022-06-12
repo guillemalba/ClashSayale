@@ -174,3 +174,63 @@ where jugador = '#VQJ9UUP' and carta = 'Putin';
 /*
  * 1.3) Targetes OP que necessiten revisió
  */
+
+
+
+
+
+
+
+
+/*
+* 4.1) Completar una missió
+*/
+
+
+/*
+* 4.2) Batalla amb jugadors
+*/
+select * from batalla order by fecha;
+select * from deck order by id;
+
+
+
+select * from arena order by max_trofeos;
+select * from arenas order by mintrophies;
+
+
+drop function if exists actualiza_batalla;
+create or replace function actualiza_batalla() returns trigger as $$
+begin
+    update jugador
+    set trofeos = trofeos + new.puntos_win
+    where jugador.id in (
+        select deck.jugador
+        from deck, batalla
+        where deck.id = batalla.deck_win
+            and new.id = batalla.id
+        );
+    update jugador
+    set trofeos = trofeos + new.puntos_lose
+    where jugador.id in (
+        select deck.jugador
+        from deck, batalla
+        where deck.id = batalla.deck_lose
+            and new.id = batalla.id
+    );
+    return null;
+end;
+$$ language plpgsql;
+
+drop trigger if exists update_player_trophies on batalla;
+create trigger update_player_trophies after insert on batalla
+    for each row
+execute function actualiza_batalla();
+
+delete from batalla
+where fecha = '2024-02-14';
+
+insert into batalla(id, deck_win, deck_lose, fecha, durada, puntos_win, puntos_lose, batalla_clan)
+values (99999, 103, 102, '2024-02-14', '09:50:50', 69, -69, null);
+
+select * from jugador order by trofeos desc;

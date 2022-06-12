@@ -108,8 +108,8 @@ create table Arena
 (
     id          integer,
     nombre      varchar(255),
-    max_trofeos integer,
     min_trofeos integer,
+    max_trofeos integer,
     primary key (id)
 );
 
