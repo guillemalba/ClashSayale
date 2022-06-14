@@ -176,7 +176,75 @@ where jugador = '#VQJ9UUP' and carta = 'Putin';
  */
 
 
+/*
+* 2.1) Actualitza les compres dels jugadors
+*/
 
+--Ahora mismo solo suma cuando compras paquete de oferta
+drop function if exists actualiza_compra();
+create or replace function actualiza_compra() returns trigger as $$
+begin
+    if(new.articulo = Any(select id_p_oferta from paquete_oferta) ) then
+        update jugador
+        set gemas = gemas + (select po.gemas_contenido
+            from paquete_oferta as po
+            where po.id_p_oferta = new.articulo)
+        where jugador.id = new.jugador;
+
+        update jugador
+        set oro = oro + (select po.oro_contenido
+            from paquete_oferta as po
+            where po.id_p_oferta = new.articulo)
+        where jugador.id = new.jugador;
+    end if;
+
+    if(new.articulo = Any(select id_paquete from paquete_arena)) then
+        update jugador
+        set oro = oro + (select n.oro from nivel_arena as n
+                                               join paquete_arena pa on pa.id_paquete = n.paquete
+                                               join articulo a on a.id = pa.id_paquete
+                                                where pa.id_paquete = new.articulo and n.arena = (select d2.arena
+                                                                 from desbloquea as d2
+                                                                          join jugador j2 on d2.jugador = j2.id
+                                                                 where jugador = new.jugador and d2.fecha = (select Max(fecha)
+                                                                                                              from desbloquea where jugador = new.jugador)))
+        where jugador.id = new.jugador;
+    end if;
+
+    return null;
+end
+$$ language plpgsql;
+
+drop trigger if exists update_player_items on compra;
+create trigger update_player_items after insert on compra
+    for each row
+execute procedure actualiza_compra();
+
+
+
+
+--Tornar a ficar la pasta y las gemas al jugador de proves
+update  jugador set oro = 310498, gemas = 78625 where id = '#202C2CU0U';
+
+
+--Treiem el or i les gemes del jugador abans
+select * from jugador where id = '#202C2CU0U';
+
+--Fem insert d'un jugador que compra un paqquet d'oferta(es sumen 65701 d'or y 10 gemes)
+insert  into compra(jugador, tarjeta, articulo, fecha, descuento)
+values ('#202C2CU0U',626381901632479,83,'2022-06-13',12.64);
+
+--Fem insert d'un paquet d'arena(es sumen 8377 d'or)
+insert  into compra(jugador, tarjeta, articulo, fecha, descuento)
+values ('#202C2CU0U',626381901632479,4,'2022-06-13',12.64);
+
+
+--Fem insert d'un article que no ens dona ni or ni gemes (no canvia res)
+insert  into compra(jugador, tarjeta, articulo, fecha, descuento)
+values ('#202C2CU0U',626381901632479,80,'2022-06-13',12.64);
+
+--Tornem a treure l'or i les gemes del jugador per veure la diferencia
+select * from jugador where id = '#202C2CU0U';
 
 
 
