@@ -6,3 +6,12 @@ create table Warnings
     date            date,
     usr             varchar(255)
 );
+
+
+drop table if exists OPCardBlackList;
+create table OPCardBlackList
+(
+    nombre          varchar(255),
+    entering_date   date,
+    unique(nombre)
+);

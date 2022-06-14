@@ -175,6 +175,111 @@ where jugador = '#VQJ9UUP' and carta = 'Putin';
  * 1.3) Targetes OP que necessiten revisió
  */
 
+drop trigger if exists OPCard_trigger on batalla;
+
+drop function if exists OPCard_function;
+create or replace function OPCard_function() returns trigger as $$
+begin
+    --Insertamos todos las cartas que superen el porcentaje de victorias en la lista sin repeticiones.
+    insert into OPCardBlackList (nombre, entering_date)
+    select distinct c3.nombre, current_date
+    from carta c3 join compuesto co on c3.nombre = co.carta
+    join deck d on co.deck = d.id
+    where (d.id = new.deck_win) or (d.id = new.deck_win)
+    group by c3.nombre having (((select count(b.id) as Num_victorias
+                                from batalla b join deck d on b.deck_win = d.id
+                                join compuesto c on d.id = c.deck
+                                join carta ca on ca.nombre = c.carta
+                                group by ca.nombre having ca.nombre = c3.nombre
+                                )*100)/(
+                                select count(b.id) as Num_partidas
+                                from batalla b join deck d on b.deck_win = d.id or b.deck_lose = d.id
+                                join compuesto c on d.id = c.deck
+                                join carta ca on ca.nombre = c.carta
+                                group by ca.nombre having ca.nombre = c3.nombre)) > 50
+    on conflict (nombre)
+    do nothing;
+
+    --Miramos si las cartas repetidas llevan más de una semana en la lista negra
+    update carta set daño = daño - (daño*0.01), velocidad_ataque = velocidad_ataque - (velocidad_ataque*0.01)
+    where nombre in (select distinct c3.nombre
+                     from carta c3 join compuesto co on c3.nombre = co.carta
+                     join deck d on co.deck = d.id
+                     where (d.id = new.deck_win) or (d.id = new.deck_win)
+                     group by c3.nombre having (((select count(b.id) as Num_victorias
+                                                 from batalla b join deck d on b.deck_win = d.id
+                                                 join compuesto c on d.id = c.deck
+                                                 join carta ca on ca.nombre = c.carta
+                                                 group by ca.nombre having ca.nombre = c3.nombre
+                                                 )*100)/(
+                                                 select count(b.id) as Num_partidas
+                                                 from batalla b join deck d on b.deck_win = d.id or b.deck_lose = d.id
+                                                 join compuesto c on d.id = c.deck
+                                                 join carta ca on ca.nombre = c.carta
+                                                 group by ca.nombre having ca.nombre = c3.nombre)) > 50
+
+                     intersect
+
+                     select nombre
+                     from opcardblacklist
+                     where ((extract(EPOCH from current_timestamp) - extract(EPOCH from entering_date))/86400) >= 7
+    );
+
+    return null;
+end;
+$$ language plpgsql;
+
+create trigger OPCard_trigger after insert on batalla
+    for each row
+execute function OPCard_function();
+
+/*******************************************************************************************
+ *
+ ******************** PRUEBAS PARA VER SI FUNCIONA LA CONSULTA *****************************
+ *
+ ******************************************************************************************/
+insert into batalla(id, deck_win, deck_lose)
+values (9999, 101, 102);
+
+delete from batalla where id = 9999;
+
+select nombre, daño, velocidad_ataque, rareza, arena
+from carta
+where nombre = 'Fisherman';
+
+update opcardblacklist set entering_date = '2022-05-14'
+where nombre = 'Fisherman';
+
+update carta set daño = 255, velocidad_ataque = 100
+where nombre = 'Fisherman';
+
+
+--Este select extrae una lista con todas las cartas y su porcentaje de victorias.
+select c3.nombre, (((select count(b.id) as Num_victorias
+                    from batalla b join deck d on b.deck_win = d.id
+                    join compuesto c on d.id = c.deck
+                    join carta ca on ca.nombre = c.carta
+                    group by ca.nombre having ca.nombre = c3.nombre
+                    )*100)/(
+                    select count(b.id) as Num_partidas
+                    from batalla b join deck d on b.deck_win = d.id or b.deck_lose = d.id
+                    join compuesto c on d.id = c.deck
+                    join carta ca on ca.nombre = c.carta
+                    group by ca.nombre having ca.nombre = c3.nombre))
+                    as porcentaje
+from carta c3
+group by c3.nombre
+order by porcentaje desc;
+
+
+
+
+--Este select musetra las cartas que tiene un deck en especifico
+select distinct c.nombre, d.id
+from carta c join compuesto c2 on c.nombre = c2.carta
+join deck d on c2.deck = d.id
+where d.id = 101 or d.id = 102;
+
 
 /*
 * 2.1) Actualitza les compres dels jugadors
@@ -245,9 +350,6 @@ values ('#202C2CU0U',626381901632479,80,'2022-06-13',12.64);
 
 --Tornem a treure l'or i les gemes del jugador per veure la diferencia
 select * from jugador where id = '#202C2CU0U';
-
-
-
 
 
 /*
