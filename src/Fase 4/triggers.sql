@@ -1,12 +1,15 @@
 /*
  * 1.1) Proporcions de rareses
  */
+
+drop trigger if exists rarity_proportions_warning on carta;
+
 drop function if exists proportions_rarity;
 create or replace function proportions_rarity() returns trigger as $$
 begin
 
     --Proporciones Common
-    if ((((select count(distinct nombre) from carta where rareza = 'Common')*100)/(select count(distinct nombre) from carta)) not between 30.1 and 31.9) then
+    if ((((select count(distinct nombre) from carta where rareza = 'Common')*100)/(select count(distinct nombre) from carta)) <> 31) then
         insert into warnings(affected_table, error_mesage,date, usr)
         values('Carta', 'Proporcions de raresa no respectades: ' || 'Common' || ' la proporció actual és '||
                     (((select count(distinct nombre) from carta where rareza = 'Common')*100)/(select count(distinct nombre) from carta))
@@ -14,7 +17,7 @@ begin
     end if;
 
     --Proporciones Rare
-    if ((((select count(distinct nombre) from carta where rareza = 'Rare')*100)/(select count(distinct nombre) from carta)) not between 25.1 and 26.9) then
+    if ((((select count(distinct nombre) from carta where rareza = 'Rare')*100)/(select count(distinct nombre) from carta)) <> 26) then
         insert into warnings(affected_table, error_mesage,date, usr)
         values('Carta', 'Proporcions de raresa no respectades: ' || 'Rare' || ' la proporció actual és '||
                         (((select count(distinct nombre) from carta where rareza = 'Rare')*100)/(select count(distinct nombre) from carta))
@@ -22,7 +25,7 @@ begin
     end if;
 
     --Proporciones Epic
-    if ((((select count(distinct nombre) from carta where rareza = 'Epic')*100)/(select count(distinct nombre) from carta)) not between 22.1 and 23.9) then
+    if ((((select count(distinct nombre) from carta where rareza = 'Epic')*100)/(select count(distinct nombre) from carta)) <> 23) then
         insert into warnings(affected_table, error_mesage,date, usr)
         values('Carta', 'Proporcions de raresa no respectades: ' || 'Epic' || ' la proporció actual és '||
                     (((select count(distinct nombre) from carta where rareza = 'Epic')*100)/(select count(distinct nombre) from carta))
@@ -30,7 +33,7 @@ begin
     end if;
 
     --Proporciones Legendary
-    if ((((select count(distinct nombre) from carta where rareza = 'Legendary')*100)/(select count(distinct nombre) from carta)) not between 16.1 and 17.9) then
+    if ((((select count(distinct nombre) from carta where rareza = 'Legendary')*100)/(select count(distinct nombre) from carta)) <> 17) then
         insert into warnings(affected_table, error_mesage,date, usr)
         values('Carta', 'Proporcions de raresa no respectades: ' || 'Legendary' || ' la proporció actual és '||
                     (((select count(distinct nombre) from carta where rareza = 'Legendary')*100)/(select count(distinct nombre) from carta))
@@ -38,7 +41,7 @@ begin
     end if;
 
     --Proporciones Champion
-    if ((((select count(distinct nombre) from carta where rareza = 'Champion')*100)/(select count(distinct nombre) from carta)) not between 2.1 and 3.9) then
+    if ((((select count(distinct nombre) from carta where rareza = 'Champion')*100)/(select count(distinct nombre) from carta)) <> 3) then
         insert into warnings(affected_table, error_mesage,date, usr)
         values('Carta', 'Proporcions de raresa no respectades: ' || 'Champion' || ' la proporció actual és '||
                     (((select count(distinct nombre) from carta where rareza = 'Champion')*100)/(select count(distinct nombre) from carta))
@@ -48,7 +51,6 @@ begin
 end;
 $$ language plpgsql;
 
-drop trigger if exists rarity_proportions_warning on carta;
 create trigger rarity_proportions_warning after insert on carta
 for each row
 execute function proportions_rarity();
@@ -102,13 +104,23 @@ values ('CartaLeng4', 100, 100, 'Legendary');
 insert into carta(nombre, daño, velocidad_ataque, rareza)
 values ('CartaChamp1', 100, 100, 'Champion');
 
---Comprobaciones
-select count(distinct nombre) from carta;
 
-select count(distinct nombre) from carta where rareza = 'Common';
-select count(distinct nombre) from carta where rareza = 'Legendary';
-select count(distinct nombre) from carta where rareza = 'Epic';
-select count(distinct nombre) from carta where rareza = 'Champion';
+/* RUEBAS */
+--Porcentajes de cada rareza
+select 'Common' as rareza , ((select count(distinct nombre) from carta where rareza = 'Common')*100)/count(distinct nombre) as porcentaje
+from carta
+union
+select 'Rare' as rareza , ((select count(distinct nombre) from carta where rareza = 'Rare')*100)/count(distinct nombre) as porcentaje
+from carta
+union
+select 'Legendary' as rareza , ((select count(distinct nombre) from carta where rareza = 'Legendary')*100)/count(distinct nombre) as porcentaje
+from carta
+union
+select 'Epic' as rareza , ((select count(distinct nombre) from carta where rareza = 'Epic')*100)/count(distinct nombre) as porcentaje
+from carta
+union
+select 'Champion' as rareza , ((select count(distinct nombre) from carta where rareza = 'Champion')*100)/count(distinct nombre) as porcentaje
+from carta;
 
 --Foto 1
 insert into carta(nombre, daño, velocidad_ataque, rareza)
@@ -116,7 +128,7 @@ values ('Añadida1', 100, 100, 'Epic');
 
 --Foto 2
 insert into carta(nombre, daño, velocidad_ataque, rareza)
-values ('Añadida2', 100, 100, 'Common');
+values ('Añadida2', 100, 100, 'Rare');
 
 --Foto 3
 insert into carta(nombre, daño, velocidad_ataque, rareza)
@@ -145,6 +157,7 @@ delete from carta where nombre = 'Añadida1' or nombre = 'Añadida2' or nombre =
 /*
  * 1.2) Regal d'actualització de cartes
  */
+drop trigger if exists card_actualization_gift on encuentra;
 
 drop function if exists actualization_gift;
 create or replace function actualization_gift() returns trigger as $$
@@ -156,8 +169,6 @@ begin
 end;
 $$ language plpgsql;
 
-
-drop trigger if exists card_actualization_gift on encuentra;
 create trigger card_actualization_gift after insert on encuentra
 for each row
 execute function actualization_gift();
@@ -165,10 +176,12 @@ execute function actualization_gift();
 
 --Consultas e insert de prueba
 insert into encuentra (jugador, carta, fecha_mejora, nivel_actual)
-values('#VQJ9UUP','Putin',current_date,1);
+values('#VQJ9UUP','Gus',current_date,1);
 
 select e.jugador, e.carta, e.fecha_mejora, e.nivel_actual from encuentra e
-where jugador = '#VQJ9UUP' and carta = 'Putin';
+where jugador = '#VQJ9UUP' and carta = 'Gus';
+
+delete from encuentra where jugador = '#VQJ9UUP' and carta = 'Gus';
 
 
 /*
@@ -239,39 +252,38 @@ execute function OPCard_function();
  *
  ******************************************************************************************/
 
--- Creamos un nuevo deck con la carta Gus para que tengan un porcentaje mayor que 90 de victorias
+-- Creamos un nuevo deck con la carta Gus para que tengan un porcentaje mayor que
+-- 90 de victorias. También veremos las características iniciales de la carta.
 insert into deck (id) values (100);
 insert into compuesto (carta, deck) values ('Gus', 100);
+select * from carta where nombre = 'Gus';
 
--- Despues de ejecutar este insert veremos que aparece la carta de gus en la blackList.
+
+-- Con esté insert creamos una nueva battalla en la que participa como deck ganador
+-- el deck anterior, veremos que aparece la carta de gus en la blackList.
 insert into batalla(id, deck_win, deck_lose)
 values (9999, 100, 101);
 
--- Podemos ver tamibén las características de la carta que ha salido en la lista.
-select * from carta where nombre = 'Gus';
 
--- Insertamos otra batalla y vemos que no cambia los datos de la carta porque no hace mas de
--- semana que está en la lista.
+-- Insertamos otra batalla y vemos que no cambia los datos de la carta porque no hace
+-- mas de semana que está en la lista.
 insert into batalla(id, deck_win, deck_lose)
 values (10000, 100, 101);
 select * from carta where nombre = 'Gus';
 
--- Ahora modificamos la tabla para que parezca que la carta lleva mas de una semana en la lista.
+-- Ahora modificamos la tabla para que parezca que la carta lleva mas de una semana en
+-- la lista y volvemos a añadir otra batalla para ver si cambian sus carcterísticas.
 update opcardblacklist set entering_date = '2022-06-7' where nombre = 'Gus';
-select * from opcardblacklist;
-
---Si volvemos a insertar otra batalla veremos que esta vez si modifica los datos de la carta.
-insert into batalla(id, deck_win, deck_lose)
-values (10001, 100, 101);
+insert into batalla(id, deck_win, deck_lose) values (10001, 100, 101);
 select * from carta where nombre = 'Gus';
 
 
 delete from batalla where id = 9999;
 delete from batalla where id = 10000;
 delete from batalla where id = 10001;
-update carta set daño = 103, velocidad_ataque = 200;
-delete from deck where id = 100;
+update carta set daño = 103, velocidad_ataque = 200 where nombre = 'Gus';
 delete from compuesto where carta = 'Gus' and deck = 100;
+delete from deck where id = 100;
 
 
 /*

@@ -170,20 +170,23 @@ where carta = 'Hal Roach''s Rascals';
  * consultes diferents per obtenir el mateix resultat.
  */
 
---Query 1
+--Query 1--TODO: Hemos sacado el left join de la consulta de depués del union.
 select c.nombre
 from carta c left join compuesto c2 on c.nombre = c2.carta
 where c2.carta is null
 union
 select c.nombre
-from carta c left join compuesto c2 on c.nombre = c2.carta
+from carta c join compuesto c2 on c.nombre = c2.carta
 group by c.nombre having count(c2.carta) = 1;
 
-
---Query 2
+--Query 2--TODO: Hemos cambiado la primera para prescindir del lleft join.
 select c.nombre
-from carta c left join compuesto c2 on c.nombre = c2.carta
-group by c.nombre having count(c2.carta) <= 1;
+from carta c
+where c.nombre not in (select compuesto.carta from compuesto)
+union
+select c.nombre
+from carta c join compuesto c2 on c.nombre = c2.carta
+group by c.nombre having count(c2.carta) = 1;
 
 
 --Comprobacion que solo hay 2 cartas con 0 decks y ninguna con 1 deck
@@ -223,9 +226,10 @@ where j.experiencia > (
     select avg(experiencia)
     from jugador j join formado f on j.id = f.jugador
     join clan c on f.clan = c.id
-    where j.nombre like '%a%' or j.nombre like '%A%'
-    group by c.nombre having c.nombre = 'NoA')
-order by m.fecha desc;
+    where (j.nombre like '%a%' or j.nombre like '%A%') and c.nombre = 'NoA'
+    --group by c.nombre
+    )
+order by m.fecha desc;--TODO: hemos sacado el grup by y puesto la condición en el where
 
 --Consultas de validación
 select avg(experiencia)
