@@ -187,6 +187,53 @@ where jugador = '#VQJ9UUP' and carta = 'Putin';
 */
 
 
+
+
+/*
+* 2.3) Final de temporada
+*/
+drop function if exists finalitza_temporada;
+create or replace function finalitza_temporada() returns trigger as $$
+begin
+    --select * from temporada where fecha_final = ((select fecha_inicio from temporada where fecha_final = new.fecha_inicio) - INTERVAL '1 DAY');
+
+    insert into ranking (player, trophies, arena)
+    --values (, 10000, 'yay');
+    values ((select temporada.nombre from temporada where fecha_final = ((select fecha_inicio from temporada where fecha_final = new.fecha_final) - INTERVAL '1 DAY')), 10000, 'yay');
+
+    return null;
+end;
+$$ language plpgsql;
+
+drop trigger if exists update_ranking on temporada;
+create trigger update_ranking after insert on temporada
+    for each row
+execute function finalitza_temporada();
+
+
+delete from temporada where nombre = 't11';
+delete from ranking where arena = 'yay';
+
+insert into temporada (nombre, fecha_inicio, fecha_final)
+VALUES ('t11', '2022-01-01', '2022-12-31');
+
+select temporada.nombre from temporada where fecha_final = ((select fecha_inicio from temporada where fecha_final = '2022-01-01') - INTERVAL '1 DAY');
+
+
+
+(select temporada.nombre from temporada where fecha_final = ((select fecha_inicio from temporada where fecha_final = new.fecha_inicio) - INTERVAL '1 DAY'));
+
+
+select * from temporada where fecha_final = (SELECT (select fecha_inicio from temporada where fecha_final = new.fecha_inicio) - INTERVAL '1 DAY');
+select * from temporada where fecha_final = (SELECT (select fecha_inicio from temporada where nombre = 'T10') - INTERVAL '1 DAY');
+
+select * from temporada order by fecha_final desc;
+select * from ranking;
+
+SELECT (select fecha_inicio from temporada where fecha_final = '2021-12-31') - INTERVAL '1 DAY';
+
+
+
 /*
 * 4.2) Batalla amb jugadors
 */
