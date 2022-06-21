@@ -372,8 +372,9 @@ create or replace function finalitza_temporada() returns trigger as $$
 begin
     --select * from temporada where fecha_final = ((select fecha_inicio from temporada where fecha_final = new.fecha_inicio) - INTERVAL '1 DAY');
 
+    select * from
+
     insert into ranking (player, trophies, arena)
-    --values (, 10000, 'yay');
     values ((select temporada.nombre from temporada where fecha_final = ((select fecha_inicio from temporada where fecha_final = new.fecha_final) - INTERVAL '1 DAY')), 10000, 'yay');
 
     return null;
@@ -409,18 +410,72 @@ SELECT (select fecha_inicio from temporada where fecha_final = '2021-12-31') - I
 
 
 
+select players.tag, sum(batalla.puntos_win)
+from batalla, players, deck
+where batalla.fecha between '2021-09-01' and '2021-12-31'
+  and players.tag = '#28CVU99UQ'
+  and deck.id = batalla.deck_win
+  and deck.jugador = players.tag
+group by players.tag;
+
+select batalla.id, players.tag, batalla.puntos_win from batalla
+    join deck on batalla.deck_win = deck.id or batalla.deck_lose = deck.id
+    --join deck on batalla.deck_lose = deck.id
+    join players on deck.jugador = players.tag
+where batalla.fecha between '2021-09-01' and '2021-12-31' and players.tag = '#28CVU99UQ'
+group by batalla.id, players.tag
+order by players.tag;
+
+select players.tag, sum(batalla.puntos_win)
+from batalla
+         join deck on batalla.deck_win = deck.id-- or batalla.deck_lose = deck.id
+--join deck on batalla.deck_lose = deck.id
+         join players on deck.jugador = players.tag
+where batalla.fecha between '2021-09-01' and '2021-12-31'
+  and players.tag = '#28CVU99UQ'
+group by players.tag;
+
+select players.tag, sum(batalla.puntos_lose)
+from batalla
+         join deck on batalla.deck_lose = deck.id
+         join players on deck.jugador = players.tag
+where batalla.fecha between '2021-09-01' and '2021-12-31'
+  and players.tag = '#28CVU99UQ'
+group by players.tag;
+
+insert into ranking(player, trophies, arena)
+select p.tag, SUM(wins_and_loses) as total_trophies, 'hehe'
+from (
+         /* suma todos los trofeos de las victorias */
+         select players.tag, sum(batalla.puntos_win) as wins_and_loses
+         from batalla
+                  join deck on batalla.deck_win = deck.id
+                  join players on deck.jugador = players.tag
+         where batalla.fecha between '2021-09-01' and '2021-12-31'
+           and players.tag = '#28CVU99UQ'
+         group by players.tag
+         union all
+         /* resta todos los trofeos de las derrotas */
+         select players.tag, sum(batalla.puntos_lose) as wins_and_loses
+         from batalla
+                  join deck on batalla.deck_lose = deck.id
+                  join players on deck.jugador = players.tag
+         where batalla.fecha between '2021-09-01' and '2021-12-31'
+           and players.tag = '#28CVU99UQ'
+         group by players.tag
+     ) p
+group by p.tag;
+
+select * from players;
+select * from compuesto;
+select * from carta;
+select * from deck;
+select * from batalla where id = 8059;
+
+
 /*
 * 4.2) Batalla amb jugadors
 */
-select * from batalla order by fecha;
-select * from deck order by id;
-
-
-
-select * from arena order by max_trofeos;
-select * from arenas order by mintrophies;
-
-
 drop function if exists actualiza_batalla;
 create or replace function actualiza_batalla() returns trigger as $$
 begin
@@ -449,10 +504,114 @@ create trigger update_player_trophies after insert on batalla
     for each row
 execute function actualiza_batalla();
 
+/* Validacions */
+insert into batalla(id, deck_win, deck_lose, fecha, durada, puntos_win, puntos_lose, batalla_clan)
+values (99999, 103, 102, '2024-02-14', '09:50:50', 10000, -10000, null);
+
+select jugador.id, jugador.nombre, jugador.trofeos from jugador
+where id = '#9Q8UCU0Q0'
+   or id = '#QV2PYL';
+
 delete from batalla
 where fecha = '2024-02-14';
 
-insert into batalla(id, deck_win, deck_lose, fecha, durada, puntos_win, puntos_lose, batalla_clan)
-values (99999, 103, 102, '2024-02-14', '09:50:50', 69, -69, null);
 
-select * from jugador order by trofeos desc;
+/*
+* 4.3) Corrupció de dades
+*/
+drop function if exists corrupcio_dades;
+create or replace function corrupcio_dades() returns trigger as $$
+begin
+
+    if (new.clan not in
+        (select clan.id
+         from clan)
+        ) then
+        insert into warnings(affected_table, error_mesage, date, usr)
+        values ('Dona', 'Jugador '|| new.jugador || ': Intent de donar ' || new.oro || ' de or a un clan anomenat ' || new.clan || ' que no existeix',
+                current_date, user);
+        return null;
+    end if;
+
+    if (new.jugador not in
+        (
+            select players.tag
+            from players
+                     join formado on formado.jugador = players.tag
+                     join clan on formado.clan = clan.id)
+        ) then
+        insert into warnings(affected_table, error_mesage, date, usr)
+        values ('Dona', 'Jugador '|| new.jugador || ': Intent de donar ' || new.oro || ' de or a ' || new.clan || ' sense pertanyer al clan',
+                current_date, user);
+        return null;
+    end if;
+
+    if (new.oro is null or new.oro < 1)
+    then
+        insert into warnings(affected_table, error_mesage, date, usr)
+        values ('Dona', 'Jugador '|| new.jugador || ': Intent de donar or amb valor "null" o "0". Or ha de ser un valor mes gran que 0.',
+                current_date, user);
+        return null;
+    end if;
+
+    return new;
+end;
+$$ language plpgsql;
+
+drop trigger if exists player_donation_warning on dona;
+create trigger player_donation_warning before insert or update on dona
+    for each row
+execute function corrupcio_dades();
+
+truncate warnings;
+
+insert into players(tag, name, experience, trophies, cardnumber, cardexpiry)
+values ('#MYTAG', 'Bartolo', 100000, 20000, 20202002, '2030-01-01');
+
+insert into dona(clan, jugador, oro, fecha)
+values ('#MYCLAN', '#MYTAG', 10, '2022-08-08');
+
+insert into dona(clan, jugador, oro, fecha)
+values ('#9GUCJRL0', '#MYTAG', 20, '2022-08-08');
+
+insert into dona(clan, jugador, oro, fecha)
+values ('#9GUCJRL0', '#CGJ8JRCR', null, '2022-08-08');
+
+insert into dona(clan, jugador, oro, fecha)
+values ('#9GUCJRL0', '#CGJ8JRCR', 0, '2022-08-08');
+
+update dona
+set oro = null
+where dona.id = 5400;
+
+select *
+from warnings;
+
+
+select * from clan;
+
+select *
+from players
+where players.tag = '#MYTAG';
+
+delete from players
+    where tag = '#MYTAG';
+
+insert into players(tag, name, experience, trophies, cardnumber, cardexpiry)
+values ('#MYTAG', 'Bartolo', 100000, 20000, 20202002, '2030-01-01');
+
+select players.tag from players
+    join formado on formado.jugador = players.tag
+    join clan on formado.clan = clan.id;
+
+select *
+from players;
+
+select *
+from formado
+where clan = '#9GUCJRL0';
+
+select * from dona;
+
+
+
