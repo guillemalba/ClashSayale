@@ -565,21 +565,27 @@ execute function corrupcio_dades();
 
 truncate warnings;
 
+/* introducimos un nuevo jugador que no pertenezca a ningun clan */
 insert into players(tag, name, experience, trophies, cardnumber, cardexpiry)
 values ('#MYTAG', 'Bartolo', 100000, 20000, 20202002, '2030-01-01');
 
+/* introducimos una donacion a un clan que no existe */
 insert into dona(clan, jugador, oro, fecha)
 values ('#MYCLAN', '#MYTAG', 10, '2022-08-08');
 
+/* introducimos una donacion de un jugador que no pertenece al clan que quiere donar */
 insert into dona(clan, jugador, oro, fecha)
 values ('#9GUCJRL0', '#MYTAG', 20, '2022-08-08');
 
+/* introducimos una donacion de un jugadro que pertenece al clan, pero con valor de oro = null */
 insert into dona(clan, jugador, oro, fecha)
 values ('#9GUCJRL0', '#CGJ8JRCR', null, '2022-08-08');
 
+/* introducimos una donacion de un jugadro que pertenece al clan, pero con valor de oro = 0 */
 insert into dona(clan, jugador, oro, fecha)
 values ('#9GUCJRL0', '#CGJ8JRCR', 0, '2022-08-08');
 
+/* update de una donacion con valor de oro = null */
 update dona
 set oro = null
 where dona.id = 5400;
@@ -587,31 +593,9 @@ where dona.id = 5400;
 select *
 from warnings;
 
-
-select * from clan;
-
-select *
-from players
-where players.tag = '#MYTAG';
-
-delete from players
-    where tag = '#MYTAG';
-
-insert into players(tag, name, experience, trophies, cardnumber, cardexpiry)
-values ('#MYTAG', 'Bartolo', 100000, 20000, 20202002, '2030-01-01');
-
-select players.tag from players
-    join formado on formado.jugador = players.tag
-    join clan on formado.clan = clan.id;
+/* introducimos una donacion valida */
+insert into dona(clan, jugador, oro, fecha)
+values ('#9GUCJRL0', '#8QR8V08YG', 100, '2022-08-08');
 
 select *
-from players;
-
-select *
-from formado
-where clan = '#9GUCJRL0';
-
-select * from dona;
-
-
-
+from dona where jugador = '#8QR8V08YG';
