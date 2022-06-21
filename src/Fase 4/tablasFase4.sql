@@ -7,7 +7,6 @@ create table Warnings
     usr             varchar(255)
 );
 
-
 drop table if exists OPCardBlackList;
 create table OPCardBlackList
 (

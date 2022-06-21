@@ -372,10 +372,34 @@ create or replace function finalitza_temporada() returns trigger as $$
 begin
     --select * from temporada where fecha_final = ((select fecha_inicio from temporada where fecha_final = new.fecha_inicio) - INTERVAL '1 DAY');
 
-    select * from
 
-    insert into ranking (player, trophies, arena)
-    values ((select temporada.nombre from temporada where fecha_final = ((select fecha_inicio from temporada where fecha_final = new.fecha_final) - INTERVAL '1 DAY')), 10000, 'yay');
+    insert into ranking(player, trophies, arena)
+        (select p.tag, SUM(wins_and_loses) as total_trophies, (select arena.nombre from arena, players
+                                                               where players.trophies between arena.min_trofeos and arena.max_trofeos
+                                                                 and players.tag = '#28CVU99UQ'
+                                                                 --and players.tag = '#QV2PYL'
+                                                                 and arena.max_trofeos <> 32767)
+         from (
+                  /* suma todos los trofeos de las victorias */
+                  select players.tag, sum(batalla.puntos_win) as wins_and_loses
+                  from batalla
+                           join deck on batalla.deck_win = deck.id
+                           join players on deck.jugador = players.tag
+                  where batalla.fecha between '2021-09-01' and '2021-12-31'
+                    and players.tag = '#28CVU99UQ'
+                  group by players.tag
+                  union all
+                  /* resta todos los trofeos de las derrotas */
+                  select players.tag, sum(batalla.puntos_lose) as wins_and_loses
+                  from batalla
+                           join deck on batalla.deck_lose = deck.id
+                           join players on deck.jugador = players.tag
+                  where batalla.fecha between '2021-09-01' and '2021-12-31'
+                    and players.tag = '#28CVU99UQ'
+                  group by players.tag
+              ) p
+         group by p.tag);
+    --values ((select temporada.nombre from temporada where fecha_final = ((select fecha_inicio from temporada where fecha_final = new.fecha_final) - INTERVAL '1 DAY')), 10000, 'yay');
 
     return null;
 end;
@@ -444,7 +468,15 @@ where batalla.fecha between '2021-09-01' and '2021-12-31'
 group by players.tag;
 
 insert into ranking(player, trophies, arena)
-select p.tag, SUM(wins_and_loses) as total_trophies, 'hehe'
+select '#yeye', 7988, 'hehehehehe';
+
+/*FINAL*/
+insert into ranking(player, trophies, arena)
+(select p.tag, SUM(wins_and_loses) as total_trophies, (select arena.nombre from arena, players
+                                                       where players.trophies between arena.min_trofeos and arena.max_trofeos
+                                                         and players.tag = '#28CVU99UQ'
+                                                         --and players.tag = '#QV2PYL'
+                                                         and arena.max_trofeos <> 32767)
 from (
          /* suma todos los trofeos de las victorias */
          select players.tag, sum(batalla.puntos_win) as wins_and_loses
@@ -452,7 +484,7 @@ from (
                   join deck on batalla.deck_win = deck.id
                   join players on deck.jugador = players.tag
          where batalla.fecha between '2021-09-01' and '2021-12-31'
-           and players.tag = '#28CVU99UQ'
+           --and players.tag = '#28CVU99UQ'
          group by players.tag
          union all
          /* resta todos los trofeos de las derrotas */
@@ -461,10 +493,29 @@ from (
                   join deck on batalla.deck_lose = deck.id
                   join players on deck.jugador = players.tag
          where batalla.fecha between '2021-09-01' and '2021-12-31'
-           and players.tag = '#28CVU99UQ'
+           --and players.tag = '#28CVU99UQ'
          group by players.tag
      ) p
-group by p.tag;
+group by p.tag);
+
+truncate ranking;
+
+select *
+from ranking;
+
+select * from warnings;
+select * from players;
+
+select arena.nombre from arena, players
+where players.trophies between arena.min_trofeos and arena.max_trofeos
+and players.tag = '#QV2PYL'
+and arena.max_trofeos <> 32767;
+
+select *
+from arena;
+
+select *
+from arena order by arena.min_trofeos ;
 
 select * from players;
 select * from compuesto;
