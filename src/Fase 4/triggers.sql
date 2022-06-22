@@ -359,6 +359,8 @@ select * from jugador where id = '#202C2CU0U';
 /*
 * 2.3) Final de temporada
 */
+drop trigger if exists update_ranking on temporada;
+
 drop function if exists finalitza_temporada;
 create or replace function finalitza_temporada() returns trigger as $$
 begin
@@ -394,7 +396,6 @@ begin
 end;
 $$ language plpgsql;
 
-drop trigger if exists update_ranking on temporada;
 create trigger update_ranking after insert on temporada
     for each row
 execute function finalitza_temporada();
@@ -407,6 +408,11 @@ from ranking order by trophies desc;
 
 delete from temporada where nombre = 't11';
 
+select arena.nombre from arena, jugador
+where jugador.trofeos between arena.min_trofeos and arena.max_trofeos
+  and jugador.id = '#VQJ9UUP'
+  and arena.max_trofeos <> 32767
+limit 1;
 
 /*
 * 4.1) Completar una missió
@@ -417,34 +423,32 @@ delete from temporada where nombre = 't11';
 
 
 
-
 /*
 * 4.2) Batalla amb jugadors
 */
+drop trigger if exists update_player_trophies on batalla;
+
 drop function if exists actualiza_batalla;
 create or replace function actualiza_batalla() returns trigger as $$
 begin
     update jugador
     set trofeos = trofeos + new.puntos_win
-    where jugador.id in (
+    where jugador.id = (
         select deck.jugador
-        from deck, batalla
-        where deck.id = batalla.deck_win
-            and new.id = batalla.id
-        );
+        from deck
+        where deck.id = new.deck_win
+    );
     update jugador
     set trofeos = trofeos + new.puntos_lose
-    where jugador.id in (
+    where jugador.id = (
         select deck.jugador
-        from deck, batalla
-        where deck.id = batalla.deck_lose
-            and new.id = batalla.id
+        from deck
+        where deck.id = new.deck_lose
     );
     return null;
 end;
 $$ language plpgsql;
 
-drop trigger if exists update_player_trophies on batalla;
 create trigger update_player_trophies after insert on batalla
     for each row
 execute function actualiza_batalla();
@@ -464,6 +468,8 @@ where fecha = '2024-02-14';
 /*
 * 4.3) Corrupció de dades
 */
+drop trigger if exists player_donation_warning on dona;
+
 drop function if exists corrupcio_dades;
 create or replace function corrupcio_dades() returns trigger as $$
 begin
@@ -478,12 +484,12 @@ begin
         return null;
     end if;
 
-    if (new.jugador not in
+    if (new.clan not in
         (
-            select jugador.id
-            from jugador
-                     join formado on formado.jugador = jugador.id
-                     join clan on formado.clan = clan.id)
+            select clan.id
+            from clan join formado on formado.clan = clan.id
+            join jugador on formado.jugador = jugador.id
+            where jugador.id = new.jugador)
         ) then
         insert into warnings(affected_table, error_mesage, date, usr)
         values ('Dona', 'Jugador '|| new.jugador || ': Intent de donar ' || new.oro || ' de or a ' || new.clan || ' sense pertanyer al clan',
@@ -503,7 +509,6 @@ begin
 end;
 $$ language plpgsql;
 
-drop trigger if exists player_donation_warning on dona;
 create trigger player_donation_warning before insert or update on dona
     for each row
 execute function corrupcio_dades();
@@ -544,3 +549,4 @@ values ('#9GUCJRL0', '#8QR8V08YG', 100, '2022-08-08');
 
 select *
 from dona where jugador = '#8QR8V08YG';
+
