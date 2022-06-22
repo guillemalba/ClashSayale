@@ -413,11 +413,6 @@ delete from temporada where nombre = 't11';
 * 4.1) Completar una missió
 */
 
-
-
-
-
-
 /*
 * 4.2) Batalla amb jugadors
 */

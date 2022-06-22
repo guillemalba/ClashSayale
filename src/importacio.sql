@@ -670,7 +670,7 @@ insert into pelea (batalla_clan, clan, fecha_inicio, fecha_fin)
 select id, '#JDI23H9S', '2019-02-21', '2021-12-31' from batalla_clan;
 
 
---------4.5
+--------4.5ANDREW TATE
 insert into insignia(nombre)
 values ('#insigniaGrupo9');
 
@@ -711,6 +711,26 @@ values ('#PQLGJ90Y', 'Mortero', '01-01-2021', 5);
 insert into jugador (id, nombre, experiencia, trofeos, oro, gemas, tarjeta)
 values ('#22UCV0000', 'Manolo', 100, 100, 1000, 200, null);
 
+-------------------------------------------------INSERTS FASE 4---------------------------------------------------------
+-- Triggers 3)
+-- Clan sense coLeader
+insert into clan (id, nombre, descripcion, trofeos_totales, minimo_trofeos, puntuacion)
+VALUES ('#1ABCDEF8', 'No CoLeader clan', 'Goal: trigger 3.2 validation', 2780, 2000, 67000);
+
+insert into jugador (id, nombre, experiencia, trofeos, oro, gemas, tarjeta)
+select concat(j.id, '2'), j.nombre, j.experiencia, j.trofeos, j.oro, j.gemas, j.tarjeta
+from jugador j join Formado f on j.id = f.jugador where f.clan like '#28V2QQ9C' and role not like 'coLeader%';
+
+insert into formado (clan, jugador, fecha, role)
+select '#1ABCDEF8', concat(jugador, '2'), fecha, role from Formado
+where clan like '#28V2QQ9C' and role not like 'coLeader%';
+
+-- Afegim l'usuari Admin
+create user admin superuser;
+alter user admin with password 'admin';
+alter user admin with createdb;
+alter user admin with replication;
+alter user admin with bypassrls;
 
 -- Drops de los CSV utilizados para la importación de datos.
 drop table if exists arena_pack cascade;
