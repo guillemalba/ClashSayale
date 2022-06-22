@@ -408,11 +408,6 @@ from ranking order by trophies desc;
 
 delete from temporada where nombre = 't11';
 
-select arena.nombre from arena, jugador
-where jugador.trofeos between arena.min_trofeos and arena.max_trofeos
-  and jugador.id = '#VQJ9UUP'
-  and arena.max_trofeos <> 32767
-limit 1;
 
 /*
 * 4.1) Completar una missió
@@ -453,7 +448,7 @@ create trigger update_player_trophies after insert on batalla
     for each row
 execute function actualiza_batalla();
 
-/* Validacions */
+/* Introducimos la nueva batalla */
 insert into batalla(id, deck_win, deck_lose, fecha, durada, puntos_win, puntos_lose, batalla_clan)
 values (99999, 103, 102, '2024-02-14', '09:50:50', 10000, -10000, null);
 
@@ -461,6 +456,16 @@ select jugador.id, jugador.nombre, jugador.trofeos from jugador
 where id = '#9Q8UCU0Q0'
    or id = '#QV2PYL';
 
+/* Volvemos a introducir los valores iniciales de los jugadores */
+update jugador
+set trofeos = 7606
+where id = '#QV2PYL';
+
+update jugador
+set trofeos = 7540
+where id = '#9Q8UCU0Q0';
+
+/* Eliminamos la batalla que hemos introducido */
 delete from batalla
 where fecha = '2024-02-14';
 
