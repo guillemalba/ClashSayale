@@ -336,23 +336,27 @@ join emoticono e on a.id = e.id_emoticono;
 select j.nombre, j.experiencia, t.numero_tarjeta
 from jugador j join tarjeta t on j.tarjeta = t.numero_tarjeta
 left join compra c on j.id = c.jugador
-where c.jugador is null;
+where c.jugador is null and experiencia > 150000;
 
 
 --Query 2
 select j.nombre, j.experiencia, t.numero_tarjeta
 from jugador j join tarjeta t on j.tarjeta = t.numero_tarjeta
-               left join compra c on j.id = c.jugador
-except
-select j.nombre, j.experiencia, t.numero_tarjeta
-from jugador j join tarjeta t on j.tarjeta = t.numero_tarjeta
-               left join compra c on j.id = c.jugador
-where c.jugador is not null;
+where j.experiencia > 150000 and t.numero_tarjeta not in (
+        select distinct tarjeta
+        from compra
+    );
 
 
 --Podemos ver que solo hay un jugador que no ha comprado ningun articulo, por lo tanto
 --la query anterior es correcta
 select count(distinct jugador) as num_jugadores
+from compra;
+
+select numero_tarjeta
+from tarjeta
+except
+select tarjeta
 from compra;
 
 
@@ -365,15 +369,14 @@ from compra;
 select distinct a.nombre
 from jugador j join compra c on j.id = c.jugador
 join articulo a on c.articulo = a.id
-join encuentra e on j.id = e.jugador
-where j.nombre in (
-    select j.nombre -- Jugadores con mas de 105 cartas
+where j.id in (
+    select j.id -- Jugadores con mas de 105 cartas
     from jugador j join encuentra e on j.id = e.jugador
-    group by j.nombre, j.id having count(e.carta) > 105
+    group by j.id having count(e.carta) > 105
     UNION
-    select j.nombre -- Jugadores con mas de 4 mensajes escritos
+    select j.id -- Jugadores con mas de 4 mensajes escritos
     from jugador j join escribe e on j.id = e.id_emisor
-    group by j.nombre having count(e.id_mensaje) > 4
+    group by j.id having count(e.id_mensaje) > 4
     )
 order by a.nombre desc;
 
@@ -383,13 +386,8 @@ order by a.nombre desc;
  * respostos, o els missatges sense respostes enviats a un clan. Ordena els resultats
  * segons la data del missatge i el text del missatge de més a menys valor.
  */
-(select cuerpo, fecha
-from mensaje
-where id in (
-    select distinct idmensajerespondido
-    from mensaje
-    where extract(year from fecha) = '2020')
-order by fecha desc, cuerpo desc)
+select distinct j.cuerpo, j.fecha
+from mensaje j join mensaje j2 on j.id = j2.idmensajerespondido
 union all
 select cuerpo, fecha
 from mensaje_clan
@@ -400,15 +398,39 @@ where id in (
     )
 order by fecha desc, cuerpo desc;
 
-select *
-from mensaje;
+--Validaciones primera parte
+select distinct j.id, j.cuerpo, j.fecha, j2.id as Respuesta
+from mensaje j join mensaje j2 on j.id = j2.idmensajerespondido;
 
+select *
+from mensaje
+where idmensajerespondido = 287;
+
+--Validaciones segunda parte
+select cuerpo, fecha, id
+from mensaje_clan
+where id in (
+    select m.id
+    from mensaje_clan m left join mensaje_clan m2 on m2.mensaje_respondido = m.id
+    where m2.id is null
+)
+order by fecha desc, cuerpo desc;
+
+select count(id)
+from mensaje_clan
+where mensaje_respondido = 683;
 
 /***************** APARTADO 3 *****************/
 /* 3.1
  * Llistar els clans (nom i descripció) i el nombre de jugadors que tenen una experiència
  * superior a 200.000. Filtra la sortida per tenir els clans amb més trofeus requerits.
  */
+select c.nombre as clan, c.descripcion, count(f.jugador) as num_judaors_XP200000
+from clan c join formado f on c.id = f.clan join jugador j on j.id = f.jugador
+where j.experiencia > 200000
+group by c.nombre, c.descripcion, c.minimo_trofeos
+order by c.minimo_trofeos desc;
+
 select c.nombre as clan, c.descripcion, count(f.jugador) as num_judaors_XP200000
 from clan c join formado f on c.id = f.clan join jugador j on j.id = f.jugador
 where j.experiencia > 200000
