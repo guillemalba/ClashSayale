@@ -427,27 +427,28 @@ where mensaje_respondido = 683;
  */
 select c.nombre as clan, c.descripcion, count(f.jugador) as num_judaors_XP200000
 from clan c join formado f on c.id = f.clan join jugador j on j.id = f.jugador
-where j.experiencia > 200000
+where j.experiencia > 200000 and c.minimo_trofeos = (
+    select c.minimo_trofeos
+    from clan c join formado f on c.id = f.clan join jugador j on j.id = f.jugador
+    where j.experiencia > 200000
+    order by c.minimo_trofeos desc
+    limit 1
+    )
 group by c.nombre, c.descripcion, c.minimo_trofeos
-order by c.minimo_trofeos desc;
+order by c.minimo_trofeos desc;--TODO: He añadido la subquery para que solo escogiera los clanes que tienen tantos trofeos como el que más.
 
-select c.nombre as clan, c.descripcion, count(f.jugador) as num_judaors_XP200000
-from clan c join formado f on c.id = f.clan join jugador j on j.id = f.jugador
-where j.experiencia > 200000
-group by c.nombre, c.descripcion, c.minimo_trofeos
-order by c.minimo_trofeos desc;
+
 
 /* 3.2
  * Llistar els 15 jugadors amb més experiència, la seva experiència i el nom del clan que pertany
  * si el clan que ha investigat una tecnologia amb un cost superior a 1000.
  */
-select j.nombre, j.experiencia, c.nombre
+select distinct j.nombre, j.experiencia, c.nombre
 from jugador as j join formado f on j.id = f.jugador join clan c on c.id = f.clan
                   join clan_modificador cm on c.id = cm.clan join modificador m on cm.modificador = m.nombre
                   join tecnologias t on m.nombre = t.nombre
 where m.coste_oro > 1000
-group by j.nombre, j.experiencia, c.nombre
-order by j.experiencia desc limit 15;
+order by j.experiencia desc limit 15;--TODO: He utilizado el distinct en vez del group by
 
 
 select nombre, experiencia from jugador order by experiencia desc;
@@ -479,10 +480,9 @@ group by c.nombre having count(e.nombre) > 2;
  * Enumera el nom dels clans, la descripció i els trofeus mínims ordenat de menor a major nivell de trofeus mínims per
  * als clans amb jugadors que tinguin més de 200.000 d’experiència i el rol co-líder.
  */
-select c.nombre, c.descripcion, c.minimo_trofeos
+select distinct c.nombre, c.descripcion, c.minimo_trofeos
 from clan c join formado f on c.id = f.clan join jugador j on j.id = f.jugador
 where j.experiencia > 200000 and f.role LIKE 'coLeader%'
-group by c.nombre, c.descripcion, c.minimo_trofeos
 order by c.minimo_trofeos asc;
 
 /* 3.6
@@ -508,7 +508,7 @@ where nombre in (
  * Enumerar el nom i la descripció de la tecnologia utilitzada pels clans que tenen una estructura "Monument"
  * construïda després del "01-01-2021". Ordena les dades segons el nom i la descripció de les tecnologies.
  */
-select t.nombre, m.descripcion
+select distinct t.nombre, m.descripcion
 from tecnologias t join modificador m on t.nombre = m.nombre
                    join clan_modificador cm on m.nombre = cm.modificador
                    join clan c on cm.clan = c.id
@@ -517,8 +517,8 @@ where c.nombre in (
     from clan c2 join clan_modificador cm2 on c2.id = cm2.clan
                  join modificador m2 on cm2.modificador = m2.nombre
                  join estructura e2 on m2.nombre = e2.nombre
-    where e2.nombre = 'Monument' and cm2.fecha > '01-05-2021')
-group by t.nombre, m.descripcion;
+    where e2.nombre = 'Monument' and cm2.fecha > '01-01-2021')
+;--TODO: He puesto la fecha correcta y he cambiado el group by por el distinct.
 
 
 /* 3.8
