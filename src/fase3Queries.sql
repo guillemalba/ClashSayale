@@ -7,6 +7,8 @@ select c.nombre, c.daño
 from carta c join tropas t on c.nombre = t.carta
 where velocidad_ataque > 100 and (c.nombre like '%k%' or c.nombre like '%K%');
 
+--Validación
+
 select c.nombre, c.velocidad_ataque
 from carta c join tropas t on c.nombre = t.carta
 order by c.velocidad_ataque desc;
@@ -227,14 +229,18 @@ where j.experiencia > (
     from jugador j join formado f on j.id = f.jugador
     join clan c on f.clan = c.id
     where (j.nombre like '%a%' or j.nombre like '%A%') and c.nombre = 'NoA')
-order by m.fecha desc;
+order by m.fecha;
 
 --Consultas de validación
+select j.nombre, experiencia
+from jugador j join formado f on j.id = f.jugador
+join clan c on f.clan = c.id
+where (j.nombre like '%a%' or j.nombre like '%A%') and  c.nombre = 'NoA';
+
 select avg(experiencia)
 from jugador j join formado f on j.id = f.jugador
 join clan c on f.clan = c.id
-where j.nombre like '%a%' or j.nombre like '%A%'
-group by c.nombre having c.nombre = 'NoA';
+where (j.nombre like '%a%' or j.nombre like '%A%') and  c.nombre = 'NoA';
 
 select j.nombre, j.experiencia, c.nombre
 from jugador j join formado f on j.id = f.jugador
