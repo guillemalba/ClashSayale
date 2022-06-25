@@ -483,7 +483,7 @@ group by c.nombre having count(e.nombre) > 2;
 select distinct c.nombre, c.descripcion, c.minimo_trofeos
 from clan c join formado f on c.id = f.clan join jugador j on j.id = f.jugador
 where j.experiencia > 200000 and f.role LIKE 'coLeader%'
-order by c.minimo_trofeos asc;
+order by c.minimo_trofeos asc; --TODO: Cambiado el group by por el distinct, más optimo
 
 /* 3.6
  * Necessitem canviar algunes dades a la base de dades. Hem d'incrementar un 25% el cost de les tecnologies que
