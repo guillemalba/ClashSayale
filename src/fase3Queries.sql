@@ -427,17 +427,16 @@ where mensaje_respondido = 683;
  */
 select c.nombre as clan, c.descripcion, count(f.jugador) as num_judaors_XP200000
 from clan c join formado f on c.id = f.clan join jugador j on j.id = f.jugador
-where j.experiencia > 200000 and c.minimo_trofeos = (
-    select c.minimo_trofeos
-    from clan c join formado f on c.id = f.clan join jugador j on j.id = f.jugador
-    where j.experiencia > 200000
-    order by c.minimo_trofeos desc
-    limit 1
-    )
+where j.experiencia > 200000 and c.minimo_trofeos = (select max(minimo_trofeos) from clan)
 group by c.nombre, c.descripcion, c.minimo_trofeos
 order by c.minimo_trofeos desc;--TODO: He añadido la subquery para que solo escogiera los clanes que tienen tantos trofeos como el que más.
 
-
+-- Query de validació: aquells clans que cumpleixin el contrari al requisit
+select c.nombre as clan, c.descripcion, count(f.jugador) as num_judaors_XP200000
+from clan c join formado f on c.id = f.clan join jugador j on j.id = f.jugador
+where j.experiencia < 200000 and c.minimo_trofeos < (select max(minimo_trofeos) from clan)
+group by c.nombre, c.descripcion, c.minimo_trofeos
+order by c.minimo_trofeos desc;
 
 /* 3.2
  * Llistar els 15 jugadors amb més experiència, la seva experiència i el nom del clan que pertany
@@ -450,6 +449,16 @@ from jugador as j join formado f on j.id = f.jugador join clan c on c.id = f.cla
 where m.coste_oro > 1000
 order by j.experiencia desc limit 15;--TODO: He utilizado el distinct en vez del group by
 
+-- Query de validació: el mateix objectiu utilitzant un altre cami
+select j.nombre
+from jugador j join formado f on f.jugador = j.id
+where f.clan in (select c.id
+                 from tecnologias t
+                          join modificador m on t.nombre = m.nombre
+                          join clan_modificador cm on m.nombre = cm.modificador
+                          join clan c on cm.clan = c.id
+                 where m.coste_oro > 1000)
+order by j.experiencia desc limit 15;
 
 select nombre, experiencia from jugador order by experiencia desc;
 
@@ -485,6 +494,13 @@ from clan c join formado f on c.id = f.clan join jugador j on j.id = f.jugador
 where j.experiencia > 200000 and f.role LIKE 'coLeader%'
 order by c.minimo_trofeos asc; --TODO: Cambiado el group by por el distinct, más optimo
 
+-- Query de validació
+select distinct c.nombre, c.descripcion, c.minimo_trofeos
+from clan c join (select distinct f.clan, f.jugador
+                from formado f join jugador j on f.jugador = j.id
+                where role like 'coLeader%' and j.experiencia > 200000) as Q1 on q1.clan = c.id
+order by c.minimo_trofeos asc;
+
 /* 3.6
  * Necessitem canviar algunes dades a la base de dades. Hem d'incrementar un 25% el cost de les tecnologies que
  * utilitzen els clans amb trofeus mínims superiors a la mitjana de trofeus mínims de tots els clans.
@@ -517,9 +533,24 @@ where c.nombre in (
     from clan c2 join clan_modificador cm2 on c2.id = cm2.clan
                  join modificador m2 on cm2.modificador = m2.nombre
                  join estructura e2 on m2.nombre = e2.nombre
-    where e2.nombre = 'Monument' and cm2.fecha > '01-01-2021')
-;--TODO: He puesto la fecha correcta y he cambiado el group by por el distinct.
+    where e2.nombre like 'Monument' and cm2.fecha > '01-01-2021'
+    )
+order by t.nombre, m.descripcion;--TODO: He puesto la fecha correcta y he cambiado el group by por el distinct.
 
+
+-- Afegim una estrctura nova
+insert into modificador(nombre, coste_oro, descripcion, daño, vel_ataque, daño_aparicion, radio, vida, dependencia)
+values ('#newTech', 320, '5.7 validation', 2,4, null, 2, 1, null);
+
+insert into tecnologias(nombre, nivel_max, dep_level)
+VALUES ('#newTech', 4, 5);
+
+insert into clan_modificador(clan, modificador, nivel, fecha)
+values ('#1ABCDEF8', 'Monument', 6, '02-01-2021');
+
+insert into clan_modificador(clan, modificador, nivel, fecha)
+values ('#1ABCDEF8', '#newTech', 7, '02-01-2021');
+select * from clan_modificador where modificador like 'Monument';
 
 /* 3.8
  * Enumera els clans amb un mínim de trofeus superior a 6900 i que hagin participat a totes les batalles de clans.
