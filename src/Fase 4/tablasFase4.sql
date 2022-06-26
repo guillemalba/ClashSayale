@@ -7,6 +7,26 @@ create table Warnings
     usr             varchar(255)
 );
 
+drop table if exists BannedWords;
+create table BannedWords(
+    bannedword   varchar(255)
+);
+
+insert into BannedWords(bannedword) values('tonto');
+insert into BannedWords(bannedword) values('puta');
+insert into BannedWords(bannedword) values('desgraciado');
+insert into BannedWords(bannedword) values('marica');
+insert into BannedWords(bannedword) values('maricon');
+insert into BannedWords(bannedword) values('zorra');
+insert into BannedWords(bannedword) values('cancer');
+insert into BannedWords(bannedword) values('burru');
+insert into BannedWords(bannedword) values('capullo');
+insert into BannedWords(bannedword) values('cabron');
+insert into BannedWords(bannedword) values('subnormal');
+
+
+
+
 drop table if exists OPCardBlackList;
 create table OPCardBlackList
 (

@@ -285,13 +285,12 @@ update carta set daño = 103, velocidad_ataque = 200 where nombre = 'Gus';
 delete from compuesto where carta = 'Gus' and deck = 100;
 delete from deck where id = 100;
 
-
 /*
 * 2.1) Actualitza les compres dels jugadors
 */
 
 --Ahora mismo solo suma cuando compras paquete de oferta
-drop function if exists actualiza_compra();
+drop function if exists actualiza_compra() cascade;
 create or replace function actualiza_compra() returns trigger as $$
 begin
     if(new.articulo = Any(select id_p_oferta from paquete_oferta) ) then
@@ -299,28 +298,24 @@ begin
         set gemas = gemas + (select po.gemas_contenido
             from paquete_oferta as po
             where po.id_p_oferta = new.articulo)
-        where jugador.id = new.jugador;
+        where id = new.jugador;
 
         update jugador
         set oro = oro + (select po.oro_contenido
             from paquete_oferta as po
             where po.id_p_oferta = new.articulo)
-        where jugador.id = new.jugador;
+        where id = new.jugador;
     end if;
 
     if(new.articulo = Any(select id_paquete from paquete_arena)) then
-        update jugador
+        update jugador--no Entra, la suma si que lo hace bien solo sale aqui el null;
         set oro = oro + (select n.oro from nivel_arena as n
-                                               join paquete_arena pa on pa.id_paquete = n.paquete
-                                               join articulo a on a.id = pa.id_paquete
-                                                where pa.id_paquete = new.articulo and n.arena = (select d2.arena
-                                                                 from desbloquea as d2
-                                                                          join jugador j2 on d2.jugador = j2.id
-                                                                 where jugador = new.jugador and d2.fecha = (select Max(fecha)
-                                                                                                              from desbloquea where jugador = new.jugador)))
-        where jugador.id = new.jugador;
+                                                where n.paquete = new.articulo and n.arena = (select arena.id from arena, jugador
+                                                                                                  where jugador.trofeos between arena.min_trofeos and arena.max_trofeos
+                                                                                                    and jugador.id = new.jugador
+                                                                                                    and arena.max_trofeos <> 32767)) --limit1))*/
+        where id = new.jugador;
     end if;
-
     return null;
 end
 $$ language plpgsql;
@@ -331,8 +326,6 @@ create trigger update_player_items after insert on compra
 execute procedure actualiza_compra();
 
 
-
-
 --Tornar a ficar la pasta y las gemas al jugador de proves
 update  jugador set oro = 310498, gemas = 78625 where id = '#202C2CU0U';
 
@@ -340,21 +333,218 @@ update  jugador set oro = 310498, gemas = 78625 where id = '#202C2CU0U';
 --Treiem el or i les gemes del jugador abans
 select * from jugador where id = '#202C2CU0U';
 
+
+
 --Fem insert d'un jugador que compra un paqquet d'oferta(es sumen 65701 d'or y 10 gemes)
 insert  into compra(jugador, tarjeta, articulo, fecha, descuento)
 values ('#202C2CU0U',626381901632479,83,'2022-06-13',12.64);
-
---Fem insert d'un paquet d'arena(es sumen 8377 d'or)
-insert  into compra(jugador, tarjeta, articulo, fecha, descuento)
-values ('#202C2CU0U',626381901632479,4,'2022-06-13',12.64);
-
-
---Fem insert d'un article que no ens dona ni or ni gemes (no canvia res)
-insert  into compra(jugador, tarjeta, articulo, fecha, descuento)
-values ('#202C2CU0U',626381901632479,80,'2022-06-13',12.64);
-
---Tornem a treure l'or i les gemes del jugador per veure la diferencia
+--Comprovamos el cambio
 select * from jugador where id = '#202C2CU0U';
+
+
+
+--Fem select per saber quina arena es troba el jugador
+select arena.id from arena, jugador
+ where jugador.trofeos between arena.min_trofeos and arena.max_trofeos
+   and jugador.id = '#202C2CU0U'
+   and arena.max_trofeos <> 32767;
+
+--El oro que deberia sumar
+select n.oro from nivel_arena as n
+where n.paquete = 140 and n.arena =(select arena.id from arena, jugador
+                                    where jugador.trofeos between arena.min_trofeos and arena.max_trofeos
+                                      and jugador.id = '#202C2CU0U'
+                                      and arena.max_trofeos <> 32767);
+
+
+
+--Fem insert d'un paquet d'arena(es sumen 1311 d'or)
+insert  into compra(jugador, tarjeta, articulo, fecha, descuento)
+values ('#202C2CU0U',626381901632479,140,'2022-06-13',12.64);
+--Comprovamos el cambio
+select * from jugador where id = '#202C2CU0U';
+
+
+--Fem insert d'un cofre que no ens dona ni or ni gemes (no canvia res)
+insert  into compra(jugador, tarjeta, articulo, fecha, descuento)
+values ('#202C2CU0U',626381901632479,38,'2022-06-13',12.64);
+
+--Fem la compra de un emoticono que no ens dona ni or ni gemes
+insert  into compra(jugador, tarjeta, articulo, fecha, descuento)
+values ('#202C2CU0U',626381901632479,48,'2022-06-13',12.64);
+--Comprovamos el cambio
+select * from jugador where id = '#202C2CU0U';
+
+
+
+
+/*
+ *2.2) Com tenim les taules de missatges y missatges jugadors separades, fem dos triggers que ens permetin controlar els dos tipus de missatges.
+ */
+
+--Funcio/trigger dels misssatges entre jugadors
+drop function if exists actualiza_missatges_jugador() cascade;
+create or replace function actualiza_missatges_jugador() returns trigger as $$
+begin
+    --creamos tabla aux para guardar el mensaje
+    drop table if exists aux;
+    create table aux(
+        palabra   varchar(255)
+    );
+    insert into aux(palabra) select regexp_split_to_table((select cuerpo from mensaje where id = new.id_mensaje),' ');
+
+    if((select Count(palabra) from aux where palabra in (select bannedword from bannedwords)) > 0 ) then
+
+        update jugador
+        set nombre = '_Banned_' || nombre
+        where id = new.id_emisor;
+
+        drop table if exists aux2;
+        create table aux2(
+            id              serial,
+            palabraBanned   varchar(255)
+        );
+        insert into aux2(palabraBanned) select palabra from aux where palabra in (select bannedword from bannedwords);
+
+        DECLARE
+            contador integer := 1;
+        begin
+            loop
+                insert into warnings(affected_table, error_mesage, date, usr) values('Mensaje','Missatge d odi enviat amb la paraula '||(select palabraBanned from aux2 where id = contador)|| ' a l usuari ' || new.id_receptor,(select fecha from mensaje where id = new.id_mensaje),(select j.nombre from jugador as j where j.id = new.id_emisor));
+            if contador = (select count(palabraBanned)from aux2) then
+                Exit;
+            end if;
+                contador = contador +1;
+        end loop;
+        end;
+    end if;
+    drop table if exists aux;
+    drop table if exists aux2;
+    return null;
+    end
+$$ language plpgsql;
+
+drop trigger if exists Banned_Words on escribe;
+create trigger Banned_Words after insert on escribe
+    for each row
+execute procedure actualiza_missatges_jugador();
+--
+
+--Borrem missatge
+delete from escribe where id_mensaje = 1001;
+delete from mensaje where id = 1001;
+delete from escribe where id_mensaje = 1002;
+delete from mensaje where id = 1002;
+delete from escribe where id_mensaje = 1003;
+delete from mensaje where id = 1003;
+
+--Tornem a ficar el nom que tocaba
+update jugador set nombre = '⚡Manoel⚡' where id  = '#202C2CU0U';
+update jugador set nombre = 'ClashKiller125' where id = '#202U2J08Q';
+
+--Borrem el warning
+delete from warnings where affected_table = 'Mensaje';
+
+
+
+--Validació
+
+--Insert sense paraules prohibides
+insert into mensaje(id,cuerpo,fecha,idmensajerespondido) values (1001, 'me encanta este juego bro','2022-06-13',null);
+insert into escribe(id_emisor, id_receptor, id_mensaje) values('#202C2CU0U','#208GJV',(select id from mensaje order by id desc limit 1));
+
+--Fem els inserts per activar el trigger( amb una paraula prohibida)
+insert into mensaje(id,cuerpo,fecha,idmensajerespondido) values (1002, 'Eres una zorra','2022-06-13',null);
+insert into escribe(id_emisor, id_receptor, id_mensaje) values('#202C2CU0U','#208GJV',(select id from mensaje order by id desc limit 1));
+
+--Fem els insert per activar el trigger( amb mes d'una paraula)
+insert into mensaje(id,cuerpo,fecha,idmensajerespondido) values (1003, 'Eres una zorra y puta','2022-06-13',null);
+insert into escribe(id_emisor, id_receptor, id_mensaje) values('#202U2J08Q','#208GJV',(select id from mensaje order by id desc limit 1));
+
+
+--Comprobem les taules afectades
+select * from warnings where affected_table = 'mensaje';
+select * from jugador where nombre like '%_Banned_%';
+
+
+--Funcio/Trigger per al missatges del clan
+drop function if exists actualiza_missatges_clan() cascade;
+create or replace function actualiza_missatges_clan() returns trigger as $$
+begin
+
+    --creamos tabla aux para guardar el mensaje
+    drop table if exists aux;
+    create table aux(
+        palabra   varchar(255)
+    );
+    insert into aux(palabra) select regexp_split_to_table(new.cuerpo,' ');
+
+    if((select Count(palabra) from aux where palabra in (select bannedword from bannedwords)) >0 ) then
+
+    update jugador
+    set nombre = '_Banned_' || nombre
+    where id = new.emisor;
+
+    drop table if exists aux2;
+    create table aux2(
+            id              serial,
+            palabraBanned   varchar(255)
+    );
+    insert into aux2(palabraBanned) select palabra from aux where palabra in (select bannedword from bannedwords);
+
+    DECLARE
+        contador integer := 1;
+
+    begin
+        loop
+            insert into warnings(affected_table, error_mesage, date, usr) values('Mensaje','Missatge d odi enviat amb la paraula '||(select palabraBanned from aux2 where id = contador)|| ' al clan ' || (select c.nombre from clan as c where c.id = new.receptor),new.fecha,(select j.nombre from jugador as j where j.id = new.emisor));
+            if contador = (select count(palabraBanned)from aux2) then
+                Exit;
+            end if;
+            contador = contador +1;
+        end loop;
+
+        end;
+        drop table if exists aux;
+        drop table if exists aux2;
+    end if;
+    return null;
+
+end
+$$ language plpgsql;
+
+drop trigger if exists Banned_Words2 on mensaje_clan;
+create trigger Banned_Words2 after insert on mensaje_clan
+    for each row
+execute procedure actualiza_missatges_clan();
+
+
+--Insert d'un missatge sense paraules prohibides
+insert into mensaje_clan(id,cuerpo,fecha,emisor,receptor,mensaje_respondido) values (1001, 'Me encanta este juego ','2022-06-13','#202C2CU0U','#8YQ9LPPV',null);
+
+--Insert d'un missatge amb una paraula prohibida
+insert into mensaje_clan(id,cuerpo,fecha,emisor,receptor,mensaje_respondido) values (1002, 'Eres una zorra ','2022-06-13','#202C2CU0U','#8YQ9LPPV',null);
+
+--Insert d'un missatge amb més d'una paraula prohibida
+insert into mensaje_clan(id,cuerpo,fecha,emisor,receptor,mensaje_respondido) values (1003, 'Eres una tonto y desgraciado ','2022-06-13','##202U2J08Q','#8YQ9LPPV',null);
+
+
+
+--Tornem a ficar el nom que tocaba
+update jugador set nombre = '⚡Manoel⚡' where id  = '#202C2CU0U';
+update jugador set nombre = 'ClashKiller125' where id = '#202U2J08Q';
+
+--Borrem el warning
+delete from warnings where affected_table = 'Mensaje';
+
+--Borramos el mensaje
+delete from mensaje_clan where id = 1001;
+delete from mensaje_clan where id = 1002;
+delete from mensaje_clan where id = 1003;
+
+
+
+
 
 /*
 * 2.3) Final de temporada
@@ -412,9 +602,96 @@ delete from temporada where nombre = 't11';
 /*
 * 4.1) Completar una missió
 */
+drop function if exists finalitza_misio() cascade;
+create or replace function finalitza_misio() returns trigger as $$
+begin
+
+    if(new.mision in (select m.id from mision as m where m.mision_dep is null))  then
+
+    update jugador
+    set oro = oro + (select ma.recompensa_oro from mision_arena as ma
+                        join mision m on m.id = ma.mision join realiza r on m.id = r.mision
+                            where new.mision = ma.mision and ma.arena = (select arena.id from arena, jugador
+                                                                         where jugador.trofeos between arena.min_trofeos and arena.max_trofeos
+                                                                           and jugador.id = new.jugador
+                                                                           and arena.max_trofeos <> 32767) --limit 1)
+                        limit 1)
+    where id = new.jugador;
+
+    update jugador
+    set experiencia = experiencia + (select ma.experiencia from mision_arena as ma
+                                        join mision m on m.id = ma.mision join realiza r on m.id = r.mision
+                                            where new.mision = ma.mision and ma.arena = (select arena.id from arena, jugador
+                                                                  where jugador.trofeos between arena.min_trofeos and arena.max_trofeos
+                                                                    and jugador.id = new.jugador
+                                                                    and arena.max_trofeos <> 32767)--limit 1)
+                                            limit 1)
+    where id = new.jugador;
 
 
+    else
+        --Aqui poner si tiene requerimiento cumplido
+       if (new.jugador in (select r.jugador from realiza as r join mision m on m.id = r.mision where m.id =(select m.mision_dep from mision as m where m.id = new.mision ))) then
+            update jugador
+            set oro = oro + (select ma.recompensa_oro from mision_arena as ma
+                                                               join mision m on m.id = ma.mision join realiza r on m.id = r.mision
+                             where new.mision = ma.mision and ma.arena = (select arena.id from arena, jugador
+                                                                          where jugador.trofeos between arena.min_trofeos and arena.max_trofeos
+                                                                            and jugador.id = new.jugador
+                                                                            and arena.max_trofeos <> 32767) --limit 1)
+                             limit 1)
+            where id = new.jugador;
 
+            update jugador
+            set experiencia = experiencia + (select ma.experiencia from mision_arena as ma
+                                                                            join mision m on m.id = ma.mision join realiza r on m.id = r.mision
+                                             where new.mision = ma.mision and ma.arena = (select arena.id from arena, jugador
+                                                                                          where jugador.trofeos between arena.min_trofeos and arena.max_trofeos
+                                                                                            and jugador.id = new.jugador
+                                                                                            and arena.max_trofeos <> 32767)--limit 1)
+                                             limit 1)
+            where id = new.jugador;
+            else
+                insert into warnings(affected_table, error_mesage, date, usr) values ('realiza','L entrada de la quest per a ' || (select m.nombre from mision as m where m.id = new.mision)|| 's ha realitzat sense completar el ' || (select m.nombre from mision as m where m.id = (select m.mision_dep from mision as m where m.id = new.mision))|| ' prerequisit',
+                                                                                      new.fecha,(select j.nombre from jugador as j where j.id = new.jugador));
+        end if;
+    end if;
+    return null;
+end
+$$ language plpgsql;
+
+drop trigger if exists update_misio on realiza;
+create trigger update_misio after insert on realiza
+    for each row
+execute procedure finalitza_misio();
+
+--Arenea 17
+select * from jugador where id = '#202C2CU0U';
+--Mision sin prerequisito -> arena 17 mision 2 = exp-154954 oro-16
+insert into realiza(mision, jugador, fecha) values(2,'#202C2CU0U','2022-06-13');
+
+
+--Arenea 17
+select * from jugador where id = '#202C2CU0U';
+--Mision con prerequisito cumplido -> arena 17 mision 50 = exp-3832 oro-192
+insert into realiza(mision, jugador, fecha) values(50,'#202C2CU0U','2022-06-13');
+
+
+--Arenea 17
+select * from jugador where id = '#202C2CU0U';
+--Mision con prerequisito no cumplido -> prereq 13 no cumplida
+insert into realiza(mision, jugador, fecha) values(47,'#202C2CU0U','2022-06-13');
+--Mirem el warning que ens indica que no s ha sumat re
+select * from warnings;
+
+
+--Torna a tot el seu valor normal
+update jugador set oro = 310498 where id = '#202C2CU0U';
+update jugador set experiencia = 126481 where id = '#202C2CU0U';
+delete from realiza where id = 1001;
+delete from realiza where id = 1002;
+delete from realiza where id = 1003;
+delete from warnings where affected_table = 'realiza';
 
 
 
