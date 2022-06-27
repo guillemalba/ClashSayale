@@ -308,7 +308,7 @@ begin
     end if;
 
     if(new.articulo = Any(select id_paquete from paquete_arena)) then
-        update jugador--no Entra, la suma si que lo hace bien solo sale aqui el null;
+        update jugador
         set oro = oro + (select n.oro from nivel_arena as n
                                                 where n.paquete = new.articulo and n.arena = (select arena.id from arena, jugador
                                                                                                   where jugador.trofeos between arena.min_trofeos and arena.max_trofeos
@@ -445,13 +445,11 @@ update jugador set nombre = 'ClashKiller125' where id = '#202U2J08Q';
 --Borrem el warning
 delete from warnings where affected_table = 'Mensaje';
 
-
-
 --Validació
 
 --Insert sense paraules prohibides
 insert into mensaje(id,cuerpo,fecha,idmensajerespondido) values (1001, 'me encanta este juego bro','2022-06-13',null);
-insert into escribe(id_emisor, id_receptor, id_mensaje) values('#202C2CU0U','#208GJV',(select id from mensaje order by id desc limit 1));
+insert into escribe(id_emisor, id_receptor, id_mensaje) values('#2092CR2RV','#208GJV',(select id from mensaje order by id desc limit 1));
 
 --Fem els inserts per activar el trigger( amb una paraula prohibida)
 insert into mensaje(id,cuerpo,fecha,idmensajerespondido) values (1002, 'Eres una zorra','2022-06-13',null);
@@ -463,7 +461,7 @@ insert into escribe(id_emisor, id_receptor, id_mensaje) values('#202U2J08Q','#20
 
 
 --Comprobem les taules afectades
-select * from warnings where affected_table = 'mensaje';
+select * from warnings where affected_table like 'Mensaje';
 select * from jugador where nombre like '%_Banned_%';
 
 
@@ -497,7 +495,7 @@ begin
 
     begin
         loop
-            insert into warnings(affected_table, error_mesage, date, usr) values('Mensaje','Missatge d odi enviat amb la paraula '||(select palabraBanned from aux2 where id = contador)|| ' al clan ' || (select c.nombre from clan as c where c.id = new.receptor),new.fecha,(select j.nombre from jugador as j where j.id = new.emisor));
+            insert into warnings(affected_table, error_mesage, date, usr) values('Mensaje','Missatge d odi enviat amb la paraula '||(select palabraBanned from aux2 where id = contador)|| ' al clan ' || (select c.id from clan as c where c.id = new.receptor),new.fecha,(select j.nombre from jugador as j where j.id = new.emisor));
             if contador = (select count(palabraBanned)from aux2) then
                 Exit;
             end if;
@@ -520,30 +518,29 @@ execute procedure actualiza_missatges_clan();
 
 
 --Insert d'un missatge sense paraules prohibides
-insert into mensaje_clan(id,cuerpo,fecha,emisor,receptor,mensaje_respondido) values (1001, 'Me encanta este juego ','2022-06-13','#202C2CU0U','#8YQ9LPPV',null);
+insert into mensaje_clan(id,cuerpo,fecha,emisor,receptor,mensaje_respondido) values (1001, 'Me encanta este juego ',
+                                                                                     '2022-06-13','#2092CR2RV','#8YQ9LPPV',null);
 
 --Insert d'un missatge amb una paraula prohibida
-insert into mensaje_clan(id,cuerpo,fecha,emisor,receptor,mensaje_respondido) values (1002, 'Eres una zorra ','2022-06-13','#202C2CU0U','#8YQ9LPPV',null);
+insert into mensaje_clan(id,cuerpo,fecha,emisor,receptor,mensaje_respondido) values (1002, 'Eres una zorra ','2022-06-13',
+                                                                                     '#202C2CU0U','#8YQ9LPPV',null);
 
 --Insert d'un missatge amb més d'una paraula prohibida
-insert into mensaje_clan(id,cuerpo,fecha,emisor,receptor,mensaje_respondido) values (1003, 'Eres una tonto y desgraciado ','2022-06-13','##202U2J08Q','#8YQ9LPPV',null);
-
-
+insert into mensaje_clan(id,cuerpo,fecha,emisor,receptor,mensaje_respondido) values (1003, 'Eres una tonto y desgraciado ',
+                                                                                     '2022-06-13','#202U2J08Q','#8YQ9LPPV',null);
+--Comprobem les taules afectades
+select * from warnings where affected_table like 'Mensaje';
+select * from jugador where nombre like '%_Banned_%';
 
 --Tornem a ficar el nom que tocaba
 update jugador set nombre = '⚡Manoel⚡' where id  = '#202C2CU0U';
 update jugador set nombre = 'ClashKiller125' where id = '#202U2J08Q';
-
 --Borrem el warning
 delete from warnings where affected_table = 'Mensaje';
-
 --Borramos el mensaje
 delete from mensaje_clan where id = 1001;
 delete from mensaje_clan where id = 1002;
 delete from mensaje_clan where id = 1003;
-
-
-
 
 
 /*
@@ -627,10 +624,7 @@ begin
                                                                     and arena.max_trofeos <> 32767)--limit 1)
                                             limit 1)
     where id = new.jugador;
-
-
     else
-        --Aqui poner si tiene requerimiento cumplido
        if (new.jugador in (select r.jugador from realiza as r join mision m on m.id = r.mision where m.id =(select m.mision_dep from mision as m where m.id = new.mision ))) then
             update jugador
             set oro = oro + (select ma.recompensa_oro from mision_arena as ma
@@ -665,16 +659,21 @@ create trigger update_misio after insert on realiza
     for each row
 execute procedure finalitza_misio();
 
+
 --Arenea 17
 select * from jugador where id = '#202C2CU0U';
 --Mision sin prerequisito -> arena 17 mision 2 = exp-154954 oro-16
 insert into realiza(mision, jugador, fecha) values(2,'#202C2CU0U','2022-06-13');
+--Arenea 17
+select * from jugador where id = '#202C2CU0U';
 
 
 --Arenea 17
 select * from jugador where id = '#202C2CU0U';
 --Mision con prerequisito cumplido -> arena 17 mision 50 = exp-3832 oro-192
 insert into realiza(mision, jugador, fecha) values(50,'#202C2CU0U','2022-06-13');
+--Arenea 17
+select * from jugador where id = '#202C2CU0U';
 
 
 --Arenea 17
@@ -683,6 +682,8 @@ select * from jugador where id = '#202C2CU0U';
 insert into realiza(mision, jugador, fecha) values(47,'#202C2CU0U','2022-06-13');
 --Mirem el warning que ens indica que no s ha sumat re
 select * from warnings;
+--Arenea 17
+select * from jugador where id = '#202C2CU0U';
 
 
 --Torna a tot el seu valor normal
