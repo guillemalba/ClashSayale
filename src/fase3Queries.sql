@@ -576,6 +576,15 @@ where oro >= 8000
 group by a.nombre, a.max_trofeos, a.min_trofeos
 having nombre like 'A%';
 
+/* query de validacion */
+select DISTINCT (arena)
+from nivel_arena
+         join arena a on a.id = nivel_arena.arena
+where oro > 8000
+  and a.nombre like 'A%'
+order by arena;
+
+
 /* 4.2
  * Llista de nom, data d'inici, data de finalització de les temporades i, de les batalles d'aquestes temporades, el nom
  * del jugador guanyador si el jugador té més victòries que derrotes i la seva experiència és més gran de 200.000.
@@ -648,6 +657,22 @@ where j.experiencia > 170000
   and c.fecha >= '2021-10-25'
 group by a.nombre
 order by a.nombre asc;
+
+/* Query de validacio */
+select *
+from arena
+where arena.nombre not in (select a.nombre
+                           from arena a,
+                                jugador j,
+                                insignia i,
+                                consigue c
+                           where j.experiencia > 170000
+                             and c.jugador = j.id
+                             and a.id = c.arena
+                             and i.nombre = c.insignia
+                             and c.fecha >= '2021-10-25'
+                           group by a.nombre);
+
 
 /* 4.5
  * Enumerar el nom de la insígnia, els noms de les cartes i el dany de les cartes dels jugadors amb una experiència
