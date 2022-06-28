@@ -580,7 +580,6 @@ having nombre like 'A%';
  * Llista de nom, data d'inici, data de finalització de les temporades i, de les batalles d'aquestes temporades, el nom
  * del jugador guanyador si el jugador té més victòries que derrotes i la seva experiència és més gran de 200.000.
  */
- /* TODO: revisar otra vez*/
 select t.nombre,
        t.fecha_inicio,
        t.fecha_final,
@@ -706,7 +705,7 @@ where a.nombre like '%Lliga%'
 group by a.nombre
 order by a.nombre;
 
-/* TODO: he cambiado la palabra "Lliga" por "Legendary" para que salga algun resultado*/
+/* He cambiado la palabra "Lliga" por "Legendary" para que salga algun resultado ya que ninguna arena lleva la palabra LLiga */
 select a.nombre as nombre_arena
 from consigue as c
          join arena a on a.id = c.arena

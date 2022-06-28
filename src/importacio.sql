@@ -5,7 +5,7 @@ create table arena_pack(
                            gold    int
 );
 
-copy arena_pack from '/Users/Shared/Bases/Base/arena_pack.csv' csv header delimiter ',';
+copy arena_pack from '/Users/guillemalba/Downloads/DB2021-2022-datasets/arena_pack.csv' csv header delimiter ',';
 
 drop table if exists arenas cascade ;
 create table arenas(
@@ -16,7 +16,7 @@ create table arenas(
 );
 
 
-copy arenas from '/Users/Shared/Bases/Base/arenas.csv' csv header delimiter ',';
+copy arenas from '/Users/guillemalba/Downloads/DB2021-2022-datasets/arenas.csv' csv header delimiter ',';
 
 drop table if exists battles cascade;
 create table battles(
@@ -29,7 +29,7 @@ create table battles(
                         clan_battle        int
 );
 
-copy battles from '/Users/Shared/Bases/Base/battles.csv' csv header delimiter ',';
+copy battles from '/Users/guillemalba/Downloads/DB2021-2022-datasets/battles.csv' csv header delimiter ',';
 
 drop table if exists buildings cascade;
 create table buildings(
@@ -45,7 +45,7 @@ create table buildings(
                           description         text
 );
 
-copy buildings from '/Users/Shared/Bases/Base/buildings.csv' csv header delimiter ',';
+copy buildings from '/Users/guillemalba/Downloads/DB2021-2022-datasets/buildings.csv' csv header delimiter ',';
 
 drop table if exists cards cascade;
 create table cards(
@@ -58,7 +58,7 @@ create table cards(
                       lifetime        int,
                       radious         int
 );
-copy cards from '/Users/Shared/Bases/Base/cards.csv' csv header delimiter ',';
+copy cards from '/Users/guillemalba/Downloads/DB2021-2022-datasets/cards.csv' csv header delimiter ',';
 
 drop table if exists clan_battles cascade;
 create table clan_battles(
@@ -68,7 +68,7 @@ create table clan_battles(
                              end_date     date
 );
 
-copy clan_battles from '/Users/Shared/Bases/Base/clan_battles.csv' csv header delimiter ',';
+copy clan_battles from '/Users/guillemalba/Downloads/DB2021-2022-datasets/clan_battles.csv' csv header delimiter ',';
 
 -----------DANI-------------------------------------------------------------DANI-------------
 
@@ -81,7 +81,7 @@ create table clan_tech_structures
     date        date,
     level       integer
 );
-copy clan_tech_structures from '/Users/Shared/Bases/Base/clan_tech_structures.csv' csv header delimiter ',';
+copy clan_tech_structures from '/Users/guillemalba/Downloads/DB2021-2022-datasets/clan_tech_structures.csv' csv header delimiter ',';
 
 drop table if exists clans cascade;
 create table clans
@@ -93,7 +93,7 @@ create table clans
     score               integer,
     trophies            integer
 );
-copy clans from '/Users/Shared/Bases/Base/clans.csv' csv header delimiter ',';
+copy clans from '/Users/guillemalba/Downloads/DB2021-2022-datasets/clans.csv' csv header delimiter ',';
 
 drop table if exists friends cascade;
 create table friends
@@ -101,7 +101,7 @@ create table friends
     requester   varchar(255),
     requeted    varchar(255)
 );
-copy friends from '/Users/Shared/Bases/Base/friends.csv' csv  header delimiter ',';
+copy friends from '/Users/guillemalba/Downloads/DB2021-2022-datasets/friends.csv' csv  header delimiter ',';
 
 drop table if exists messages_between_players cascade;
 create table messages_between_players
@@ -113,7 +113,7 @@ create table messages_between_players
     date        date,
     answer      integer
 );
-copy messages_between_players from '/Users/Shared/Bases/Base/messages_between_players.csv' csv header delimiter ',';
+copy messages_between_players from '/Users/guillemalba/Downloads/DB2021-2022-datasets/messages_between_players.csv' csv header delimiter ',';
 
 drop table if exists messages_to_clans cascade;
 create table messages_to_clans
@@ -125,7 +125,7 @@ create table messages_to_clans
     date        date,
     answer      integer
 );
-copy messages_to_clans from '/Users/Shared/Bases/Base/messages_to_clans.csv' csv header delimiter ',';
+copy messages_to_clans from '/Users/guillemalba/Downloads/DB2021-2022-datasets/messages_to_clans.csv' csv header delimiter ',';
 
 drop table if exists player_purchases cascade;
 create table player_purchases
@@ -148,7 +148,7 @@ create table player_purchases
     emote_name          varchar(255),
     emote_path          varchar(255)
 );
-copy player_purchases from '/Users/Shared/Bases/Base/player_purchases.csv' csv header delimiter ',';
+copy player_purchases from '/Users/guillemalba/Downloads/DB2021-2022-datasets/player_purchases.csv' csv header delimiter ',';
 
 
 ---------------GUILLEM----------------------------------------------GUILLEM-------------
@@ -166,7 +166,7 @@ Create table players_quests
 
 );
 
-copy players_quests from '/Users/Shared/Bases/Base/players_quests.csv' csv  header delimiter ',';
+copy players_quests from '/Users/guillemalba/Downloads/DB2021-2022-datasets/players_quests.csv' csv  header delimiter ',';
 
 Drop table if exists players cascade;
 Create table players
@@ -179,7 +179,7 @@ Create table players
     cardexpiry Date
 
 );
-copy players from '/Users/Shared/Bases/Base/players.csv' csv  header delimiter ',';
+copy players from '/Users/guillemalba/Downloads/DB2021-2022-datasets/players.csv' csv  header delimiter ',';
 
 Drop table if exists playersachievements cascade;
 Create table playersachievements
@@ -191,7 +191,7 @@ Create table playersachievements
     date        Date,
     gems        int
 );
-copy playersachievements from '/Users/Shared/Bases/Base/playersachievements.csv' csv  header delimiter ',';
+copy playersachievements from '/Users/guillemalba/Downloads/DB2021-2022-datasets/playersachievements.csv' csv  header delimiter ',';
 
 Drop table if exists playersbadge cascade;
 Create table playersbadge
@@ -202,7 +202,7 @@ Create table playersbadge
     date   Date,
     img    varchar(255)
 );
-copy playersbadge from '/Users/Shared/Bases/Base/playersbadge.csv' csv  header delimiter ',';
+copy playersbadge from '/Users/guillemalba/Downloads/DB2021-2022-datasets/playersbadge.csv' csv  header delimiter ',';
 
 Drop table if exists playerscards cascade;
 Create table playerscards
@@ -214,7 +214,7 @@ Create table playerscards
     amount int,
     date   Date
 );
-copy playerscards from '/Users/Shared/Bases/Base/playerscards.csv' csv  header delimiter ',';
+copy playerscards from '/Users/guillemalba/Downloads/DB2021-2022-datasets/playerscards.csv' csv  header delimiter ',';
 
 Drop table if exists playersClans cascade;
 Create table playersClans
@@ -225,7 +225,7 @@ Create table playersClans
     date   Date
 );
 
-copy playersClans from '/Users/Shared/Bases/Base/playersClans.csv' csv  header delimiter ',';
+copy playersClans from '/Users/guillemalba/Downloads/DB2021-2022-datasets/playersClans.csv' csv  header delimiter ',';
 
 -----DIDAC----------------------------------------------------DIDAC----------------------
 
@@ -237,7 +237,7 @@ CREATE TABLE playersClansdonations
     gold   INTEGER,
     date   DATE
 );
-COPY playersClansdonations FROM '/Users/Shared/Bases/Base/playersClansdonations.csv' CSV HEADER DELIMITER ',';
+COPY playersClansdonations FROM '/Users/guillemalba/Downloads/DB2021-2022-datasets/playersClansdonations.csv' CSV HEADER DELIMITER ',';
 
 DROP TABLE IF EXISTS playersdeck CASCADE;
 CREATE TABLE playersdeck
@@ -250,7 +250,7 @@ CREATE TABLE playersdeck
     card        INTEGER,
     level       INTEGER
 );
-COPY playersdeck FROM '/Users/Shared/Bases/Base/playersdeck.csv' CSV HEADER DELIMITER ',';
+COPY playersdeck FROM '/Users/guillemalba/Downloads/DB2021-2022-datasets/playersdeck.csv' CSV HEADER DELIMITER ',';
 
 DROP TABLE IF EXISTS quests_arenas CASCADE;
 CREATE TABLE quests_arenas
@@ -260,7 +260,7 @@ CREATE TABLE quests_arenas
     gold       INTEGER,
     experience INTEGER
 );
-COPY quests_arenas FROM '/Users/Shared/Bases/Base/quests_arenas.csv' CSV HEADER DELIMITER ',';
+COPY quests_arenas FROM '/Users/guillemalba/Downloads/DB2021-2022-datasets/quests_arenas.csv' CSV HEADER DELIMITER ',';
 
 DROP TABLE IF EXISTS seasons CASCADE;
 CREATE TABLE seasons
@@ -269,7 +269,7 @@ CREATE TABLE seasons
     startDate DATE,
     endDate  DATE
 );
-COPY seasons FROM '/Users/Shared/Bases/Base/seasons.csv' CSV HEADER DELIMITER ',';
+COPY seasons FROM '/Users/guillemalba/Downloads/DB2021-2022-datasets/seasons.csv' CSV HEADER DELIMITER ',';
 
 DROP TABLE IF EXISTS shared_decks CASCADE;
 CREATE TABLE shared_decks
@@ -277,7 +277,7 @@ CREATE TABLE shared_decks
     deck   INTEGER,
     player VARCHAR(50)
 );
-COPY shared_decks FROM '/Users/Shared/Bases/Base/shared_decks.csv' CSV HEADER DELIMITER ',';
+COPY shared_decks FROM '/Users/guillemalba/Downloads/DB2021-2022-datasets/shared_decks.csv' CSV HEADER DELIMITER ',';
 
 DROP TABLE IF EXISTS technologies CASCADE;
 CREATE TABLE technologies
@@ -294,7 +294,7 @@ CREATE TABLE technologies
     mod_lifetime     INTEGER,
     description      text
 );
-COPY technologies FROM '/Users/Shared/Bases/Base/technologies.csv' CSV HEADER DELIMITER ',';
+COPY technologies FROM '/Users/guillemalba/Downloads/DB2021-2022-datasets/technologies.csv' CSV HEADER DELIMITER ',';
 
 DROP TABLE IF EXISTS oro_gemas CASCADE;
 CREATE TABLE oro_gemas
@@ -303,7 +303,7 @@ CREATE TABLE oro_gemas
     gemas             INTEGER,
     player            VARCHAR(255)
 );
-COPY oro_gemas FROM '/Users/Shared/Bases/Base/oro_gemas.csv' CSV HEADER DELIMITER ',';
+COPY oro_gemas FROM '/Users/guillemalba/Downloads/DB2021-2022-datasets/oro_gemas.csv' CSV HEADER DELIMITER ',';
 
 
 DROP TABLE IF EXISTS clan_insignia CASCADE;
@@ -313,7 +313,7 @@ CREATE TABLE clan_insignia
     clan        VARCHAR(255),
     fecha       date
 );
-COPY clan_insignia FROM '/Users/Shared/Bases/Base/clan_insignia.csv' CSV HEADER DELIMITER ',';
+COPY clan_insignia FROM '/Users/guillemalba/Downloads/DB2021-2022-datasets/clan_insignia.csv' CSV HEADER DELIMITER ',';
 
 
 
@@ -726,7 +726,7 @@ select '#1ABCDEF8', concat(jugador, '2'), fecha, role from Formado
 where clan like '#28V2QQ9C' and role not like 'coLeader%';
 
 -- Afegim l'usuari Admin
-drop user admin;
+drop user if exists admin;
 create user admin superuser;
 alter user admin with password 'admin';
 alter user admin with createdb;
