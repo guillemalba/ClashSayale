@@ -48,6 +48,8 @@ update formado set role = null, fecha = '2021-08-07' where jugador like '#2PVCG9
 update formado set role = null, fecha = '2021-08-07' where jugador like '#8YL988LL8';
 update formado set role = null, fecha = '2021-08-07' where jugador like '#2GRQQU02'; -- membre d'un clan diferent
 update formado set fecha = '2021-08-06' where jugador like '#28GUPGY2';
+    -- Per comprovar eliminar el següent líder d'aquest clan (afectarà a la comprovació al següent tigger):
+    -- update formado set fecha = '2021-08-06' where jugador like '#229P2QYL0';
 
 -- Cas SENSE coLeader
 update formado
@@ -60,8 +62,10 @@ where jugador like '#28GUPGY22';
 -- Select general
 select * from removed_member;
 
--- Select comprovació
+-- Selects de comprovació
 select * from formado order by clan, role;
+select * from formado where clan like '#28V2QQ9C' order by clan, role;
+select * from formado where clan like '#1ABCDEF8' order by clan, role;
 
 /*
  3.2) Hipocresia de trofeus minims
@@ -72,22 +76,22 @@ BEGIN
     if (new.trofeos < (select c.minimo_trofeos from clan c join formado f on c.id = f.clan where f.jugador = new.id)) then
         insert into removed_player (clan, player, role)
         values ((select clan from formado where jugador = new.id), new.id, (select role from formado where jugador = new.id));
-        delete from formado
-        where jugador = new.id;
         if ((select role from removed_player where player = new.id) like 'leader%') then
-            if ((select count(role) from formado where jugador = new.id and role like 'coLeader%' group by clan) < 1
-                or (select count(role) from formado where jugador = new.id and role like 'coLeader%' group by clan) is null) then
+            if ((select count(role) from formado where clan = (select clan from removed_player where player = new.id) and role like 'coLeader%') < 1
+                or (select count(role) from formado where clan = (select clan from removed_player where player = new.id) and role like 'coLeader%') IS NULL) then
                 update formado
                 set role = 'leader: They have the same privileges as Co-leaders however the Leader is the only player in the Clan who can kick and demote everyone. Transferring leadership of a clan will demote the transferring player''s role to Co-Leader and their desired player will take the Leader role.'
                 where jugador like (select jugador from formado where clan = (select clan from removed_player where player = new.id)
-                                    group by clan, jugador limit 1);
+                                                                  and role not like 'leader%' group by clan, jugador limit 1);
             else
                 update formado
                 set role = 'leader: They have the same privileges as Co-leaders however the Leader is the only player in the Clan who can kick and demote everyone. Transferring leadership of a clan will demote the transferring player''s role to Co-Leader and their desired player will take the Leader role.'
                 where jugador like (select jugador from formado where clan = (select clan from removed_player where player = new.id)
-                                                                  and role like 'coLeader%' group by clan, jugador limit 1);
+                                                                  and role like 'coLeader%' and role not like 'leader%' group by clan, jugador limit 1);
             end if;
         end if;
+        delete from formado
+        where jugador = new.id;
     end if;
     return null;
 end;
@@ -105,18 +109,33 @@ where id = '#8PQ9QCPL';
 -- Update de prova eliminant el líder AMB coLeader
 update jugador
 set trofeos = 0
-where id = '#28GUPGY2';
+where id = '#229P2QYL0';
+    -- Comprovar eliminar el següents líders d'aquest clan fins quedar-se sense coLeaders
+    /*
+    update jugador
+    set trofeos = 0
+    where id = '#8P988JLV0';
+    -- Després d'aquest entrarà al condicional de clan sense coLeaders
+    update jugador
+    set trofeos = 0
+    where id = '#G82LPRJG';
+    update jugador
+    set trofeos = 0
+    where id = '#2GJ0R2RL9';
+    */
 
 -- Update de prova eliminant el líder SENSE coLeader
 update jugador
 set trofeos = 0
-where id = '#28GUPGY22';
+where id = '#2GJ0R2RL92';
 
 -- Select general
 select * from removed_player;
 
--- Select de comprovacion
+-- Selects de comprovacion
 select * from formado order by clan, role;
+select * from formado where clan like '#28V2QQ9C' order by clan, role;
+select * from formado where clan like '#1ABCDEF8' order by clan, role;
 
 /*
  * 3.3) Mals perdedors
