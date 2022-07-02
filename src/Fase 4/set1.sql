@@ -1,7 +1,56 @@
 /*
  * 1.1) Proporcions de rareses
  */
+--Para obtener inicialmente las cartas que queremos tenemos que añadir cartas de cada rareza
+-- ANTES DE CREAR EL TRIGGER.
+--Epic + 2 cartas
+update carta
+set rareza = 'Epic'
+where nombre in (select nombre from carta where rareza is null limit 2);
 
+--Common +9
+update carta
+set rareza = 'Common'
+where rareza is null;
+
+--Rare +6
+insert into carta(nombre, daño, velocidad_ataque, rareza)
+values ('Carta1', 100, 100, 'Rare');
+
+insert into carta(nombre, daño, velocidad_ataque, rareza)
+values ('Carta2', 100, 100, 'Rare');
+
+insert into carta(nombre, daño, velocidad_ataque, rareza)
+values ('Carta3', 100, 100, 'Rare');
+
+insert into carta(nombre, daño, velocidad_ataque, rareza)
+values ('Carta4', 100, 100, 'Rare');
+
+insert into carta(nombre, daño, velocidad_ataque, rareza)
+values ('Carta5', 100, 100, 'Rare');
+
+insert into carta(nombre, daño, velocidad_ataque, rareza)
+values ('Carta6', 100, 100, 'Rare');
+
+--Legendary +4
+insert into carta(nombre, daño, velocidad_ataque, rareza)
+values ('CartaLeng1', 100, 100, 'Legendary');
+
+insert into carta(nombre, daño, velocidad_ataque, rareza)
+values ('CartaLeng2', 100, 100, 'Legendary');
+
+insert into carta(nombre, daño, velocidad_ataque, rareza)
+values ('CartaLeng3', 100, 100, 'Legendary');
+
+insert into carta(nombre, daño, velocidad_ataque, rareza)
+values ('CartaLeng4', 100, 100, 'Legendary');
+
+--Champion +1
+insert into carta(nombre, daño, velocidad_ataque, rareza)
+values ('CartaChamp1', 100, 100, 'Champion');
+
+
+--Trigger
 drop trigger if exists rarity_proportions_warning on carta;
 
 drop function if exists proportions_rarity;
@@ -54,56 +103,6 @@ $$ language plpgsql;
 create trigger rarity_proportions_warning after insert on carta
     for each row
 execute function proportions_rarity();
-
-
-
---Para obtener inicialmente las cartas que queremos tenemos que añadir cartas de cada rareza.
---Epic + 2 cartas
-update carta
-set rareza = 'Epic'
-where nombre in (select nombre from carta where rareza is null limit 2);
-
---Common +9
-update carta
-set rareza = 'Common'
-where rareza is null;
-
---Rare +6
-insert into carta(nombre, daño, velocidad_ataque, rareza)
-values ('Carta1', 100, 100, 'Rare');
-
-insert into carta(nombre, daño, velocidad_ataque, rareza)
-values ('Carta2', 100, 100, 'Rare');
-
-insert into carta(nombre, daño, velocidad_ataque, rareza)
-values ('Carta3', 100, 100, 'Rare');
-
-insert into carta(nombre, daño, velocidad_ataque, rareza)
-values ('Carta4', 100, 100, 'Rare');
-
-insert into carta(nombre, daño, velocidad_ataque, rareza)
-values ('Carta5', 100, 100, 'Rare');
-
-insert into carta(nombre, daño, velocidad_ataque, rareza)
-values ('Carta6', 100, 100, 'Rare');
-
---Legendary +4
-insert into carta(nombre, daño, velocidad_ataque, rareza)
-values ('CartaLeng1', 100, 100, 'Legendary');
-
-insert into carta(nombre, daño, velocidad_ataque, rareza)
-values ('CartaLeng2', 100, 100, 'Legendary');
-
-insert into carta(nombre, daño, velocidad_ataque, rareza)
-values ('CartaLeng3', 100, 100, 'Legendary');
-
-insert into carta(nombre, daño, velocidad_ataque, rareza)
-values ('CartaLeng4', 100, 100, 'Legendary');
-
---Champion +1
-insert into carta(nombre, daño, velocidad_ataque, rareza)
-values ('CartaChamp1', 100, 100, 'Champion');
-
 
 /* RUEBAS */
 --Porcentajes de cada rareza
