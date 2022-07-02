@@ -9,7 +9,13 @@ where j.experiencia > 200000 and c.minimo_trofeos = (select max(minimo_trofeos) 
 group by c.nombre, c.descripcion, c.minimo_trofeos
 order by c.minimo_trofeos desc;
 
--- Query de validació: aquells clans que cumpleixin el contrari al requisit
+--1a Query de validació
+select c.nombre, count(f.jugador)
+from clan c join formado f on c.id = f.clan join jugador j on f.jugador = j.id
+where j.experiencia > 200000
+group by c.nombre;
+
+-- 2a query de validacio
 select c.nombre as clan, c.descripcion, count(f.jugador) as num_judaors_XP200000
 from clan c join formado f on c.id = f.clan join jugador j on j.id = f.jugador
 where j.experiencia < 200000 and c.minimo_trofeos < (select max(minimo_trofeos) from clan)
@@ -67,6 +73,12 @@ from clan as c left join clan_modificador cm on c.id = cm.clan
                join modificador m on cm.modificador = m.nombre join estructura e on m.nombre = e.nombre
 where cm.fecha >= '01-01-2020' and cm.fecha <= '31-12-2020' and c.minimo_trofeos > 1200
 group by c.nombre having count(e.nombre) > 2;
+
+-- Query de validacio
+select c.nombre as nombre2, count(e.nombre) as nombre_estructuras, sum(m.coste_oro) as coste_total_oro
+from clan as c left join clan_modificador cm on c.id = cm.clan
+               join modificador m on cm.modificador = m.nombre join estructura e on m.nombre = e.nombre
+group by c.nombre;
 
 
 /* 3.5
@@ -152,12 +164,14 @@ values ('#newTech', 320, '5.7 validation', 2,4, null, 2, 1, null);
 insert into tecnologias(nombre, nivel_max, dep_level)
 VALUES ('#newTech', 4, 5);
 
-insert into clan_modificador(clan, modificador, nivel, fecha)
-values ('#1ABCDEF8', 'Monument', 6, '02-01-2021');
+insert into clan(id, nombre, descripcion, trofeos_totales, minimo_trofeos, puntuacion)
+values ('#036ABCD', 'New Tech Clan', 'Goal: 3.7 validation (Chuck Norris)', 2780, 2700, 89000);
 
 insert into clan_modificador(clan, modificador, nivel, fecha)
-values ('#1ABCDEF8', '#newTech', 7, '02-01-2021');
-select * from clan_modificador where modificador like 'Monument';
+values ('#036ABCD', 'Monument', 6, '02-01-2021');
+
+insert into clan_modificador(clan, modificador, nivel, fecha)
+values ('#036ABCD', '#newTech', 7, '02-01-2021');
 
 /* 3.8
  * Enumera els clans amb un mínim de trofeus superior a 6900 i que hagin participat a totes les batalles de clans.
