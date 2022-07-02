@@ -36,14 +36,12 @@ $$ language plpgsql;
 drop trigger if exists update_player_items on compra;
 create trigger update_player_items after insert on compra
     for each row
-execute procedure actualiza_compra();
+execute function actualiza_compra();
 
 --Validació
 
 --Treiem el or i les gemes del jugador abans
 select * from jugador where id = '#202C2CU0U';
-
-
 
 --Fem insert d'un jugador que compra un paqquet d'oferta(es sumen 65701 d'or y 10 gemes)
 insert  into compra(jugador, tarjeta, articulo, fecha, descuento)
@@ -84,8 +82,6 @@ insert  into compra(jugador, tarjeta, articulo, fecha, descuento)
 values ('#202C2CU0U',626381901632479,48,'2022-06-13',12.64);
 --Comprovamos el cambio
 select * from jugador where id = '#202C2CU0U';
-
-
 
 
 /*
@@ -137,7 +133,7 @@ $$ language plpgsql;
 drop trigger if exists Banned_Words on escribe;
 create trigger Banned_Words after insert on escribe
     for each row
-execute procedure actualiza_missatges_jugador();
+execute function actualiza_missatges_jugador();
 
 --Validació
 
@@ -208,7 +204,7 @@ $$ language plpgsql;
 drop trigger if exists Banned_Words2 on mensaje_clan;
 create trigger Banned_Words2 after insert on mensaje_clan
     for each row
-execute procedure actualiza_missatges_clan();
+execute function actualiza_missatges_clan();
 
 
 --Validació

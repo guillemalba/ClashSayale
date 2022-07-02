@@ -59,7 +59,7 @@ $$ language plpgsql;
 drop trigger if exists update_misio on realiza;
 create trigger update_misio after insert on realiza
     for each row
-execute procedure finalitza_misio();
+execute function finalitza_misio();
 
 
 --Arenea 17

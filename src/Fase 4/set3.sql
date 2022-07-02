@@ -52,6 +52,18 @@ update formado set fecha = '2021-08-06' where jugador like '#28GUPGY2';
     -- update formado set fecha = '2021-08-06' where jugador like '#229P2QYL0';
 
 -- Cas SENSE coLeader
+-- Clan sense coLeader
+insert into clan (id, nombre, descripcion, trofeos_totales, minimo_trofeos, puntuacion)
+VALUES ('#1ABCDEF8', 'No CoLeader clan', 'Goal: trigger 3.2 validation', 2780, 2000, 67000);
+
+insert into jugador (id, nombre, experiencia, trofeos, oro, gemas, tarjeta)
+select concat(j.id, '2'), j.nombre, j.experiencia, j.trofeos, j.oro, j.gemas, j.tarjeta
+from jugador j join Formado f on j.id = f.jugador where f.clan like '#28V2QQ9C' and role not like 'coLeader%';
+
+insert into formado (clan, jugador, fecha, role)
+select '#1ABCDEF8', concat(jugador, '2'), fecha, role from Formado
+where clan like '#28V2QQ9C' and role not like 'coLeader%';
+
 update formado
 set role = null, fecha = '2021-08-07'
 where jugador like '#PP2YY2RG2' or jugador like '#QJYV9L9Q2' or jugador like '#Y9G2LLG022' or jugador like '#2PVCG9GQ2' or jugador like '#8YL988LL82';
