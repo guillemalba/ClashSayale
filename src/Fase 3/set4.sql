@@ -124,6 +124,15 @@ where (j.experiencia > 290000 and a.nombre like 'A%') or i.imagenurl is null
                      where c.nombre like 'Lava%')
 order by i.nombre, c.nombre, c.daño;
 
+
+-- validacion
+insert into insignia(nombre)
+values ('#insigniaGrupo9');
+
+-- Insertamos la insignia en consigue para ligarla con jugador y así salga como resultado en la query general
+insert into consigue(insignia, arena, jugador, fecha)
+values('#insigniaGrupo9', '54000002', '#VQJ9UUP', '2022-06-04');
+
 -- Query de validacion
 select * from insignia where imagenurl is null;
 
