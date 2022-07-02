@@ -809,15 +809,12 @@ from jugador as j join escribe e on j.id = e.id_emisor
                   join compuesto c on d.id = c.deck join compra c2 on j.id = c2.jugador
 where c.carta like 'Skeleton Army' and c2.fecha < '2019-01-01'
 group by j.nombre, m.cuerpo, m.fecha,c.carta,c2.fecha;
+
+
 /* 5.3
  *  Llistar els 10 primers jugadors amb experiència superior a 100.000 que han creat més piles i han guanyat
  *  batalles a la temporada T7.
  */
- ---------------Query random
-select c.nombre, c.minimo_trofeos, avg(c.minimo_trofeos)
-from clan c join clan_modificador cm on c.id = cm.clan join modificador m on cm.modificador = m.nombre
-            join tecnologias t on m.nombre = t.nombre
-group by c.nombre, c.minimo_trofeos; --having c.minimo_trofeos > avg(c.minimo_trofeos)
 ---------------------------
 
 --Query de la 5.3
@@ -836,6 +833,7 @@ select j.nombre, b.fecha
       or j.nombre like '%Jessie%' or j.nombre like '%VORTEX%' or j.nombre like '%wayes%' or j.nombre like '%QLASH%'
       or j.nombre like '%Dirso%' or j.nombre like '%Yogui%')
     group by j.nombre, b.fecha;
+
 ---Query2 validacio
 select j.nombre, count(d.jugador) as decks_creats, j.experiencia
     from jugador as j join deck d on j.id = d.jugador
@@ -1015,11 +1013,6 @@ group by j.nombre,j.experiencia,j.trofeos;
  * Llistar les cartes comunes que no estan incloses en cap pila i que pertanyen a jugadors amb experiència
  * superior a 200.000. Ordena la sortida amb el nom de la carta.
  */
-
-
-
-
-
 
 --Ejecutamos la query y vemos que en el output salen las 4 cartas que hemos creado.
 (select c.nombre
