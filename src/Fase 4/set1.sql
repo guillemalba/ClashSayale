@@ -174,6 +174,11 @@ execute function actualization_gift();
 
 
 --Consultas e insert de prueba
+
+delete from carta where nombre = 'Gus';
+insert into carta (nombre, daño, velocidad_ataque, rareza, arena)
+values ('Gus', 103, 200, 'Common', 54000028);
+
 insert into encuentra (jugador, carta, fecha_mejora, nivel_actual)
 values('#VQJ9UUP','Gus',current_date,1);
 
@@ -251,6 +256,11 @@ execute function OPCard_function();
  *
  ******************************************************************************************/
 
+-- Si no existe ya tenemos que crear una carta llamada Gus
+delete from carta where nombre = 'Gus';
+insert into carta (nombre, daño, velocidad_ataque, rareza, arena)
+values ('Gus', 103, 200, 'Common', 54000028);
+
 -- Creamos un nuevo deck con la carta Gus para que tengan un porcentaje mayor que
 -- 90 de victorias. También veremos las características iniciales de la carta.
 insert into deck (id) values (100);
@@ -280,6 +290,6 @@ select * from carta where nombre = 'Gus';
 delete from batalla where id = 9999;
 delete from batalla where id = 10000;
 delete from batalla where id = 10001;
-update carta set daño = 103, velocidad_ataque = 200 where nombre = 'Gus';
 delete from compuesto where carta = 'Gus' and deck = 100;
+delete from carta where nombre = 'Gus';
 delete from deck where id = 100;
