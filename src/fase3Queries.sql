@@ -689,6 +689,7 @@ where (j.experiencia > 290000 and a.nombre like 'A%') or i.imagenurl is null
                      where c.nombre like 'Lava%')
 order by i.nombre, c.nombre, c.daño;
 
+
 -- Query de validacion
 select * from insignia where imagenurl is null;
 
