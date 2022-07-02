@@ -51,6 +51,22 @@ where b.fecha >= t.fecha_inicio
                                    where jj.experiencia > 200000))
 order by t.fecha_inicio asc;
 
+-- Validacion
+-- devolvemos el numero de victorias y de derrotas de todos los jugadores y que tengan mas victorias que derrotas
+select w.jugador, w.num_wins, l.num_loses, w.num_wins - l.num_loses as difference
+from (select d.jugador, COUNT(d.id) as num_wins
+      from deck d
+               join batalla b on d.id = b.deck_win
+      group by d.jugador) as w
+         join (select d.jugador, COUNT(d.id) as num_loses
+               from deck d
+                        join batalla b on d.id = b.deck_lose
+               group by d.jugador) as l on w.jugador = l.jugador
+where w.num_wins - l.num_loses > 0
+  and w.jugador in (select j.id
+                    from jugador j
+                    where j.experiencia > 200000);
+
 /* 4.3
  * Llistar la puntuació total dels jugadors guanyadors de batalles de cada temporada. Filtrar la sortida per considerar
  * només les temporades que han començat i acabat el 2019.
@@ -75,6 +91,19 @@ where b.fecha >= t.fecha_inicio
                      group by d.jugador) as w)
 group by t.nombre, j.nombre, d.jugador
 order by t.nombre asc, suma_puntos desc;
+
+/* Validaciones */
+/* Devolvemos una lista con los trofeos que han conseguido en la temporada 2019 */
+select j.nombre,
+       SUM(b.puntos_win) as total_points
+from jugador j,
+     batalla b,
+     deck d
+where b.deck_win = d.id
+  and j.id = d.jugador
+  and EXTRACT(YEAR FROM b.fecha) = 2019
+group by j.nombre
+order by total_points desc;
 
 /* 4.4
  * Enumerar els noms de les arenes en què els jugadors veterans (experiència superior a 170.000) van obtenir insígnies
@@ -174,6 +203,7 @@ where a.nombre like '%Lliga%'
 group by a.nombre
 order by a.nombre;
 
+/* Validacion */
 /* He cambiado la palabra "Lliga" por "Legendary" para que salga algun resultado ya que ninguna arena lleva la palabra LLiga */
 select a.nombre as nombre_arena
 from consigue as c
