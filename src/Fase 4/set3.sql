@@ -69,7 +69,7 @@ set role = null, fecha = '2021-08-07'
 where jugador like '#PP2YY2RG2' or jugador like '#QJYV9L9Q2' or jugador like '#Y9G2LLG022' or jugador like '#2PVCG9GQ2' or jugador like '#8YL988LL82';
 update formado
 set fecha = '2021-08-06'
-where jugador like '#28GUPGY22';
+where jugador like '#229P2QYL02';
 
 -- Select general
 select * from removed_member;
