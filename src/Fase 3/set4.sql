@@ -84,16 +84,12 @@ where b.fecha >= t.fecha_inicio
   and b.fecha <= t.fecha_final
   and EXTRACT(YEAR FROM t.fecha_inicio) = 2019
   and EXTRACT(YEAR FROM t.fecha_final) = 2019
-  and j.id in (select w.jugador
-               from (select d.jugador
-                     from deck d
-                              join batalla b on d.id = b.deck_win
-                     group by d.jugador) as w)
+  and b.deck_win = d.id
 group by t.nombre, j.nombre, d.jugador
 order by t.nombre asc, suma_puntos desc;
 
 /* Validaciones */
-/* Devolvemos una lista con los trofeos que han conseguido en la temporada 2019 */
+/* Devolvemos una lista con los trofeos que han conseguido en batallas realizadas en 2019 */
 select j.nombre,
        SUM(b.puntos_win) as total_points
 from jugador j,
