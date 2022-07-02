@@ -52,7 +52,7 @@ update formado set fecha = '2021-08-06' where jugador like '#28GUPGY2';
     -- update formado set fecha = '2021-08-06' where jugador like '#229P2QYL0';
 
 -- Cas SENSE coLeader
--- Clan sense coLeader
+-- Creem un clan sense coLeader ja que tots els altres en tenen
 insert into clan (id, nombre, descripcion, trofeos_totales, minimo_trofeos, puntuacion)
 VALUES ('#1ABCDEF8', 'No CoLeader clan', 'Goal: trigger 3.2 validation', 2780, 2000, 67000);
 
@@ -69,8 +69,8 @@ set role = null, fecha = '2021-08-07'
 where jugador like '#PP2YY2RG2' or jugador like '#QJYV9L9Q2' or jugador like '#Y9G2LLG022' or jugador like '#2PVCG9GQ2' or jugador like '#8YL988LL82';
 update formado
 set fecha = '2021-08-06'
-where jugador like '#229P2QYL02';
-
+where jugador like (select jugador from formado where clan like '#1ABCDEF8' and role like 'leader%');
+                    -- Fem un subselect perque pot variar el lider segons l'ordre d'execució del script.
 -- Select general
 select * from removed_member;
 
